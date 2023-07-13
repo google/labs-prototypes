@@ -53,7 +53,8 @@
     "@clack/prompts": "^0.6.3",
     "@google-labs/breadboard": "*",
     "dotenv": "^16.3.1"
-  }, "engines": {
+  },
+  "engines": {
     "node": ">=19.0.0"
   }
 }

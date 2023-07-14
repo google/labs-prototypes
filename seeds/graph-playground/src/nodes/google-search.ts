@@ -10,17 +10,15 @@ import { config } from "dotenv";
 
 config();
 
-const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID;
-if (!GOOGLE_CSE_ID)
-  throw new Error("GOOGLE_CSE_ID is required to use Google search");
+function init() {
+  const GOOGLE_CSE_ID = process.env.GOOGLE_CSE_ID;
+  if (!GOOGLE_CSE_ID)
+    throw new Error("GOOGLE_CSE_ID is required to use Google search");
 
-const API_KEY = process.env.API_KEY;
-if (!API_KEY) throw new Error("API_KEY is required to use Google search");
-
-const makeSearchUrl = (query: string) => {
-  const encodedQuery = encodeURIComponent(query);
-  return `https://customsearch.googleapis.com/customsearch/v1?cx=${GOOGLE_CSE_ID}&q=${encodedQuery}&key=${API_KEY}`;
-};
+  const API_KEY = process.env.API_KEY;
+  if (!API_KEY) throw new Error("API_KEY is required to use Google search");
+  return [GOOGLE_CSE_ID, API_KEY];
+}
 
 type GoogleSearchInputs = {
   query: string;
@@ -39,6 +37,13 @@ const justSnippets = (response: GoogleSearchResponse) => {
 };
 
 export default async (_cx: GraphTraversalContext, inputs: InputValues) => {
+  const makeSearchUrl = (query: string) => {
+    const encodedQuery = encodeURIComponent(query);
+    return `https://customsearch.googleapis.com/customsearch/v1?cx=${GOOGLE_CSE_ID}&q=${encodedQuery}&key=${API_KEY}`;
+  };
+
+  // TODO: Call this during a different time for this node, such as a new entry point for initialization.
+  const [GOOGLE_CSE_ID, API_KEY] = init();
   const values = inputs as GoogleSearchInputs;
   const query = values.query;
   if (!query) throw new Error("Google search requires `query` input");

@@ -7,6 +7,8 @@
 /**
  * Truly core nodes that are necessary for building and composing graphs.
  */
+
+import staticText from "./nodes/static-text.js";
 import input from "./nodes/input.js";
 import output from "./nodes/output.js";
 import passthrough from "./nodes/passthrough.js";
@@ -36,6 +38,7 @@ export const coreHandlers = {
   slot,
   "slot-input": slotInput,
   "slot-output": slotOutput,
+  "static-text": staticText,
   "prompt-template": promptTemplate,
   "text-completion": textCompletion,
   "local-memory": localMemory,

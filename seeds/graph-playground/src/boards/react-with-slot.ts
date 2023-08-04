@@ -28,7 +28,8 @@ const kit = board.addKit(Starter);
 const secrets = kit.secrets(["PALM_KEY", "GOOGLE_CSE_ID"]);
 
 // This is the context that ReAct algo accumulates.
-const context = kit.localMemory();
+const context = kit.append({ accumulator: "\n" });
+context.wire("accumulator->", context);
 
 const reflectionSlot = board.slot("tools", {
   $id: "get-slot",
@@ -60,11 +61,11 @@ const reActTemplate = kit
       "Observation: the result of the action\n... " +
       "(this Thought/Action/Action Input/Observation can repeat N times)\n" +
       "Thought: I now know the final answer\nFinal Answer: the final answer to " +
-      "the original input question\n\nBegin!\n\n{{memory}}\nThought:"
+      "the original input question\n\nBegin!\n{{memory}}\nThought:"
   )
   .wire("descriptions<-result.", descriptions)
   .wire("tools<-result.", tools)
-  .wire("memory<-context", context);
+  .wire("memory<-accumulator", context);
 
 // The completion must include stop sentences, to prevent LLM form hallucinating
 // all answers.
@@ -75,39 +76,32 @@ const reActCompletion = kit
   })
   .wire("<-PALM_KEY.", secrets);
 
-board.input("Ask ReAct a question").wire(
-  "text->Question",
-  kit.localMemory({ $id: "remember-question" }).wire(
-    "context->memory",
-    reActTemplate.wire(
-      "prompt->text",
-      reActCompletion
-        .wire(
-          "completion->json",
-          kit
-            .jsonata(
-              "($f := function($line, $str) { $contains($line, $str) ? $substring($line, $length($str)) }; $merge(($split('\n')[[1..2]]) @ $line.$.{'action': $f($line, 'Action: '), 'input': $f($line, 'Action Input: '),'answer': $f($line, 'Final Answer: ') }).{ action: input,'answer': answer})",
-              {
-                raw: true,
-              }
-            )
-            // Instead of wiring tools directly, we create a slot for them.
-            .wire(
-              "*->",
-              board
-                .slot("tools", {
-                  $id: "tools-slot",
-                })
-                .wire("text->Observation", context)
-            )
-            .wire("answer->text", board.output())
+board.input("Ask ReAct a question").wire("text->Question?", context);
+
+reActTemplate.wire(
+  "prompt->text",
+  reActCompletion
+    .wire(
+      "completion->json",
+      kit
+        .jsonata(
+          "($f := function($line, $str) { $contains($line, $str) ? $substring($line, $length($str)) }; $merge(($split('\n')[[1..2]]) @ $line.$.{'action': $f($line, 'Action: '), 'input': $f($line, 'Action Input: '),'answer': $f($line, 'Final Answer: ') }).{ action: input,'answer': answer})",
+          {
+            raw: true,
+          }
         )
+        // Instead of wiring tools directly, we create a slot for them.
         .wire(
-          "completion->Thought",
-          kit.localMemory({ $id: "remember-thought" })
+          "*->",
+          board
+            .slot("tools", {
+              $id: "tools-slot",
+            })
+            .wire("text->Observation?", context)
         )
+        .wire("answer->text", board.output())
     )
-  )
+    .wire("completion->Thought?", context)
 );
 
 export default board;

@@ -13,12 +13,13 @@ import type { InputValues, OutputValues } from "@google-labs/graph-runner";
 
 type SecretInputs = {
   keys: string[];
+  callback: (key: string) => [string, string | undefined];
 };
 
 export default async (inputs: InputValues) => {
-  const { keys = [] } = inputs as SecretInputs;
+  const { keys = [], callback = (key) => [key, undefined] } = inputs as SecretInputs;
   return keys
-    .map((key) => [key, process.env[key]])
+    .map((key) => callback(key))
     .reduce((acc, [key, value]) => {
       if (value) acc[key as string] = value;
       return acc;

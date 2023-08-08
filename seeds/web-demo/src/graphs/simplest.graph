@@ -1,0 +1,50 @@
+{
+  "edges": [
+    {
+      "from": "secrets-2",
+      "to": "text-completion-1",
+      "out": "API_KEY",
+      "in": "API_KEY"
+    },
+    {
+      "from": "text-completion-1",
+      "to": "output-4",
+      "out": "completion",
+      "in": "text"
+    },
+    {
+      "from": "input-3",
+      "to": "text-completion-1",
+      "out": "text",
+      "in": "text"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "text-completion-1",
+      "type": "text-completion"
+    },
+    {
+      "id": "secrets-2",
+      "type": "secrets",
+      "configuration": {
+        "keys": [
+          "API_KEY"
+        ]
+      }
+    },
+    {
+      "id": "input-3",
+      "type": "input"
+    },
+    {
+      "id": "output-4",
+      "type": "output"
+    }
+  ],
+  "kits": [
+    {
+      "url": "npm:https://esm.sh/@google-labs/llm-starter"
+    }
+  ]
+}

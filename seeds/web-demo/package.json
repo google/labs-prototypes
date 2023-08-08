@@ -1,15 +1,17 @@
 {
-  "name": "@google-labs/breadboard",
-  "version": "0.0.2",
-  "description": "A library for rapid generative AI application prototyping",
+  "name": "@google-labs/web-demo",
+  "private": true,
+  "version": "0.0.1",
+  "description": "A web demo for a Google Labs prototype",
   "main": "./dist/src/index.js",
   "exports": "./dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
     "test": "FORCE_COLOR=1 ava",
-    "build": "FORCE_COLOR=1 tsc --b",
-    "watch": "FORCE_COLOR=1 tsc --b --watch"
+    "build": "FORCE_COLOR=1 vite build",
+    "watch": "FORCE_COLOR=1 tsc --b --watch && vite build",
+    "preview": "vite"
   },
   "repository": {
     "type": "git",
@@ -36,20 +38,25 @@
   "bugs": {
     "url": "https://github.com/google/labs-prototypes/issues"
   },
-  "homepage": "https://github.com/google/labs-prototypes/seeds/breadboard#readme",
+  "homepage": "https://github.com/google/labs-prototypes#readme",
   "devDependencies": {
     "@ava/typescript": "^4.0.0",
     "@google-labs/tsconfig": "*",
-    "@types/node": "^18.17.4",
+    "@preact/preset-vite": "^2.5.0",
+    "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
     "ava": "^5.2.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vite": "^4.4.5"
   },
   "dependencies": {
-    "@google-labs/graph-runner": "^0.0.1"
-  },
-  "engines": {
-    "node": ">=19.0.0"
+    "@google-labs/breadboard": "*",
+    "@google-labs/graph-runner": "*",
+    "@google-labs/llm-starter": "*",
+    "@preact/signals": "^1.2.0",
+    "mermaid": "^10.2.4",
+    "preact": "^10.16.0",
+    "preact-router": "^4.1.2"
   }
 }

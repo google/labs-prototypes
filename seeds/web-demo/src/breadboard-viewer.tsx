@@ -3,15 +3,47 @@ import { useRef } from 'preact/hooks';
 import graph from './graphs/simplest.graph';
 
 import { Board } from "@google-labs/breadboard";
+import { OutputValues, InputValues } from "@google-labs/graph-runner";
+
 import mermaid from "mermaid";
+
+const ask = async (inputs: InputValues): Promise<OutputValues> => {
+  const defaultValue = "<Exit>";
+  const message = ((inputs && inputs.message) as string) || "Enter some text";
+  const input = prompt(message, defaultValue);
+  if (input === defaultValue) return { exit: true };
+  return { text: input };
+};
 
 export function BreadboardViewerApp() {
   const graphUrl = signal(graph);
   const error = signal("");
+  const board = signal<Board | undefined>(undefined);
 
-  const run = async (e) => {
+  const loadGraph = async (e) => {
     const { files } = e.target;
     graphUrl.value = URL.createObjectURL(files[0]);
+  };
+
+  const runGraph = async () => {
+    const url = graphUrl.value;
+    try {
+      const currentBoard = await Board.load(url);
+      board.value = currentBoard;
+
+      for await (const result of currentBoard.run()) {
+        if (result.seeksInputs) {
+          result.inputs = await ask(result.inputArguments);
+        }
+        else {
+          outputs.push(result.outputs);
+        }
+      }
+
+      console.log(outputs);
+    } catch (e) {
+      error.value = e.message;
+    }
   };
 
   useSignalEffect(async () => {
@@ -39,8 +71,12 @@ export function BreadboardViewerApp() {
         </pre>
       </div>
 
-      <input type="file" onChange={(e) => { run(e) }} value="Go" />
+      <input type="file" onChange={(e) => { loadGraph(e) }} value="Go" />
       <div>{error}</div>
+
+      <button class="primary" onClick={(e) => runGraph()}>Run</button>
+
+
     </>
   )
 }

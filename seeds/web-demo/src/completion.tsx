@@ -1,10 +1,6 @@
 import { signal } from '@preact/signals';
 import { useRef } from 'preact/hooks';
 
-import './app.css'
-
-import { Header } from './components/header.tsx';
-
 import { Board } from "@google-labs/breadboard";
 import { Starter } from "@google-labs/llm-starter";
 
@@ -14,7 +10,6 @@ const promptOutput = signal("");
 export function CompletionApp() {
   const run = async (apiKey: string, text: string) => {
     const board = new Board();
-
     const input = board.input();
     const output = board.output();
     const kit = board.addKit(Starter);
@@ -33,8 +28,6 @@ export function CompletionApp() {
       ask: text,
     });
 
-    console.log("result", result);
-
     promptOutput.value = result.receive;
   };
 
@@ -43,8 +36,27 @@ export function CompletionApp() {
 
   return (
     <>
-      <Header></Header>
       <h1>Completion demo</h1>
+      <p>This tool let's you run a completion on a prompt. Under the hood it uses the <code>Breadboard</code> imperative API.<br></br> <br></br><details><summary>Code</summary><pre><code>{`const board = new Board();
+const input = board.input();
+const output = board.output();
+const kit = board.addKit(Starter);
+const completion = kit.generateText();
+
+const secrets: { [x: string]: string } = { "PALM_KEY": apiKey }
+
+const extras = { callback: (key: string): [string, string | undefined] => [key, secrets[key]] }
+
+kit.secrets(["PALM_KEY"], extras).wire("PALM_KEY", completion);
+
+input.wire("ask->text", completion);
+completion.wire("completion->receive", output);
+
+const result = await board.runOnce({
+  ask: text,
+});
+
+promptOutput.value = result.receive;`}</code></pre></details></p>
 
       <div class="card">
         <label for="apikey" >API key</label>
@@ -61,7 +73,7 @@ export function CompletionApp() {
         <div id="output">{promptOutput}</div>
       </div>
 
-      <button onClick={() => { run(apikeyRef.current.value, promptRef.current.value) }}>Go</button>
+      <button class="primary" onClick={() => { run(apikeyRef.current.value, promptRef.current.value) }}>Go</button>
     </>
   )
 }

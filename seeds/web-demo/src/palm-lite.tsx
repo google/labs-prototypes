@@ -1,9 +1,6 @@
 import { signal } from '@preact/signals';
-import { useRef, useEffect } from 'preact/hooks';
-import { Header } from './components/header.tsx';
+import { useRef } from 'preact/hooks';
 
-
-import './app.css'
 import { palm, Chat, Text } from "@google-labs/palm-lite";
 
 const promptOutput = signal("");
@@ -49,14 +46,13 @@ const embedding = async (apiKey: string, text: string) => {
 
 export function PalmLiteApp() {
   const promptRef = useRef();
-  const apikeyRef = useRef();
+  const apiKeyRef = useRef();
   return (
     <>
-      <Header></Header>
       <h1>Palm lite</h1>
       <div class="card">
         <label for="apikey" >API key</label>
-        <input id="apikey" type="text" ref={apikeyRef} placeholder="API key" />
+        <input id="apikey" type="text" ref={apiKeyRef} placeholder="API key" />
       </div>
 
       <div class="card">
@@ -79,7 +75,7 @@ export function PalmLiteApp() {
         <div id="output" style="overflow-x: auto;">{embeddingOutput}</div>
       </div>
 
-      <button onClick={() => { call(apikeyRef.current.value, promptRef.current.value) }
+      <button class="primary" onClick={() => { call(apiKeyRef.current.value, promptRef.current.value) }
       }>Go.</button>
     </>
   )

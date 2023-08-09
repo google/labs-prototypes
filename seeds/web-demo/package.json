@@ -11,7 +11,8 @@
     "test": "FORCE_COLOR=1 ava",
     "build": "FORCE_COLOR=1 vite build",
     "watch": "FORCE_COLOR=1 tsc --b --watch && vite build",
-    "preview": "vite"
+    "dev": "vite",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",

@@ -17,7 +17,7 @@ type SecretInputs = {
 };
 
 export default async (inputs: InputValues) => {
-  const { keys = [], callback = (key) => [key, undefined] } = inputs as SecretInputs;
+  const { keys = [], callback = (key) => [key, process.env[key]] } = inputs as SecretInputs;
   return keys
     .map((key) => callback(key))
     .reduce((acc, [key, value]) => {

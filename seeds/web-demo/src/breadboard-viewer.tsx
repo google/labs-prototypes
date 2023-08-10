@@ -16,6 +16,10 @@ const ask = async (inputs: InputValues): Promise<OutputValues> => {
 };
 
 export function BreadboardViewerApp() {
+  const mermaidRef = useRef();
+  const resultsRef = useRef();
+  const runButtonRef = useRef();
+
   const graphUrl = signal(simpleGraph);
   const error = signal("");
   const board = signal<Board | undefined>(undefined);
@@ -58,13 +62,13 @@ export function BreadboardViewerApp() {
       const board = await Board.load(url);
       const { svg } = await mermaid.render('mermaid', board.mermaid());
       mermaidRef.current.innerHTML = svg;
+      runButtonRef.current.disabled = false;
     } catch (e) {
+      runButtonRef.current.disabled = true;
       error.value = e.message;
     }
   });
 
-  const mermaidRef = useRef();
-  const resultsRef = useRef();
   mermaid.initialize({ startOnLoad: false });
 
   return (
@@ -80,7 +84,7 @@ export function BreadboardViewerApp() {
 
       <input type="file" onChange={(e) => { loadGraph(e) }} value="Go" />
   
-      <button class="primary" onClick={(e) => runGraph()}>Run</button>
+      <button class="primary" onClick={(e) => runGraph()} ref={runButtonRef} disabled>Run</button>
 
       <div class="card output results">
         <label>Results</label>

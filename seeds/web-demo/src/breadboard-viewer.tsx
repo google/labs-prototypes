@@ -1,6 +1,6 @@
 import { signal, useSignalEffect } from '@preact/signals';
 import { useRef } from 'preact/hooks';
-import graph from './graphs/simplest.graph';
+import simpleGraph from './graphs/simplest.graph';
 
 import { Board } from "@google-labs/breadboard";
 import { OutputValues, InputValues } from "@google-labs/graph-runner";
@@ -16,7 +16,7 @@ const ask = async (inputs: InputValues): Promise<OutputValues> => {
 };
 
 export function BreadboardViewerApp() {
-  const graphUrl = signal(graph);
+  const graphUrl = signal(simpleGraph);
   const error = signal("");
   const board = signal<Board | undefined>(undefined);
 
@@ -28,6 +28,8 @@ export function BreadboardViewerApp() {
   const runGraph = async () => {
     const url = graphUrl.value;
     const outputs = [];
+    resultsRef.current.innerText = "";
+
     try {
       const currentBoard = await Board.load(url);
       board.value = currentBoard;

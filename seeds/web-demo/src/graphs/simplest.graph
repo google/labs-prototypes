@@ -15,10 +15,16 @@
       "in": "GOOGLE_CSE_ID"
     },
     {
-      "from": "jsonata-5",
+      "from": "generateText-1",
       "to": "output-6",
-      "out": "result",
+      "out": "completion",
       "in": "text"
+    },
+    {
+      "from": "jsonata-5",
+      "to": "promptTemplate-1",
+      "out": "result",
+      "in": "headlines"
     },
     {
       "from": "fetch-4",
@@ -37,6 +43,25 @@
       "to": "urlTemplate-3",
       "out": "text",
       "in": "query"
+    },
+    {
+      "from": "input-2",
+      "to": "promptTemplate-1",
+      "out": "text",
+      "in": "query"
+    },
+     {
+      "from": "secrets-1",
+      "to": "generateText-1",
+      "constant": true,
+      "out": "PALM_KEY",
+      "in": "PALM_KEY"
+    },
+    {
+      "from": "promptTemplate-1",
+      "to": "generateText-1",
+      "out": "prompt",
+      "in": "text"
     }
   ],
   "nodes": [
@@ -78,11 +103,22 @@
     {
       "id": "output-6",
       "type": "output"
+    },
+    {
+      "id": "promptTemplate-1",
+      "type": "promptTemplate",
+      "configuration": {
+        "template": "Use the news headlines below to write a few sentences to summarize the latest news on this topic:\n\n##Topic:\n{{query}}\n\n## Headlines {{headlines}}\n\\n## Summary:\n"
+      }
+    },
+    {
+      "id": "generateText-1",
+      "type": "generateText"
     }
   ],
   "kits": [
     {
-      "url": "npm:https://esm.sh/@google-labs/llm-starter"
+      "url": "npm:https://esm.sh/@paulkinlan/llm-starter"
     }
   ]
 }

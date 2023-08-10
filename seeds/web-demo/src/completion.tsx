@@ -15,11 +15,9 @@ export function CompletionApp() {
     const kit = board.addKit(Starter);
     const completion = kit.generateText();
 
-    const secrets: { [x: string]: string } = { "PALM_KEY": apiKey }
+    localStorage.setItem("PALM_KEY", apiKey);
 
-    const extras = { callback: (key: string): [string, string | undefined] => [key, secrets[key]] }
-
-    kit.secrets(["PALM_KEY"], extras).wire("PALM_KEY", completion);
+    kit.secrets(["PALM_KEY"]).wire("PALM_KEY", completion);
 
     input.wire("ask->text", completion);
     completion.wire("completion->receive", output);
@@ -43,11 +41,9 @@ const output = board.output();
 const kit = board.addKit(Starter);
 const completion = kit.generateText();
 
-const secrets: { [x: string]: string } = { "PALM_KEY": apiKey }
+localStorage.setItem("PALM_KEY", apiKey);
 
-const extras = { callback: (key: string): [string, string | undefined] => [key, secrets[key]] }
-
-kit.secrets(["PALM_KEY"], extras).wire("PALM_KEY", completion);
+kit.secrets(["PALM_KEY"]).wire("PALM_KEY", completion);
 
 input.wire("ask->text", completion);
 completion.wire("completion->receive", output);

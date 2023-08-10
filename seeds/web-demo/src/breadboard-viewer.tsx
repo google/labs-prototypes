@@ -27,6 +27,7 @@ export function BreadboardViewerApp() {
 
   const runGraph = async () => {
     const url = graphUrl.value;
+    const outputs = [];
     try {
       const currentBoard = await Board.load(url);
       board.value = currentBoard;
@@ -40,9 +41,12 @@ export function BreadboardViewerApp() {
         }
       }
 
-      console.log(outputs);
+      for(const output of outputs) {
+        resultsRef.current.innerText += `${output.text}\n`
+
+      }
     } catch (e) {
-      error.value = e.message;
+      resultsRef.current.innerText = e.message;
     }
   };
 
@@ -58,6 +62,7 @@ export function BreadboardViewerApp() {
   });
 
   const mermaidRef = useRef();
+  const resultsRef = useRef();
   mermaid.initialize({ startOnLoad: false });
 
   return (
@@ -72,11 +77,14 @@ export function BreadboardViewerApp() {
       </div>
 
       <input type="file" onChange={(e) => { loadGraph(e) }} value="Go" />
-      <div>{error}</div>
-
+  
       <button class="primary" onClick={(e) => runGraph()}>Run</button>
 
-
+      <div class="card output results">
+        <label>Results</label>
+        <pre ref={resultsRef}>
+        </pre>
+      </div>
     </>
   )
 }

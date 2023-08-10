@@ -92,3 +92,7 @@ div.output {
   text-align: left;
   color: darkslategrey;
 }
+
+div.output.results pre {
+  overflow-x: auto;
+}

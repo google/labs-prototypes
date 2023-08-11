@@ -43,23 +43,23 @@
   "homepage": "https://github.com/google/labs-prototypes#readme",
   "devDependencies": {
     "@ava/typescript": "^4.0.0",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@google-labs/tsconfig": "*",
     "@preact/preset-vite": "^2.5.0",
     "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
     "ava": "^5.2.0",
+    "esbuild": "^0.19.0",
     "typescript": "^5.0.4",
     "vite": "^4.4.9"
   },
   "dependencies": {
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@google-labs/breadboard": "*",
     "@google-labs/graph-runner": "*",
     "@google-labs/llm-starter": "*",
     "@preact/signals": "^1.2.0",
-    "esbuild": "^0.19.0",
     "mermaid": "^10.2.4",
     "preact": "^10.16.0",
     "preact-router": "^4.1.2"

@@ -6,46 +6,57 @@
 
 import { writeFile } from "fs/promises";
 
-import { Board } from "@google-labs/breadboard";
-import { Starter } from "@google-labs/llm-starter";
-
+import { intro, log, text, outro } from "@clack/prompts";
 import { config } from "dotenv";
-import { makeTemplate } from "./make-template.js";
+
+import { LogProbe } from "@google-labs/breadboard";
+
+import { orderAgent } from "./order-agent.js";
+
+const board = orderAgent;
 
 config();
 
-const board = new Board();
-const kit = board.addKit(Starter);
-
-const template = await makeTemplate(board, kit);
-board.input().wire(
-  "user->",
-  template.wire(
-    "prompt->text",
-    kit
-      .generateText({
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_DEROGATORY",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE",
-          },
-        ],
-      })
-      .wire("completion->", board.output({ $id: "completion" }))
-      .wire("filters->", board.output({ $id: "blocked" }))
-      .wire("<-PALM_KEY", kit.secrets(["PALM_KEY"]))
-  )
-);
-
-await writeFile("./graphs/coffee-bot.json", JSON.stringify(board, null, 2));
+await writeFile("./graphs/coffee-bot-v2.json", JSON.stringify(board, null, 2));
 
 await writeFile(
-  "./docs/coffee-bot.md",
+  "./docs/coffee-bot-v2.md",
   `# Coffee Bot\n\n\`\`\`mermaid\n${board.mermaid()}\n\`\`\``
 );
 
-const result = await board.runOnce({
-  user: "I'd like a latte",
-});
+intro("Hi! I am coffee bot! What would you like to have today?");
 
-console.log(result);
+const probe = process.argv.includes("-v") ? new LogProbe() : undefined;
+
+const ask = async (inputs: Record<string, unknown>) => {
+  const defaultValue = "<Exit>";
+  const message = ((inputs && inputs.message) as string) || "Enter some text";
+  const input = await text({
+    message,
+    defaultValue,
+  });
+  if (input === defaultValue) return { exit: true };
+  return { customer: input };
+};
+const show = (outputs: Record<string, unknown>) => {
+  const { bot } = outputs;
+  if (typeof bot == "string") log.success(bot);
+  else log.success(JSON.stringify(bot));
+};
+
+try {
+  // Run the board until it finishes. This may run forever.
+  for await (const stop of board.run(probe)) {
+    if (stop.seeksInputs) {
+      stop.inputs = await ask(stop.inputArguments);
+    } else {
+      show(stop.outputs);
+    }
+  }
+
+  outro("Awesome work! Let's do this again sometime.");
+} catch (e) {
+  console.log(e);
+  if (e instanceof Error) log.error(e.message);
+  outro("Oh no! Something went wrong.");
+}

@@ -14,7 +14,7 @@
 
 import {
   GraphDescriptor,
-  Edge,
+  Edge as EdgeDescriptor,
   NodeDescriptor,
 } from "@google-labs/graph-runner";
 import {
@@ -22,31 +22,27 @@ import {
   type BreadboardValidatorMetadata,
 } from "@google-labs/breadboard";
 
-import { Graph, Node, IncomingEdge, OutgoingEdge, NodeRoles } from "./types.js";
+import { Graph, Node, Edge, NodeRoles } from "./types.js";
 import { computeLabelsForGraph } from "./compute-labels.js";
-import { SafetyLabel } from "./label.js";
+import { Label } from "./label.js";
 import { trustedLabels } from "./trusted-labels.js";
 
 export interface GraphIntegrityValidatorMetadata
   extends BreadboardValidatorMetadata {
-  label: SafetyLabel;
+  label: Label;
 }
 
-interface IncomingEdgeFromBreadboard extends IncomingEdge {
-  edge: Edge;
+interface EdgeFromBreadboard extends Edge {
+  edge: EdgeDescriptor;
   from: NodeFromBreadboard;
-}
-
-interface OutgoingEdgeFromBreadboard extends OutgoingEdge {
-  edge: Edge;
   to: NodeFromBreadboard;
 }
 
 interface NodeFromBreadboard extends Node {
   node: NodeDescriptor;
   insertionNumber: number;
-  incoming: IncomingEdgeFromBreadboard[];
-  outgoing: OutgoingEdgeFromBreadboard[];
+  incoming: EdgeFromBreadboard[];
+  outgoing: EdgeFromBreadboard[];
 }
 
 interface GraphFromBreadboard extends Graph {
@@ -68,9 +64,9 @@ let insertionCount = 0;
  * @implements {BreadboardValidator} and validates the integrity of a graph in
  * terms of safety.
  *
- * Use one instance per id namespace. Call @method {addGraph} to add nodes to
- * the validator. And call @method {getSubgraphValidator} to get a new validator
- * for new namespaces, such as include and slot nodes
+ * Use one instance per id namespace. Call @method addGraph to add nodes to the
+ * validator. And call @method getSubgraphValidator to get a new validator for
+ * new namespaces, such as include and slot nodes
  *
  * Acts as bridge between Breadboard and the generic graph validation code.
  */
@@ -159,8 +155,8 @@ function insertGraph(
       insertionNumber: insertionCount,
       incoming: [],
       outgoing: [],
-      label: new SafetyLabel(),
-      constraint: trustedLabels.get(node.type),
+      label: new Label(),
+      constraint: trustedLabels[node.type]?.node,
       role: typeToRole.get(node.type),
     } as NodeFromBreadboard;
     idMap.set(node.id, internalNode);
@@ -175,11 +171,26 @@ function insertGraph(
     if (!from) throw new Error(`Invalid graph: Can't find node ${edge.from}`);
     if (!to) throw new Error(`Invalid graph: Can't find node ${edge.from}`);
 
-    const incoming = { edge, from } as IncomingEdgeFromBreadboard;
-    const outgoing = { edge, to } as OutgoingEdgeFromBreadboard;
+    const newEdge = { edge, from, to } as EdgeFromBreadboard;
 
-    from.outgoing.push(outgoing);
-    to.incoming.push(incoming);
+    const fromConstraintDef = trustedLabels[from.node.type];
+    newEdge.fromConstraint =
+      (edge.out &&
+        fromConstraintDef &&
+        fromConstraintDef.outgoing &&
+        fromConstraintDef.outgoing[edge.out]) ||
+      undefined;
+
+    const toConstraintDef = trustedLabels[to.node.type];
+    newEdge.toConstraint =
+      (edge.in &&
+        toConstraintDef &&
+        toConstraintDef.incoming &&
+        toConstraintDef.incoming[edge.in]) ||
+      undefined;
+
+    from.outgoing.push(newEdge);
+    to.incoming.push(newEdge);
   });
 
   // If this is an included graph, we need to connect the input and output
@@ -190,34 +201,46 @@ function insertGraph(
     const inputNodes = newNodes.filter((node) => node.node.type === "input");
     const outputNodes = newNodes.filter((node) => node.node.type === "output");
 
+    // Rewire nodes sending data to the parent node to send data to the
+    // corresponding input node instead.
     parentNode.incoming.forEach((incoming) => {
-      const newEdges: OutgoingEdgeFromBreadboard[] = [];
+      const newEdges: EdgeFromBreadboard[] = [];
 
-      incoming.from.outgoing.forEach((outgoing) => {
-        if (outgoing.to === parentNode)
-          inputNodes.forEach((input) =>
-            newEdges.push({ ...outgoing, to: input })
-          );
+      // Find the input nodes that correspond to the wire to the parent
+      // node. *-> matches all input nodes.
+      inputNodes.forEach((input) => {
+        if (
+          incoming.edge.out === "*" ||
+          input.outgoing.find((edge) => edge.edge.out === incoming.edge.in)
+        )
+          newEdges.push({ ...incoming, to: input });
       });
+
+      // Add the new edges to the graph, connecting the node originally wired to
+      // the parent node with the corresponding input nodes.
       incoming.from.outgoing.push(...newEdges);
-
-      inputNodes.forEach((input) => input.incoming.push(incoming));
+      newEdges.forEach((edge) => edge.to.incoming.push(edge));
     });
 
+    // Same for output nodes.
     parentNode.outgoing.forEach((outgoing) => {
-      const newEdges: IncomingEdgeFromBreadboard[] = [];
+      const newEdges: EdgeFromBreadboard[] = [];
 
-      outgoing.to.incoming.forEach((incoming) => {
-        if (incoming.from === parentNode)
-          outputNodes.forEach((output) =>
-            newEdges.push({ ...incoming, from: output })
-          );
+      // Same as above. *-> matches all output nodes.
+      outputNodes.forEach((output) => {
+        if (
+          outgoing.edge.out === "*" ||
+          output.incoming.find((edge) => edge.edge.in === outgoing.edge.out)
+        )
+          newEdges.push({ ...outgoing, from: output });
       });
-      outgoing.to.incoming.push(...newEdges);
 
-      outputNodes.forEach((output) => output.outgoing.push(outgoing));
+      outgoing.to.incoming.push(...newEdges);
+      newEdges.forEach((edge) => edge.from.outgoing.push(edge));
     });
 
+    // Mark input and output nodes as passthrough nodes, as that's how included
+    // input and output nodes behave like in the runtime.
     inputNodes.forEach((input) => (input.role = NodeRoles.passthrough));
     outputNodes.forEach((output) => (output.role = NodeRoles.passthrough));
   }

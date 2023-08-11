@@ -5,8 +5,7 @@
  */
 
 import type { NodeTypeIdentifier } from "@google-labs/graph-runner";
-import { SafetyLabel } from "./label.js";
-import { SafetyLabelValue } from "./types.js";
+import { Label, LabelValue } from "./label.js";
 
 /**
  * Manual assignment of labels to node types.
@@ -15,7 +14,20 @@ import { SafetyLabelValue } from "./types.js";
  * The key for now is that these labels can only be set by a trusted source,
  * which is for now this file.
  */
-export const trustedLabels: Map<NodeTypeIdentifier, SafetyLabel> = new Map([
-  ["fetch", new SafetyLabel(SafetyLabelValue.UNTRUSTED)],
-  ["runJavascript", new SafetyLabel(SafetyLabelValue.TRUSTED)],
-]);
+
+interface TrustedLabels {
+  node?: Label;
+  incoming?: Record<string, Label>;
+  outgoing?: Record<string, Label>;
+}
+
+export const trustedLabels: Record<NodeTypeIdentifier, TrustedLabels> = {
+  fetch: {
+    outgoing: {
+      response: new Label({ integrity: LabelValue.UNTRUSTED }),
+    },
+  },
+  runJavascript: {
+    node: new Label({ integrity: LabelValue.TRUSTED }),
+  },
+};

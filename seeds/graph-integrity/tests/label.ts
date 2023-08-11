@@ -6,33 +6,47 @@
 
 import test from "ava";
 
-import { SafetyLabel } from "../src/label.js";
-import { SafetyLabelValue } from "../src/types.js";
+import { Label, LabelValue } from "../src/label.js";
 
-test("SafetyLabel: constructor", (t) => {
-  const trusted = new SafetyLabel(SafetyLabelValue.TRUSTED);
-  t.is(trusted.value, SafetyLabelValue.TRUSTED);
+test("Label: constructor", (t) => {
+  const combined = new Label({
+    confidentiality: LabelValue.TRUSTED,
+    integrity: LabelValue.UNTRUSTED,
+  });
+  t.is(combined.confidentiality, LabelValue.TRUSTED);
+  t.is(combined.integrity, LabelValue.UNTRUSTED);
 
-  const untrusted = new SafetyLabel(SafetyLabelValue.UNTRUSTED);
-  t.is(untrusted.value, SafetyLabelValue.UNTRUSTED);
+  const combinedCopy = new Label(combined);
+  t.is(combinedCopy.confidentiality, LabelValue.TRUSTED);
+  t.is(combinedCopy.integrity, LabelValue.UNTRUSTED);
 
-  const undetermined = new SafetyLabel(undefined);
-  t.is(undetermined.value, undefined);
+  const untrustedAndUndetermined = new Label({
+    confidentiality: LabelValue.UNTRUSTED,
+  });
+  t.is(untrustedAndUndetermined.confidentiality, LabelValue.UNTRUSTED);
+  t.is(untrustedAndUndetermined.integrity, undefined);
 
-  const trustedCopy = new SafetyLabel(trusted);
-  t.is(trustedCopy.value, SafetyLabelValue.TRUSTED);
+  const untrustedAndUndeterminedCopy = new Label(untrustedAndUndetermined);
+  t.is(untrustedAndUndeterminedCopy.confidentiality, LabelValue.UNTRUSTED);
+  t.is(untrustedAndUndeterminedCopy.integrity, undefined);
 
-  const untrustedCopy = new SafetyLabel(untrusted);
-  t.is(untrustedCopy.value, SafetyLabelValue.UNTRUSTED);
+  const undetermined = new Label(undefined);
+  t.is(undetermined.confidentiality, undefined);
+  t.is(undetermined.integrity, undefined);
 
-  const undeterminedCopy = new SafetyLabel(undetermined);
-  t.is(undeterminedCopy.value, undefined);
+  const undetermined2 = new Label({});
+  t.is(undetermined2.confidentiality, undefined);
+  t.is(undetermined2.integrity, undefined);
+
+  const undeterminedCopy = new Label(undetermined);
+  t.is(undeterminedCopy.confidentiality, undefined);
+  t.is(undeterminedCopy.integrity, undefined);
 });
 
-test("SafetyLabel: equalsTo", (t) => {
-  const trusted = new SafetyLabel(SafetyLabelValue.TRUSTED);
-  const untrusted = new SafetyLabel(SafetyLabelValue.UNTRUSTED);
-  const undetermined = new SafetyLabel(undefined);
+test("Label: equalsTo", (t) => {
+  const trusted = new Label({ integrity: LabelValue.TRUSTED });
+  const untrusted = new Label({ integrity: LabelValue.UNTRUSTED });
+  const undetermined = new Label(undefined);
 
   t.true(trusted.equalsTo(trusted));
   t.true(untrusted.equalsTo(untrusted));
@@ -46,144 +60,112 @@ test("SafetyLabel: equalsTo", (t) => {
   t.false(undetermined.equalsTo(untrusted));
 });
 
-test("SafetyLabel: meet and join", (t) => {
-  const trusted = new SafetyLabel(SafetyLabelValue.TRUSTED);
-  const untrusted = new SafetyLabel(SafetyLabelValue.UNTRUSTED);
-  const undetermined = new SafetyLabel(undefined);
+test("Label: meet and join (integrity only)", (t) => {
+  const trusted = new Label({ integrity: LabelValue.TRUSTED });
+  const untrusted = new Label({ integrity: LabelValue.UNTRUSTED });
+  const undetermined = new Label(undefined);
 
-  t.true(SafetyLabel.computeMeetOfLabels([trusted]).equalsTo(trusted));
-  t.true(SafetyLabel.computeMeetOfLabels([trusted, trusted]).equalsTo(trusted));
-  t.true(
-    SafetyLabel.computeMeetOfLabels([untrusted, untrusted]).equalsTo(untrusted)
-  );
-  t.true(
-    SafetyLabel.computeMeetOfLabels([trusted, untrusted]).equalsTo(untrusted)
-  );
+  t.true(Label.computeMeetOfLabels([trusted]).equalsTo(trusted));
+  t.true(Label.computeMeetOfLabels([trusted, trusted]).equalsTo(trusted));
+  t.true(Label.computeMeetOfLabels([untrusted, untrusted]).equalsTo(untrusted));
+  t.true(Label.computeMeetOfLabels([trusted, untrusted]).equalsTo(untrusted));
 
+  t.true(Label.computeMeetOfLabels([undetermined]).equalsTo(undetermined));
+  t.true(Label.computeMeetOfLabels([undetermined, trusted]).equalsTo(trusted));
   t.true(
-    SafetyLabel.computeMeetOfLabels([undetermined]).equalsTo(undetermined)
-  );
-  t.true(
-    SafetyLabel.computeMeetOfLabels([undetermined, trusted]).equalsTo(trusted)
-  );
-  t.true(
-    SafetyLabel.computeMeetOfLabels([undetermined, trusted, trusted]).equalsTo(
+    Label.computeMeetOfLabels([undetermined, trusted, trusted]).equalsTo(
       trusted
     )
   );
   t.true(
-    SafetyLabel.computeMeetOfLabels([
-      undetermined,
-      untrusted,
-      untrusted,
-    ]).equalsTo(untrusted)
-  );
-  t.true(
-    SafetyLabel.computeMeetOfLabels([
-      undetermined,
-      trusted,
-      untrusted,
-    ]).equalsTo(untrusted)
-  );
-
-  t.true(SafetyLabel.computeMeetOfLabels([]).equalsTo(undetermined));
-  t.true(SafetyLabel.computeMeetOfLabels([undefined]).equalsTo(undetermined));
-  t.true(
-    SafetyLabel.computeMeetOfLabels([undetermined, undefined]).equalsTo(
-      undetermined
+    Label.computeMeetOfLabels([undetermined, untrusted, untrusted]).equalsTo(
+      untrusted
     )
   );
   t.true(
-    SafetyLabel.computeMeetOfLabels([
-      undetermined,
-      undefined,
-      trusted,
-    ]).equalsTo(trusted)
-  );
-  t.true(
-    SafetyLabel.computeMeetOfLabels([
-      undetermined,
-      undefined,
-      trusted,
-      trusted,
-    ]).equalsTo(trusted)
-  );
-  t.true(
-    SafetyLabel.computeMeetOfLabels([
-      undetermined,
-      undefined,
-      untrusted,
-      untrusted,
-    ]).equalsTo(untrusted)
-  );
-  t.true(
-    SafetyLabel.computeMeetOfLabels([
-      undetermined,
-      undefined,
-      trusted,
-      untrusted,
-    ]).equalsTo(untrusted)
+    Label.computeMeetOfLabels([undetermined, trusted, untrusted]).equalsTo(
+      untrusted
+    )
   );
 
-  t.true(SafetyLabel.computeJoinOfLabels([trusted]).equalsTo(trusted));
-  t.true(SafetyLabel.computeJoinOfLabels([trusted, trusted]).equalsTo(trusted));
+  t.true(Label.computeMeetOfLabels([]).equalsTo(undetermined));
+  t.true(Label.computeMeetOfLabels([undefined]).equalsTo(undetermined));
   t.true(
-    SafetyLabel.computeJoinOfLabels([untrusted, untrusted]).equalsTo(untrusted)
+    Label.computeMeetOfLabels([undetermined, undefined]).equalsTo(undetermined)
   );
   t.true(
-    SafetyLabel.computeJoinOfLabels([trusted, untrusted]).equalsTo(trusted)
-  );
-
-  t.true(
-    SafetyLabel.computeJoinOfLabels([undetermined]).equalsTo(undetermined)
-  );
-  t.true(
-    SafetyLabel.computeJoinOfLabels([undetermined, trusted]).equalsTo(trusted)
-  );
-  t.true(
-    SafetyLabel.computeJoinOfLabels([undetermined, trusted, trusted]).equalsTo(
+    Label.computeMeetOfLabels([undetermined, undefined, trusted]).equalsTo(
       trusted
     )
   );
   t.true(
-    SafetyLabel.computeJoinOfLabels([
+    Label.computeMeetOfLabels([
       undetermined,
+      undefined,
+      trusted,
+      trusted,
+    ]).equalsTo(trusted)
+  );
+  t.true(
+    Label.computeMeetOfLabels([
+      undetermined,
+      undefined,
       untrusted,
       untrusted,
     ]).equalsTo(untrusted)
   );
   t.true(
-    SafetyLabel.computeJoinOfLabels([
+    Label.computeMeetOfLabels([
       undetermined,
+      undefined,
       trusted,
       untrusted,
-    ]).equalsTo(trusted)
+    ]).equalsTo(untrusted)
   );
 
-  t.true(SafetyLabel.computeJoinOfLabels([]).equalsTo(undetermined));
-  t.true(SafetyLabel.computeJoinOfLabels([undefined]).equalsTo(undetermined));
+  t.true(Label.computeJoinOfLabels([trusted]).equalsTo(trusted));
+  t.true(Label.computeJoinOfLabels([trusted, trusted]).equalsTo(trusted));
+  t.true(Label.computeJoinOfLabels([untrusted, untrusted]).equalsTo(untrusted));
+  t.true(Label.computeJoinOfLabels([trusted, untrusted]).equalsTo(trusted));
+
+  t.true(Label.computeJoinOfLabels([undetermined]).equalsTo(undetermined));
+  t.true(Label.computeJoinOfLabels([undetermined, trusted]).equalsTo(trusted));
   t.true(
-    SafetyLabel.computeJoinOfLabels([undetermined, undefined]).equalsTo(
-      undetermined
+    Label.computeJoinOfLabels([undetermined, trusted, trusted]).equalsTo(
+      trusted
     )
   );
   t.true(
-    SafetyLabel.computeJoinOfLabels([
+    Label.computeJoinOfLabels([undetermined, untrusted, untrusted]).equalsTo(
+      untrusted
+    )
+  );
+  t.true(
+    Label.computeJoinOfLabels([undetermined, trusted, untrusted]).equalsTo(
+      trusted
+    )
+  );
+
+  t.true(Label.computeJoinOfLabels([]).equalsTo(undetermined));
+  t.true(Label.computeJoinOfLabels([undefined]).equalsTo(undetermined));
+  t.true(
+    Label.computeJoinOfLabels([undetermined, undefined]).equalsTo(undetermined)
+  );
+  t.true(
+    Label.computeJoinOfLabels([undetermined, undefined, trusted]).equalsTo(
+      trusted
+    )
+  );
+  t.true(
+    Label.computeJoinOfLabels([
       undetermined,
       undefined,
+      trusted,
       trusted,
     ]).equalsTo(trusted)
   );
   t.true(
-    SafetyLabel.computeJoinOfLabels([
-      undetermined,
-      undefined,
-      trusted,
-      trusted,
-    ]).equalsTo(trusted)
-  );
-  t.true(
-    SafetyLabel.computeJoinOfLabels([
+    Label.computeJoinOfLabels([
       undetermined,
       undefined,
       untrusted,
@@ -191,7 +173,7 @@ test("SafetyLabel: meet and join", (t) => {
     ]).equalsTo(untrusted)
   );
   t.true(
-    SafetyLabel.computeJoinOfLabels([
+    Label.computeJoinOfLabels([
       undetermined,
       undefined,
       trusted,
@@ -200,30 +182,77 @@ test("SafetyLabel: meet and join", (t) => {
   );
 });
 
-test("SafetyLabel: canFlowTo", (t) => {
-  const trusted = new SafetyLabel(SafetyLabelValue.TRUSTED);
-  const untrusted = new SafetyLabel(SafetyLabelValue.UNTRUSTED);
-  const undetermined = new SafetyLabel(undefined);
+test("Label: meet and join with both confidentiality and integrity", (t) => {
+  const low = new Label({
+    confidentiality: LabelValue.UNTRUSTED,
+    integrity: LabelValue.TRUSTED,
+  });
+
+  const high = new Label({
+    confidentiality: LabelValue.TRUSTED,
+    integrity: LabelValue.UNTRUSTED,
+  });
+
+  t.true(Label.computeJoinOfLabels([low, high]).equalsTo(low));
+  t.true(Label.computeMeetOfLabels([low, high]).equalsTo(high));
+
+  const lowHigh = new Label({
+    confidentiality: LabelValue.UNTRUSTED,
+    integrity: LabelValue.UNTRUSTED,
+  });
+
+  const highLow = new Label({
+    confidentiality: LabelValue.TRUSTED,
+    integrity: LabelValue.TRUSTED,
+  });
+
+  t.true(Label.computeJoinOfLabels([lowHigh, highLow]).equalsTo(low));
+  t.true(Label.computeMeetOfLabels([lowHigh, highLow]).equalsTo(high));
+});
+
+test("Label: canFlowTo (integrity only)", (t) => {
+  const trusted = new Label({ integrity: LabelValue.TRUSTED });
+  const untrusted = new Label({ integrity: LabelValue.UNTRUSTED });
+  const undetermined = new Label(undefined);
 
   t.true(trusted.canFlowTo(trusted));
   t.true(trusted.canFlowTo(untrusted));
-  t.throws(() => trusted.canFlowTo(undetermined));
+  t.true(trusted.canFlowTo(undetermined));
 
   t.true(untrusted.canFlowTo(untrusted));
-  t.throws(() => untrusted.canFlowTo(undetermined));
+  t.true(untrusted.canFlowTo(undetermined));
   t.false(untrusted.canFlowTo(trusted));
 
-  t.throws(() => undetermined.canFlowTo(undetermined));
-  t.throws(() => undetermined.canFlowTo(trusted));
-  t.throws(() => undetermined.canFlowTo(untrusted));
+  t.true(undetermined.canFlowTo(undetermined));
+  t.true(undetermined.canFlowTo(trusted));
+  t.true(undetermined.canFlowTo(untrusted));
 });
 
-test("SafetyLabel: toString", (t) => {
-  const trusted = new SafetyLabel(SafetyLabelValue.TRUSTED);
-  const untrusted = new SafetyLabel(SafetyLabelValue.UNTRUSTED);
-  const undetermined = new SafetyLabel(undefined);
+test("Label: canFlowTo with both confidentiality and integrity", (t) => {
+  const low = new Label({
+    confidentiality: LabelValue.UNTRUSTED,
+    integrity: LabelValue.TRUSTED,
+  });
 
-  t.is(trusted.toString(), "TRUSTED");
-  t.is(untrusted.toString(), "UNTRUSTED");
-  t.is(undetermined.toString(), "UNDETERMINED");
+  const high = new Label({
+    confidentiality: LabelValue.TRUSTED,
+    integrity: LabelValue.UNTRUSTED,
+  });
+
+  t.true(low.canFlowTo(high));
+});
+
+test("Label: toString", (t) => {
+  const combined = new Label({
+    confidentiality: LabelValue.UNTRUSTED,
+    integrity: LabelValue.TRUSTED,
+  });
+  const partUndetermined = new Label({
+    integrity: LabelValue.UNTRUSTED,
+  });
+  const undetermined = new Label(undefined);
+
+  t.is(combined.toString(), "[UNTRUSTED, TRUSTED]");
+  t.is(partUndetermined.toString(), "[UNDETERMINED, UNTRUSTED]");
+  t.is(undetermined.toString(), "[UNDETERMINED, UNDETERMINED]");
 });

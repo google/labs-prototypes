@@ -1,5 +1,3 @@
-import { Header } from './components/header.tsx';
-
 export function App() {
   return (
     <>

@@ -77,7 +77,7 @@
   ],
   "kits": [
     {
-      "url": "npm:https://esm.sh/@paulkinlan/llm-starter"
+      "url": "npm:@google-labs/llm-starter"
     }
   ]
 }

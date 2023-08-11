@@ -5,6 +5,7 @@ import simpleGraph from './graphs/simplest.graph';
 import { Board } from "@google-labs/breadboard";
 import { OutputValues, InputValues } from "@google-labs/graph-runner";
 
+
 import mermaid from "mermaid";
 
 const ask = async (inputs: InputValues): Promise<OutputValues> => {
@@ -47,7 +48,7 @@ export function BreadboardViewerApp() {
         }
       }
 
-      for(const output of outputs) {
+      for (const output of outputs) {
         resultsRef.current.innerText += `${output.text}\n`
 
       }
@@ -65,7 +66,7 @@ export function BreadboardViewerApp() {
       runButtonRef.current.disabled = false;
     } catch (e) {
       runButtonRef.current.disabled = true;
-      error.value = e.message;
+      resultsRef.value = e.message;
     }
   });
 
@@ -78,12 +79,12 @@ export function BreadboardViewerApp() {
 
       <div class="card output">
         <label>Mermaid</label>
-        <pre class="mermaid" ref={mermaidRef}>
-        </pre>
+        <div class="mermaid" ref={mermaidRef}>
+        </div>
       </div>
 
       <input type="file" onChange={(e) => { loadGraph(e) }} value="Go" />
-  
+
       <button class="primary" onClick={(e) => runGraph()} ref={runButtonRef} disabled>Run</button>
 
       <div class="card output results">

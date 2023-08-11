@@ -5,13 +5,13 @@
  */
 
 import type { InputValues } from "@google-labs/graph-runner";
-import vm from "node:vm";
 
 // https://regex101.com/r/PeEmEW/1
 const stripCodeBlock = (code: string) =>
   code.replace(/(?:```(?:js|javascript)?\n+)(.*)(?:\n+```)/gms, "$1");
 
 const runInNode = async (code: string, functionName: string, args: string) => {
+  const vm = await import("node:vm");
   const codeToRun = `${code}\n${functionName}(${args});`;
   const context = vm.createContext({ console });
   const script = new vm.Script(codeToRun);

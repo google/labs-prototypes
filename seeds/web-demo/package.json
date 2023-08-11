@@ -12,7 +12,8 @@
     "build": "FORCE_COLOR=1 vite build",
     "watch": "FORCE_COLOR=1 tsc --b --watch && vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "npx serve dist"
   },
   "repository": {
     "type": "git",

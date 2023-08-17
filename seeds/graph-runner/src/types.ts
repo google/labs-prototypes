@@ -4,17 +4,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export interface Capability {
+  readonly kind: string;
+}
+
 /**
  * A type representing a valid JSON value.
  */
-export type JSONValue =
+export type NodeValue =
   | string
   | number
   | boolean
   | null
   | undefined
-  | JSONValue[]
-  | { [key: string]: JSONValue };
+  | NodeValue[]
+  | Capability
+  | { [key: string]: NodeValue };
 
 /**
  * Unique identifier of a node in a graph.
@@ -140,18 +145,18 @@ export type EdgeMap = Map<NodeIdentifier, OutputValues>;
 /**
  * Values that are supplied as inputs to the `NodeHandler`.
  */
-export type InputValues = Record<InputIdentifier, JSONValue>;
+export type InputValues = Record<InputIdentifier, NodeValue>;
 
 /**
  * Values that the `NodeHandler` outputs.
  */
-export type OutputValues = Partial<Record<OutputIdentifier, JSONValue>>;
+export type OutputValues = Partial<Record<OutputIdentifier, NodeValue>>;
 
 /**
  * Values that are supplied as part of the graph. These values are merged with
  * the `InputValues` and supplied as inputs to the `NodeHandler`.
  */
-export type NodeConfiguration = Record<string, JSONValue>;
+export type NodeConfiguration = Record<string, NodeValue>;
 
 /**
  * A function that represents a type of a node in the graph.

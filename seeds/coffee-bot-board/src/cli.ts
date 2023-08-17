@@ -5,14 +5,14 @@ import {
   LogProbe,
   type BreadboardSlotSpec,
 } from "@google-labs/breadboard";
-import { JSONValue } from "@google-labs/graph-runner";
+import { NodeValue } from "@google-labs/graph-runner";
 
 export const run = async (board: Board, slots: BreadboardSlotSpec) => {
   intro("Hi! I am coffee bot! What would you like to have today?");
 
   const probe = process.argv.includes("-v") ? new LogProbe() : undefined;
 
-  const ask = async (inputs: Record<string, JSONValue>) => {
+  const ask = async (inputs: Record<string, NodeValue>) => {
     const defaultValue = "<Exit>";
     const message = ((inputs && inputs.message) as string) || "Enter some text";
     const input = (await text({
@@ -28,7 +28,7 @@ export const run = async (board: Board, slots: BreadboardSlotSpec) => {
     return JSON.stringify(o);
   };
 
-  const show = (outputs: Record<string, JSONValue>) => {
+  const show = (outputs: Record<string, NodeValue>) => {
     const { bot, error } = outputs;
     if (error) log.error(stringify(error));
     else log.success(stringify(bot));

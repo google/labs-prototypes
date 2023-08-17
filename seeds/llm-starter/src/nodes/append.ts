@@ -6,7 +6,7 @@
 
 import {
   InputValues,
-  JSONValue,
+  NodeValue,
   OutputValues,
 } from "@google-labs/graph-runner";
 
@@ -16,10 +16,10 @@ export enum ObjectType {
   object,
 }
 
-type AccumulatorType = string | string[] | Record<string, JSONValue>;
-type ValueType = string | Record<string, JSONValue>;
+type AccumulatorType = string | string[] | Record<string, NodeValue>;
+type ValueType = string | Record<string, NodeValue>;
 
-export type AppendInputs = Record<string, JSONValue> & {
+export type AppendInputs = Record<string, NodeValue> & {
   accumulator: AccumulatorType;
 };
 

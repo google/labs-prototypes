@@ -6,7 +6,7 @@
 
 import type {
   InputValues,
-  JSONValue,
+  NodeValue,
   OutputValues,
 } from "@google-labs/graph-runner";
 import {
@@ -20,7 +20,7 @@ export type GenerateTextOutputs = GenerateTextResponse & {
   completion: string;
 };
 
-export type GenerateTextInputs = JSONValue & {
+export type GenerateTextInputs = NodeValue & {
   /**
    * Prompt for text completion.
    */

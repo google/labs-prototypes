@@ -6,7 +6,7 @@
 
 import type {
   InputValues,
-  JSONValue,
+  NodeValue,
   OutputValues,
 } from "@google-labs/graph-runner";
 import {
@@ -42,7 +42,7 @@ const properName = (name: string) => {
  */
 const toAltJson = (
   node: XmlElement | XmlDocument | XmlText | XmlCdata | XmlComment
-): [string, JSONValue] => {
+): [string, NodeValue] => {
   if (node.type === "document") {
     const doc = node as XmlDocument;
     const element = doc.children[0] as XmlElement;

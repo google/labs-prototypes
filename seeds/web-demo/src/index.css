@@ -159,8 +159,6 @@ dialog[open] {
   grid-template-rows: min-content 1fr;
   grid-template-columns: 1fr 1fr;
   gap: 1em;
-  min-width: 80dvw;
-  min-height: 80dvw;
 }
 
 dialog[open] h3:has(+ pre.output) {

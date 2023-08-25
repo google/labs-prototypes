@@ -139,6 +139,10 @@ section.repl div.graph fieldset {
   max-inline-size: 100%;
 }
 
+section.repl div.mermaid fieldset .output {
+  margin:initial
+}
+
 section.repl div.graph fieldset .fields {
   display: flex;
   flex-direction: column;
@@ -147,6 +151,38 @@ section.repl div.graph fieldset .fields {
 
 section.repl div.graph fieldset .fields textarea {
   flex: 1;
+}
+
+dialog[open] {
+  display: grid;
+  grid-template-areas: "output_header debug_header" "output debug";
+  grid-template-rows: min-content 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+  min-width: 80dvw;
+  min-height: 80dvw;
+}
+
+dialog[open] h3:has(+ pre.output) {
+  grid-area: output_header;
+}
+
+dialog[open] h3:has(+ pre.debug) {
+  grid-area: debug_header;
+}
+
+dialog[open] pre.output {
+  overflow: auto;
+  text-align: left;
+  grid-area: output;
+  margin: initial;
+}
+
+dialog[open] pre.debug {
+  overflow: auto;
+  text-align: left;
+  grid-area: debug;
+  margin: initial;
 }
 
 @media screen and (max-width: 720px){

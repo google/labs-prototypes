@@ -1,11 +1,12 @@
 import { signal, useSignalEffect } from '@preact/signals';
 import { useRef } from 'preact/hooks';
-import simpleGraph from './graphs/simplest.graph';
+import emptyGraph from './graphs/empty.graph';
 
 import { Board } from "@google-labs/breadboard";
 import { OutputValues, InputValues } from "@google-labs/graph-runner";
 
 import mermaid from "mermaid";
+import { LogToElementProbe } from './lib/probe.js';
 
 const ask = async (inputs: InputValues): Promise<OutputValues> => {
   const defaultValue = "<Exit>";
@@ -20,8 +21,11 @@ export function REPLApp() {
   const graphRef = useRef();
   const resultsRef = useRef();
   const runButtonRef = useRef();
+  const dialogRef = useRef();
+  const debugRef = useRef();
 
-  const graphUrl = signal(simpleGraph);
+
+  const graphUrl = signal(emptyGraph);
   const graphJson = signal();
   const board = signal<Board | undefined>(undefined);
 
@@ -40,7 +44,7 @@ export function REPLApp() {
       URL.revokeObjectURL(graphUrl.value);
     }
 
-    const blob = new Blob([jsonText], {type: "application/json"})
+    const blob = new Blob([jsonText], { type: "application/json" })
 
     // Kick off the rendering
     graphUrl.value = URL.createObjectURL(blob);
@@ -48,27 +52,27 @@ export function REPLApp() {
 
   const runGraph = async () => {
     const url = graphUrl.value;
-    const outputs = [];
+    
     resultsRef.current.innerText = "";
+    debugRef.current.innerText = "";
+
+    const probe = new LogToElementProbe(debugRef.current);
 
     try {
       const currentBoard = await Board.load(url);
       board.value = currentBoard;
 
-      for await (const result of currentBoard.run()) {
+      dialogRef.current.showModal();
+
+      for await (const result of currentBoard.run(probe)) {
         if (result.seeksInputs) {
           result.inputs = await ask(result.inputArguments);
         }
         else {
-          outputs.push(result.outputs);
+          resultsRef.current.innerText += `${JSON.stringify(result.outputs, null, 2)}\n`
         }
       }
-
-      for (const output of outputs) {
-        resultsRef.current.innerText += `${output.text}\n`
-
-      }
-    } catch (e) {
+    } catch (e: any) {
       resultsRef.current.innerText = e.message;
     }
   };
@@ -77,14 +81,14 @@ export function REPLApp() {
     const url = graphUrl.value;
     try {
       const board = await Board.load(url);
-      graphJson.value = JSON.stringify(board, null, 2);
-
       const { svg } = await mermaid.render('mermaid', board.mermaid());
+     
+      graphJson.value = JSON.stringify(board, null, 2);
       mermaidRef.current.innerHTML = svg;
       runButtonRef.current.disabled = false;
     } catch (e) {
       runButtonRef.current.disabled = true;
-      resultsRef.value = e.message;
+      alert(`Unable to load graph: ${e.message}`);
     }
   });
 
@@ -103,8 +107,6 @@ export function REPLApp() {
               <textarea ref={graphRef} onInput={(e) => loadGraphJSON(e)}>{graphJson}</textarea>
               <input type="file" onChange={(e) => loadGraph(e)} value="Go" />
               <button class="primary" onClick={(e) => runGraph()} ref={runButtonRef} disabled>Run</button>
-              <pre class="output" ref={resultsRef}>
-              </pre>
             </div>
           </fieldset>
         </div>
@@ -113,10 +115,17 @@ export function REPLApp() {
 
           <fieldset>
             <legend>Mermaid</legend>
-            <div ref={mermaidRef}>
+            <div class="output" ref={mermaidRef}>
             </div>
           </fieldset>
         </div>
+        <dialog ref={dialogRef}>
+            <h3>Graph Output</h3>
+            <pre class="output" ref={resultsRef}>
+            </pre>
+            <h3>Probe Output</h3>
+            <pre class="debug" ref={debugRef}></pre>
+        </dialog>
       </section>
     </>
   )

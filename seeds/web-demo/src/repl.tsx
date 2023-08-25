@@ -110,7 +110,6 @@ export function REPLApp() {
             </div>
           </fieldset>
         </div>
-
         <div class="card mermaid">
 
           <fieldset>

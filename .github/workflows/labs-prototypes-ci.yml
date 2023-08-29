@@ -27,11 +27,11 @@ jobs:
     - name: Generating the build
       run: npm run build
 
-    - name: Running tests
-      run: npm run test
-
     - name: Checking the code quality
       run: npm run lint
 
     - name: Checking the code formatting
       run: npm run check:format
+
+    - name: Running tests
+      run: npm run test

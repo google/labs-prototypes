@@ -10,7 +10,7 @@
     "clean:build": "rimraf -g seeds/*/dist seeds/*/.turbo",
     "ci": "npm ci",
     "check:format": "prettier --check --config .prettierrc seeds/**/*.ts",
-    "ci:local": "npm run clean:build && turbo build && turbo test && turbo lint && npm run check:format"
+    "ci:local": "npm run clean:build && turbo build && turbo lint && npm run check:format && turbo test"
   },
   "keywords": [],
   "author": "Google Labs Team",

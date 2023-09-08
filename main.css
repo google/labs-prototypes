@@ -14,7 +14,7 @@ body{
 }
 
 .wrapper .sidebar{
-    background: rgb(5, 68, 104);
+    background:#f2f2f2;
     position: fixed;
     top: 0;
     left: 0;

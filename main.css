@@ -51,7 +51,7 @@ body{
 
 .wrapper .sidebar ul li a:hover .icon,
 .wrapper .sidebar ul li a.active .icon{
-    color: #0c7db1;
+    color: #212121;
 }
 
 .wrapper .sidebar ul li a:hover:before,

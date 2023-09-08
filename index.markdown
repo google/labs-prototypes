@@ -115,7 +115,7 @@ layout: default
                 <hr class="dropdown-divider" />
               </li>
               <li>
-                <a class="dropdown-item" href="#"><i class="flag-poland flag"></i>Polski</a>
+                <a class="dropdown-item" href="https://chizobaonorh.github.io/labs-prototypes/seeds/cloud-function/"><i class="flag-poland flag"></i>Experimane with clouds</a>
               </li>
               <li>
                 <a class="dropdown-item" href="#"><i class="flag-china flag"></i>中文</a>
@@ -172,7 +172,7 @@ layout: default
     <div class="container pt-4"></div>
   </main>
   <body>
-  
+
     # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to

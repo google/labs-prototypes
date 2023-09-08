@@ -16,7 +16,7 @@ body{
 .wrapper .sidebar{
     background:#f2f2f2;
     position: fixed;
-    top: 0;
+    top: 50px;
     left: 0;
     width: 225px;
     height: 100%;

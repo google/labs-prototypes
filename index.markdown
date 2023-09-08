@@ -14,6 +14,7 @@ layout: default
 </head>
 <!--Main Navigation-->
 <header>
+    <aside>
     <!-- Sidebar -->
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
       <div class="position-sticky">
@@ -164,11 +165,12 @@ layout: default
       <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
+    </aside>
   </header>
   <!--Main Navigation-->
   
   <!--Main layout-->
-  <main style="margin-top: 58px;">
+  <main style="margin-top: 5px;">
     <div class="container pt-4"></div>
   </main>
   <body>

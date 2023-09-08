@@ -1,0 +1,38 @@
+{
+  "folders": [
+    {
+      "path": "seeds/graph-playground"
+    },
+    {
+      "path": "seeds/graph-runner"
+    },
+    {
+      "path": "seeds/breadboard"
+    },
+    {
+      "path": "seeds/llm-starter"
+    },
+    {
+      "path": "seeds/graph-integrity"
+    },
+    {
+      "path": "seeds/palm-lite"
+    },
+    {
+      "path": "seeds/node-nursery"
+    },
+    {
+      "path": "seeds/coffee-bot-board"
+    },
+    {
+      "path": "seeds/web-demo"
+    },
+    {
+      "path": "seeds/cloud-function"
+    },
+    {
+      "path": "seeds/breadboard-server"
+    }
+  ],
+  "settings": {}
+}

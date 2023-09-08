@@ -1,0 +1,63 @@
+{
+  "name": "@google-labs/node-nursery",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Nursery for new nodes. Move to other kits to publish.",
+  "main": "./dist/src/index.js",
+  "exports": "./dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "test": "FORCE_COLOR=1 ava",
+    "build": "FORCE_COLOR=1 tsc --b",
+    "watch": "FORCE_COLOR=1 tsc --b --watch",
+    "lint": "FORCE_COLOR=1 eslint . --ext .ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google/labs-prototypes"
+  },
+  "files": [
+    "dist/src"
+  ],
+  "ava": {
+    "files": [
+      "tests/**/*.ts"
+    ],
+    "workerThreads": false,
+    "typescript": {
+      "rewritePaths": {
+        "./": "dist/"
+      },
+      "compile": false
+    }
+  },
+  "keywords": [],
+  "author": "Google Labs Team",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/google/labs-prototypes/issues"
+  },
+  "homepage": "https://github.com/google/labs-prototypes#readme",
+  "devDependencies": {
+    "@ava/typescript": "^4.0.0",
+    "@google-labs/tsconfig": "*",
+    "@types/json-stable-stringify": "^1.0.34",
+    "@types/node": "^18.16.3",
+    "@types/sqlite3": "^3.1.8",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
+    "ava": "^5.2.0",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@google-labs/breadboard": "*",
+    "@google-labs/graph-runner": "*",
+    "@google-labs/palm-lite": "*",
+    "json-stable-stringify": "^1.0.2",
+    "jsonschema": "^1.4.1",
+    "ml-distance": "^4.0.1",
+    "sqlite": "^5.0.1",
+    "sqlite3": "^5.1.6"
+  }
+}

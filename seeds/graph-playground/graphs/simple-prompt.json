@@ -1,0 +1,63 @@
+{
+  "edges": [
+    {
+      "from": "secrets-2",
+      "to": "generateText-1",
+      "out": "PALM_KEY",
+      "in": "PALM_KEY"
+    },
+    {
+      "from": "generateText-1",
+      "to": "output-4",
+      "out": "completion",
+      "in": "text"
+    },
+    {
+      "from": "analyze-this",
+      "to": "generateText-1",
+      "out": "prompt",
+      "in": "text"
+    },
+    {
+      "from": "input-3",
+      "to": "analyze-this",
+      "out": "text",
+      "in": "question"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "generateText-1",
+      "type": "generateText"
+    },
+    {
+      "id": "secrets-2",
+      "type": "secrets",
+      "configuration": {
+        "keys": [
+          "PALM_KEY"
+        ]
+      }
+    },
+    {
+      "id": "input-3",
+      "type": "input"
+    },
+    {
+      "id": "analyze-this",
+      "type": "promptTemplate",
+      "configuration": {
+        "template": "Analyze the following question and instead of answering, list out steps to take to answer the question: {{question}}"
+      }
+    },
+    {
+      "id": "output-4",
+      "type": "output"
+    }
+  ],
+  "kits": [
+    {
+      "url": "npm:@google-labs/llm-starter"
+    }
+  ]
+}

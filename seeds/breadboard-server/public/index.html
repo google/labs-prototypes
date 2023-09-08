@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<style>
+  body {
+    padding: 1rem;
+  }
+  body,
+  input {
+    font-family: Fira Code, monospace;
+    font-size: 1.1rem;
+  }
+
+  #log {
+    white-space: pre-wrap;
+  }
+
+  input {
+    width: 80%;
+  }
+
+  div,
+  form {
+    padding-bottom: 1rem;
+  }
+
+  #progress {
+    color: lightgray;
+  }
+</style>
+<div id="intro">
+  This is a Breadboard API endpoint. This page provides a simple way to query
+  the API. For more information on how to use the API endpoint, see
+  <a
+    href="https://github.com/google/labs-prototypes/tree/main/seeds/breadboard/docs/endpoint-api.md"
+    >Breadboard API Endpoint Reference</a
+  >
+</div>
+<div id="url"></div>
+
+<div id="log">
+  <div id="progress">Initializing ...</div>
+</div>
+<script type="module">
+  const log = document.querySelector("#log");
+
+  // Polyfill to make ReadableStream async iterable
+  // See https://bugs.chromium.org/p/chromium/issues/detail?id=929585
+  ReadableStream.prototype[Symbol.asyncIterator] = async function* () {
+    const reader = this.getReader();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) return;
+        yield value;
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  };
+
+  class BoardStreamer {
+    writable;
+    readable;
+    controller = null;
+
+    constructor() {
+      this.writable = new WritableStream({
+        write: (chunk) => this.write(chunk),
+      });
+      this.readable = new ReadableStream({
+        start: (controller) => {
+          this.controller = controller;
+        },
+      });
+    }
+
+    write(chunk) {
+      const decoder = new TextDecoder();
+      const s = decoder.decode(chunk);
+      s.split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .forEach((line) => {
+          try {
+            if (line === "stop") {
+              this.controller?.close();
+              return;
+            }
+            const data = JSON.parse(line);
+            this.controller?.enqueue(data);
+          } catch (e) {
+            console.error(e);
+          }
+        });
+    }
+  }
+
+  const createInputFromSchema = (schema, previousState) => {
+    const input = document.createElement("div");
+    input.id = "input";
+    if (!schema) {
+      input.textContent =
+        "No input schema detected, unable to provide useful interaction.";
+      return input;
+    }
+    const form = input.appendChild(document.createElement("form"));
+    Object.entries(schema.properties).forEach(([key, property]) => {
+      const label = form.appendChild(document.createElement("label"));
+      label.textContent = `${property.title}: `;
+      const input = label.appendChild(document.createElement("input"));
+      input.name = key;
+      input.placeholder = property.description;
+      input.autofocus = true;
+    });
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      let data = {};
+      Object.entries(schema.properties).forEach(([key, property]) => {
+        const input = form[key];
+        if (input.value) {
+          data[key] = input.value;
+          log.append(`${property.title}: ${input.value}\n`);
+        }
+      });
+      input.remove();
+      await runLoop(data, previousState);
+    });
+    return input;
+  };
+
+  const writeOutput = (output) => {
+    Object.entries(output.schema.properties).forEach(([key, property]) => {
+      log.append(`${property.title}: ${output[key]}\n`);
+    });
+  };
+
+  const post = async (inputs, state) => {
+    const url = new URL(window.location);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ inputs, state }),
+    });
+    const stream = response.body?.pipeThrough(new BoardStreamer());
+    for await (const result of stream) {
+      if (result.type === "output") {
+        log.querySelector("#progress")?.remove();
+        const output = result.data;
+        writeOutput(output);
+        return result;
+      } else if (result.type === "input") {
+        log.querySelector("#progress")?.remove();
+        const input = createInputFromSchema(result.data.schema, result.state);
+        log.append(input);
+        return result;
+      } else if (result.type === "beforehandler") {
+        let progress = log.querySelector("#progress");
+        if (!progress) {
+          progress = document.createElement("div");
+          progress.id = "progress";
+          log.append(progress);
+        }
+        progress.textContent = `Running "${result.data.id}" ...`;
+      } else if (result.type === "error") {
+        log.querySelector("#progress")?.remove();
+        log.append(`Error: ${result.data.message}\n`);
+        return result;
+      } else if (result.type === "done") {
+        log.querySelector("#progress")?.remove();
+        return result;
+      }
+    }
+    return results;
+  };
+
+  const runLoop = async (inputs, state) => {
+    for (;;) {
+      let result = await post(inputs, state);
+      console.log(result);
+      if (result.type !== "output" || result.state === undefined) {
+        break;
+      }
+      state = result.state;
+      inputs = undefined;
+    }
+  };
+
+  {
+    const response = await fetch("/info");
+    const data = await response.json();
+    const a = document.createElement("a");
+    a.href = data.url;
+    a.textContent = "Board URL";
+    document.querySelector("#url").append(a);
+  }
+
+  await runLoop();
+</script>

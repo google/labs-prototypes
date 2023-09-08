@@ -1,0 +1,211 @@
+{
+  "edges": [
+    {
+      "from": "input-1",
+      "to": "prologue",
+      "constant": true,
+      "out": "prologue",
+      "in": "prologue"
+    },
+    {
+      "from": "input-1",
+      "to": "epilogue",
+      "constant": true,
+      "out": "epilogue",
+      "in": "epilogue"
+    },
+    {
+      "from": "input-1",
+      "to": "schema",
+      "constant": true,
+      "out": "schema",
+      "in": "schema"
+    },
+    {
+      "from": "input-1",
+      "to": "shouldRecover",
+      "constant": true,
+      "out": "recover",
+      "in": "allow"
+    },
+    {
+      "from": "shouldRecover",
+      "to": "willRecover",
+      "out": "value",
+      "in": "value"
+    },
+    {
+      "from": "shouldRecover",
+      "to": "error",
+      "out": "error",
+      "in": "error"
+    },
+    {
+      "from": "willRecover",
+      "to": "prologue"
+    },
+    {
+      "from": "willRecover",
+      "to": "epilogue"
+    },
+    {
+      "from": "willRecover",
+      "to": "schema"
+    },
+    {
+      "from": "schema",
+      "to": "schemish",
+      "out": "schema",
+      "in": "schema"
+    },
+    {
+      "from": "schema",
+      "to": "validate-json",
+      "out": "schema",
+      "in": "schema"
+    },
+    {
+      "from": "validate-json",
+      "to": "completion",
+      "out": "json",
+      "in": "completion"
+    },
+    {
+      "from": "validate-json",
+      "to": "shouldRecover",
+      "out": "error",
+      "in": "value"
+    },
+    {
+      "from": "secrets-2",
+      "to": "generator",
+      "constant": true,
+      "out": "PALM_KEY",
+      "in": "PALM_KEY"
+    },
+    {
+      "from": "generator",
+      "to": "validate-json",
+      "out": "completion",
+      "in": "json"
+    },
+    {
+      "from": "generator",
+      "to": "shouldRecover",
+      "out": "filters",
+      "in": "value"
+    },
+    {
+      "from": "prologue",
+      "to": "schemishGenerator",
+      "out": "prologue",
+      "in": "prologue"
+    },
+    {
+      "from": "epilogue",
+      "to": "schemishGenerator",
+      "out": "epilogue",
+      "in": "epilogue"
+    },
+    {
+      "from": "schemish",
+      "to": "schemishGenerator",
+      "out": "schemish",
+      "in": "schemish"
+    },
+    {
+      "from": "schemishGenerator",
+      "to": "generator",
+      "out": "prompt",
+      "in": "text"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "prologue",
+      "type": "passthrough"
+    },
+    {
+      "id": "epilogue",
+      "type": "passthrough"
+    },
+    {
+      "id": "schema",
+      "type": "passthrough"
+    },
+    {
+      "id": "shouldRecover",
+      "type": "runJavascript",
+      "configuration": {
+        "name": "gate",
+        "code": "function gate({ allow, value }) {\n    if (allow)\n        return { value };\n    return { error: value };\n}",
+        "raw": true
+      }
+    },
+    {
+      "id": "willRecover",
+      "type": "passthrough"
+    },
+    {
+      "id": "error",
+      "type": "output"
+    },
+    {
+      "id": "completion",
+      "type": "output"
+    },
+    {
+      "id": "input-1",
+      "type": "input"
+    },
+    {
+      "id": "schemish",
+      "type": "schemish"
+    },
+    {
+      "id": "validate-json",
+      "type": "validateJson"
+    },
+    {
+      "id": "generator",
+      "type": "generateText",
+      "configuration": {
+        "stopSequences": [
+          "Tool:",
+          "Customer:",
+          "\n\n"
+        ],
+        "safetySettings": [
+          {
+            "category": "HARM_CATEGORY_DEROGATORY",
+            "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
+      }
+    },
+    {
+      "id": "secrets-2",
+      "type": "secrets",
+      "configuration": {
+        "keys": [
+          "PALM_KEY"
+        ]
+      }
+    },
+    {
+      "id": "schemishGenerator",
+      "type": "promptTemplate",
+      "configuration": {
+        "template": "{{prologue}}\n\nYour response must be a valid JSON of the following format:\n{{schemish}}\n\n{{epilogue}}"
+      }
+    }
+  ],
+  "kits": [
+    {
+      "url": "npm:@google-labs/llm-starter"
+    },
+    {
+      "url": "npm:@google-labs/node-nursery"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "name": "@google-labs/cloud-function",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Experimenting with Breadboard and Cloud Functions",
+  "main": "./src/index.js",
+  "type": "module",
+  "scripts": {
+    "deploy": "./scripts/deploy.sh",
+    "start": "functions-framework --target=board",
+    "test": "FORCE_COLOR=1 ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/google/labs-prototypes"
+  },
+  "files": [
+    "dist/src"
+  ],
+  "ava": {
+    "files": [
+      "tests/**/*.js"
+    ],
+    "workerThreads": false
+  },
+  "keywords": [],
+  "author": "Google Labs Team",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/google/labs-prototypes/issues"
+  },
+  "homepage": "https://github.com/google/labs-prototypes#readme",
+  "devDependencies": {
+    "ava": "^5.2.0"
+  },
+  "dependencies": {
+    "@google-labs/breadboard-server": "^0.0.1",
+    "@google-labs/llm-starter": "^0.1.1",
+    "dotenv": "^16.3.1"
+  }
+}

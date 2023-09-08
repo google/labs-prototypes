@@ -5,7 +5,7 @@
 layout: default
 ---
 <link rel="stylesheet" href="main.css" type="text/css"></link>
-<!-- <!DOCTYPE html> -->
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">

@@ -15,7 +15,7 @@ body{
 
 .wrapper .sidebar{
     background:  #212121;
-    position: sticky;
+    position: fixed;
     top: 0;
     left: 0;
     bottom: 0;

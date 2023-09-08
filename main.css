@@ -15,8 +15,8 @@ body{
 
 .wrapper .sidebar{
     background:  #212121;
-    position: fixed;
-    overflow: hidden;
+    position: sticky;
+    overflow-x: hidden;
     top: 0;
     left: 0;
     bottom: 0;

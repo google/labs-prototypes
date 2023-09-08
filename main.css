@@ -17,8 +17,9 @@ body{
     background:  #212121;
     position: fixed;
     overflow: hidden;
-    top: 150px;
+    top: 0;
     left: 0;
+    bottom: 0;
     width: 225px;
     height: 100%;
     padding: 20px 0;

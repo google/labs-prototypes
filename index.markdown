@@ -14,7 +14,7 @@ layout: default
 </head>
 <!--Main Navigation-->
 <header>
-    <aside>
+    <aside class="layout-container">
     <!-- Sidebar -->
     <nav id="sidebarMenu" class="collapse d-lg-block sidebar collapse bg-white">
       <div class="position-sticky">

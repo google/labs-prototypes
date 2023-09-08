@@ -1,10 +1,10 @@
-<link rel="stylesheet" href="main.css" type="text/css"></link>
 ---
 # Feel free to add content and custom Front Matter to this file.
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: default
 ---
+<link rel="stylesheet" href="main.css" type="text/css"></link>
 <!-- <!DOCTYPE html> -->
 <html lang="en">
 <head>

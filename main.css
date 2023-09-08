@@ -10,20 +10,17 @@
 }
 
 body{
-    background: #212121;
+    background:  #212121;
 }
 
 .wrapper .sidebar{
-    background:  #212121;
+    background: #212121;
     position: fixed;
-    overflow: hidden;
-    top: 0;
+    top: 150px;
     left: 0;
-    bottom: 0;
     width: 225px;
     height: 100%;
-    padding: 50px 0;
-    padding-top: 100px;
+    padding: 20px 0;
     transition: all 0.5s ease;
 }
 
@@ -52,7 +49,7 @@ body{
 
 .wrapper .sidebar ul li a:hover .icon,
 .wrapper .sidebar ul li a.active .icon{
-    color: #212121;
+    color: #0c7db1;
 }
 
 .wrapper .sidebar ul li a:hover:before,

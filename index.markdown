@@ -47,7 +47,6 @@ layout: default
       </div>
     </nav>
     <!-- Sidebar -->
-  
     <!-- Navbar -->
     <nav id="main-navbar" class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
       <!-- Container wrapper -->
@@ -57,7 +56,6 @@ layout: default
           aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
           <i class="fas fa-bars"></i>
         </button>
-  
         <!-- Brand -->
         <a class="navbar-brand" href="#">
           <img src="https://mdbcdn.b-cdn.net/img/logo/mdb-transaprent-noshadows.webp" height="25" alt="MDB Logo"
@@ -69,7 +67,6 @@ layout: default
             placeholder='Search (ctrl + "/" to focus)' style="min-width: 225px;" />
           <span class="input-group-text border-0"><i class="fas fa-search"></i></span>
         </form>
-  
         <!-- Right links -->
         <ul class="navbar-nav ms-auto d-flex flex-row">
           <!-- Notification dropdown -->
@@ -91,7 +88,6 @@ layout: default
               </li>
             </ul>
           </li>
-  
           <!-- Icon -->
           <li class="nav-item">
             <a class="nav-link me-3 me-lg-0" href="#">
@@ -104,7 +100,6 @@ layout: default
               <i class="fab fa-github"></i>
             </a>
           </li>
-  
           <!-- Icon dropdown -->
           <li class="nav-item dropdown">
             <a class="nav-link me-3 me-lg-0 dropdown-toggle hidden-arrow" href="#" id="navbarDropdown"
@@ -145,7 +140,6 @@ layout: default
               </li>
             </ul>
           </li>
-  
           <!-- Avatar -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle hidden-arrow d-flex align-items-center" href="#"
@@ -178,6 +172,7 @@ layout: default
     <div class="container pt-4"></div>
   </main>
   <body>
+  
     # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to

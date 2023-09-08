@@ -10,13 +10,13 @@
 }
 
 body{
-    background: #f5f6fa;
+    background: #212121;
 }
 
 .wrapper .sidebar{
-    background:#f2f2f2;
+    background: rgb(5, 68, 104);
     position: fixed;
-    top: 50px;
+    top: 150px;
     left: 0;
     width: 225px;
     height: 100%;

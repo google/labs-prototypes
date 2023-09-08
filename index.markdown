@@ -4,8 +4,8 @@
 
 layout: default
 ---
-<link rel="stylesheet" href="main.css" type="text/css"></link>
-<!DOCTYPE html>
+<link rel="stylesheet" href="main.css" type="text/css">
+<!-- <!DOCTYPE html> -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">

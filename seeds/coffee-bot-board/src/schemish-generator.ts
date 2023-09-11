@@ -15,7 +15,12 @@ const BASE = "v2-multi-agent";
 
 const maker = new PromptMaker(BASE);
 
-const board = new Board();
+const board = new Board({
+  title: "Schemish Generator",
+  description:
+    "A wrapper for PaLM API `generateText` to ensure that its output conforms to a given schema. The wrapper utilizes [Schemish](https://glazkov.com/2023/05/06/schemish/), which is a compact JSON dialect that is used express JSON Schemas.",
+  version: "0.0.1",
+});
 const kit = board.addKit(Starter);
 const nursery = board.addKit(Nursery);
 
@@ -38,12 +43,69 @@ const shouldRecover = kit.runJavascript("gate", {
 const willRecover = board.passthrough({ $id: "willRecover" });
 
 // Outputs
-const $error = board.output({ $id: "error" });
-const $completion = board.output({ $id: "completion" });
+const $error = board.output({
+  $id: "error",
+  schema: {
+    type: "object",
+    properties: {
+      error: {
+        type: "object",
+        title: "Error",
+        description: "The error reported during generation",
+      },
+    },
+  },
+});
+const $completion = board.output({
+  $id: "completion",
+  schema: {
+    type: "object",
+    properties: {
+      completion: {
+        type: "string",
+        title: "Completion",
+        description:
+          "Generated text that conforms to the specified output schema",
+      },
+    },
+  },
+});
 
 // Wire all useful parts of the input.
 board
-  .input()
+  .input({
+    $id: "input",
+    schema: {
+      type: "object",
+      properties: {
+        prologue: {
+          type: "string",
+          title: "Template prologue",
+          description:
+            "The part of the template that preceeds the place where output schema is mentioned",
+        },
+        epilogue: {
+          type: "string",
+          title: "Template epilogue",
+          description:
+            "The part of the template that follows the place where output schema is mentioned",
+        },
+        schema: {
+          type: "object",
+          title: "Output schema",
+          description: "The JSON schema object that describes desired output",
+        },
+        recover: {
+          type: "boolean",
+          title: "Error recovery",
+          description:
+            "Whether to try to recover from errors or just report failure",
+        },
+      },
+      required: ["prologue", "epilogue", "schema", "recover"],
+      additionalProperties: false,
+    },
+  })
   .wire("prologue->.", prologue)
   .wire("epilogue->.", epilogue)
   .wire("schema->.", schema)

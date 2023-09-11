@@ -13,7 +13,8 @@ import {
   GraphIntegrityValidator,
   GraphIntegrityPolicy,
   Label,
-  LabelLattice,
+  Principal,
+  PrincipalLattice,
 } from "@google-labs/graph-integrity";
 
 import { ReActHelper } from "./react.js";
@@ -43,6 +44,10 @@ const wait_for_input = async (message: string) => {
   return output;
 };
 
+type InputSchema = {
+  properties?: Record<string, { description?: string }>;
+};
+
 async function main(args: string[], use_input_handler = false) {
   // Parse arguments. Redo with a library once it gets more complex. Example:
   // npm run dev graphs/simplest.json -- --validate-integrity --log-integrity-labels
@@ -57,9 +62,19 @@ async function main(args: string[], use_input_handler = false) {
   // This is how the `secrets` node gets ahold of the keys.
   config();
 
+  const get_intro = (schema?: InputSchema) => {
+    const defaultIntro = "Enter some text";
+    if (!schema) return defaultIntro;
+    if (!schema.properties) return defaultIntro;
+    const properties = Object.entries(schema.properties) || [];
+    if (!properties.length) return defaultIntro;
+    return properties[0][1].description || defaultIntro;
+  };
+
   const ask = async (inputs: InputValues): Promise<OutputValues> => {
     const defaultValue = "<Exit>";
-    const message = ((inputs && inputs.message) as string) || "Enter some text";
+    // TODO: This currently implies a single input node. Make it not so.
+    const message = get_intro(inputs?.schema as InputSchema);
     const input = use_input_handler
       ? await wait_for_input(message)
       : await text({
@@ -115,22 +130,27 @@ async function main(args: string[], use_input_handler = false) {
 
   // Load the board, specified in the command line.
   const board = await Board.load(graph, { base });
-
   // Add a custom kit.
   board.addKit(ReActHelper);
 
   if (validateIntegrity) {
-    const lattice = new LabelLattice();
+    const lattice = new PrincipalLattice();
+
+    const possiblePromptInjection = new Principal("possiblePromptInjection");
+    const noPromptInjection = new Principal("noPromptInjection");
+    lattice.insert(possiblePromptInjection, lattice.TRUSTED, lattice.UNTRUSTED);
+    lattice.insert(noPromptInjection, lattice.TRUSTED, possiblePromptInjection);
+
     const policy = {
       fetch: {
         outgoing: {
-          response: new Label({ integrity: lattice.UNTRUSTED }),
+          response: new Label({ integrity: possiblePromptInjection }),
         },
       },
       runJavascript: {
         incoming: {
-          code: new Label({ integrity: lattice.TRUSTED }),
-          name: new Label({ integrity: lattice.TRUSTED }),
+          code: new Label({ integrity: noPromptInjection }),
+          name: new Label({ integrity: noPromptInjection }),
         },
       },
     } as GraphIntegrityPolicy;

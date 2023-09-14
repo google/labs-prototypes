@@ -24,6 +24,8 @@
     "npm-ci": "^0.0.2",
     "rimraf": "^5.0.1",
     "turbo": "^1.10.13",
+    "typedoc": "^0.25.1",
+    "typedoc-plugin-markdown": "^3.16.0",
     "typescript": "^5.0.4"
   },
   "workspaces": [

@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
+=======
 # Logs
 logs
 *.log
@@ -111,3 +118,4 @@ dist
 # Ignore Turbobuild cache files
 .turbo
 .DS_Store
+>>>>>>> b2eb8e64ef0b8ca49bf0b64894f57f95305e9b53

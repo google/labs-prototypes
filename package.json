@@ -4,7 +4,6 @@
   "description": "Google Labs repo for rapid prototyping",
   "type": "module",
   "scripts": {
-    "generate:docs": "typedoc --plugin typedoc-plugin-markdown",
     "test": "turbo test",
     "build": "turbo build",
     "lint": "turbo lint",

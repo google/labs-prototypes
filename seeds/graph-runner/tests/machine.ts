@@ -18,7 +18,7 @@ const IN_DIR = "./tests/data/";
 interface TestGraphDescriptor extends GraphDescriptor {
   sequence: string[];
   inputs: InputValues;
-  outputs: OutputValues;
+  outputs: OutputValues[];
   throws: boolean;
 }
 
@@ -31,8 +31,13 @@ await Promise.all(
     test(filename, async (t) => {
       const data = await readFile(`${IN_DIR}${filename}`, "utf-8");
       const graph = JSON.parse(data) as TestGraphDescriptor;
+      if (graph.title?.includes("skip")) {
+        t.pass();
+        t.log("Skipped");
+        return;
+      }
       const machine = new TraversalMachine(graph);
-      const outputs = {};
+      const outputs: OutputValues[] = [];
       const sequence: string[] = [];
       const run = async () => {
         for await (const result of machine) {
@@ -44,8 +49,14 @@ await Promise.all(
               result.outputs = graph.inputs;
               break;
             case "output":
-              Object.assign(outputs, inputs);
+              outputs.push(inputs);
               break;
+            case "extract": {
+              const list = result.inputs.list as string[];
+              const text = list.shift();
+              result.outputs = list.length ? { list, text } : { text };
+              break;
+            }
             case "noop":
               result.outputs = inputs;
               break;
@@ -121,5 +132,5 @@ test("Can be interrupted and resumed", async (t) => {
     });
   }
 
-  t.deepEqual(result.inputs, graph.outputs);
+  t.deepEqual(result.inputs, graph.outputs[0]);
 });

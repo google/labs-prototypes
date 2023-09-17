@@ -6,6 +6,7 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
+    "generate:docs": "typedoc --plugin typedoc-plugin-markdown",
     "deploy": "./scripts/deploy.sh",
     "dev": "npx turbo build && functions-framework --target=board",
     "test": "FORCE_COLOR=1 ava"

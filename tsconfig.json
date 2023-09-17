@@ -1,6 +1,7 @@
 {
   "extends": "@google-labs/tsconfig/base.json",
   "files": [],
+  
   "references": [
     { "path": "seeds/discovery-types" },
     { "path": "seeds/palm-lite" },

@@ -266,8 +266,8 @@ npm publish --registry https://wombat-dressing-room.appspot.com
 As more development takes place and more features are added, the documentation requires update to stay in sync with these developments. <br> <br>
 The TSDoc provides a command that when run automatically updates the generated docs and inserts it into the workflow.<br> <br>
 The modules/packages have been configured with a ready TSDoc command that gets triggered when a certain command is specified. <br> <br>
-1. Navigate to your working directory where the change was implemented. <br> <br>
-2. Run the command in the terminal:
+1. Navigate to your working directory where the change was made. <br> <br>
+2. Run this command in your terminal:
   ```
   npm run generate:docs
   ```

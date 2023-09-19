@@ -8,6 +8,7 @@
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
+    "generate:docs": "typedoc --plugin typedoc-plugin-markdown",
     "test": "echo test",
     "build": "FORCE_COLOR=1 vite build",
     "watch": "FORCE_COLOR=1 tsc --b --watch && vite build",

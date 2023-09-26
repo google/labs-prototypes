@@ -48,4 +48,4 @@ Renames and re-exports [Nursery](classes/Nursery.md)
 
 #### Defined in
 
-[nodes/map.ts:61](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/node-nursery/src/nodes/map.ts#L61)
+[nodes/map.ts:61](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/node-nursery/src/nodes/map.ts#L61)

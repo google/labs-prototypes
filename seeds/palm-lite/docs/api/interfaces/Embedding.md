@@ -20,4 +20,4 @@ The embedding values.
 
 #### Defined in
 
-[types.ts:83](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/palm-lite/src/types.ts#L83)
+[types.ts:83](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/palm-lite/src/types.ts#L83)

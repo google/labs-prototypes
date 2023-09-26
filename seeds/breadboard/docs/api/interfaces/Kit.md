@@ -64,4 +64,4 @@ seeds/graph-runner/dist/src/types.d.ts:103
 
 #### Defined in
 
-[seeds/breadboard/src/types.ts:21](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/breadboard/src/types.ts#L21)
+[seeds/breadboard/src/types.ts:21](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/breadboard/src/types.ts#L21)

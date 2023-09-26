@@ -37,7 +37,7 @@
 
 #### Defined in
 
-[seeds/breadboard/src/types.ts:24](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/breadboard/src/types.ts#L24)
+[seeds/breadboard/src/types.ts:24](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/breadboard/src/types.ts#L24)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[seeds/breadboard/src/types.ts:81](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/breadboard/src/types.ts#L81)
+[seeds/breadboard/src/types.ts:81](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/breadboard/src/types.ts#L81)
 
 ___
 
@@ -68,7 +68,7 @@ passed to the node itself.
 
 #### Defined in
 
-[seeds/breadboard/src/types.ts:234](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/breadboard/src/types.ts#L234)
+[seeds/breadboard/src/types.ts:234](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/breadboard/src/types.ts#L234)
 
 ___
 
@@ -82,7 +82,7 @@ See [Chapter 7: Probes](https://github.com/google/labs-prototypes/tree/main/seed
 
 #### Defined in
 
-[seeds/breadboard/src/types.ts:166](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/breadboard/src/types.ts#L166)
+[seeds/breadboard/src/types.ts:166](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/breadboard/src/types.ts#L166)
 
 ___
 
@@ -92,4 +92,4 @@ ___
 
 #### Defined in
 
-[seeds/breadboard/src/types.ts:26](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/breadboard/src/types.ts#L26)
+[seeds/breadboard/src/types.ts:26](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/breadboard/src/types.ts#L26)

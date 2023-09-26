@@ -56,7 +56,7 @@ Represents an edge in a graph.
 
 #### Defined in
 
-[types.ts:74](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L74)
+[types.ts:74](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L74)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[types.ts:11](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L11)
+[types.ts:11](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L11)
 
 ___
 
@@ -78,7 +78,7 @@ Represents a graph.
 
 #### Defined in
 
-[types.ts:171](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L171)
+[types.ts:171](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L171)
 
 ___
 
@@ -99,7 +99,7 @@ Represents graph metadata.
 
 #### Defined in
 
-[types.ts:133](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L133)
+[types.ts:133](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L133)
 
 ___
 
@@ -111,7 +111,7 @@ Values that are supplied as inputs to the `NodeHandler`.
 
 #### Defined in
 
-[types.ts:229](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L229)
+[types.ts:229](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L229)
 
 ___
 
@@ -133,7 +133,7 @@ The `@google-labs/llm-starter` package is an example of kit.
 
 #### Defined in
 
-[types.ts:117](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L117)
+[types.ts:117](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L117)
 
 ___
 
@@ -146,7 +146,7 @@ the `InputValues` and supplied as inputs to the `NodeHandler`.
 
 #### Defined in
 
-[types.ts:240](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L240)
+[types.ts:240](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L240)
 
 ___
 
@@ -166,7 +166,7 @@ Represents a node in a graph.
 
 #### Defined in
 
-[types.ts:54](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L54)
+[types.ts:54](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L54)
 
 ___
 
@@ -192,7 +192,7 @@ A function that represents a type of a node in the graph.
 
 #### Defined in
 
-[types.ts:245](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L245)
+[types.ts:245](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L245)
 
 ___
 
@@ -204,7 +204,7 @@ All known node handlers.
 
 #### Defined in
 
-[types.ts:255](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L255)
+[types.ts:255](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L255)
 
 ___
 
@@ -216,7 +216,7 @@ Unique identifier of a node's type.
 
 #### Defined in
 
-[types.ts:49](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L49)
+[types.ts:49](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L49)
 
 ___
 
@@ -228,7 +228,7 @@ A type representing a valid JSON value.
 
 #### Defined in
 
-[types.ts:21](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L21)
+[types.ts:21](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L21)
 
 ___
 
@@ -240,7 +240,7 @@ Values that the `NodeHandler` outputs.
 
 #### Defined in
 
-[types.ts:234](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L234)
+[types.ts:234](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L234)
 
 ___
 
@@ -254,7 +254,7 @@ The value is the descriptor of the sub-graph.
 
 #### Defined in
 
-[types.ts:166](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/types.ts#L166)
+[types.ts:166](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/types.ts#L166)
 
 ## Functions
 
@@ -275,4 +275,4 @@ The value is the descriptor of the sub-graph.
 
 #### Defined in
 
-[mermaid.ts:201](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/graph-runner/src/mermaid.ts#L201)
+[mermaid.ts:201](https://github.com/Chizobaonorh/labs-prototypes/blob/0d5a680/seeds/graph-runner/src/mermaid.ts#L201)

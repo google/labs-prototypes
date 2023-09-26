@@ -9,7 +9,7 @@
       "dependsOn": ["build", "^test"]
     },
     "generate:docs": {
-      "dependsOn": ["build"]
+      "dependsOn": ["^generate:docs"]
     },
     "watch": {
       "persistent": true,

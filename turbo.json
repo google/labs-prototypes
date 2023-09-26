@@ -8,6 +8,9 @@
     "test": {
       "dependsOn": ["build", "^test"]
     },
+    "generate:docs": {
+      "dependsOn": ["build"]
+    },
     "watch": {
       "persistent": true,
       "cache": false

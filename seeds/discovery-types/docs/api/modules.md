@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[index.ts:11](https://github.com/Chizobaonorh/labs-prototypes/blob/220f97e/seeds/discovery-types/src/index.ts#L11)
+[index.ts:11](https://github.com/Chizobaonorh/labs-prototypes/blob/66eed2a/seeds/discovery-types/src/index.ts#L11)

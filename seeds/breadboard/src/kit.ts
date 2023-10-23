@@ -15,9 +15,10 @@ import {
   KitConstructor,
   KitImportMap,
   NodeFactory,
-  OptionalIdConfiguration,
+  NodeHandlerContext,
+  ConfigOrLambda,
+  OutputValues,
 } from "./types.js";
-import { Board } from "./board.js";
 import { callHandler } from "./handler.js";
 import { BoardRunner } from "./runner.js";
 
@@ -64,11 +65,13 @@ export class KitLoader {
 
 export class GraphToKitAdapter {
   graph: GraphDescriptor;
+  kits?: KitImportMap;
   handlers?: NodeHandlers;
   board?: BoardRunner;
 
-  private constructor(graph: GraphDescriptor) {
+  private constructor(graph: GraphDescriptor, kits?: KitImportMap) {
     this.graph = graph;
+    this.kits = kits;
   }
 
   populateDescriptor(descriptor: KitBuilderOptions) {
@@ -77,9 +80,21 @@ export class GraphToKitAdapter {
   }
 
   async #initialize(url: string) {
-    const board = await Board.fromGraphDescriptor(this.graph);
+    const board = await BoardRunner.fromGraphDescriptor(this.graph, this.kits);
     board.url = url;
-    this.handlers = await Board.handlersFromBoard(board);
+    // NOTE: This means that this board will _not_ use handlers defined upstream
+    // in the stack of boards to execute to nodes on this graph, but only the
+    // kits defined on this graph.
+    //
+    // Note however that `invoke` nodes will execute subgraphs with handlers
+    // from higher in the stack, so for example a subgraph defined here that
+    // uses `fetch` will use the `fetch` handler from the parent graph before
+    // using the `fetch` handler from kit defined here.
+    //
+    // The comment above applies only to nodes acting as node handler. We
+    // haven't seen this use-case yet for anything that isn't a Core node, so
+    // let's revisit once we have that.
+    this.handlers = await BoardRunner.handlersFromBoard(board);
     this.board = board;
   }
 
@@ -90,29 +105,35 @@ export class GraphToKitAdapter {
     if (!node) throw new Error(`Node ${id} not found in graph.`);
 
     return {
-      invoke: async (inputs: InputValues) => {
+      invoke: async (inputs: InputValues, context: NodeHandlerContext) => {
         const configuration = node.configuration;
         if (configuration) {
           inputs = { ...configuration, ...inputs };
         }
         const handler = this.handlers?.[node.type];
-        if (!handler) return;
+        if (!handler)
+          throw new Error(`No handler found for node "${node.type}".`);
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const board = this.board!;
 
         return callHandler(handler, inputs, {
-          board,
-          descriptor: node,
-          parent: board,
-          slots: {}, // TODO: Perhaps pass slots from graph?
+          ...context,
+          outerGraph: board,
+          base: board.url,
+          // Add this board's kits, so they are available to subgraphs
+          kits: [...(context.kits || []), ...board.kits],
         });
       },
     };
   }
 
-  static async create(graph: GraphDescriptor, url: string) {
-    const adapter = new GraphToKitAdapter(graph);
+  static async create(
+    graph: GraphDescriptor,
+    url: string,
+    kits?: KitImportMap
+  ) {
+    const adapter = new GraphToKitAdapter(graph, kits);
     await adapter.#initialize(url);
     return adapter;
   }
@@ -177,15 +198,18 @@ export class KitBuilder {
       }
 
       constructor(nodeFactory: NodeFactory) {
-        return new Proxy(this, {
+        const proxy = new Proxy(this, {
           get(target, prop: string) {
             if (prop === "handlers" || prop === "url") {
               return target[prop];
             } else if (nodes.includes(prop as NodeNames[number])) {
-              return (config: OptionalIdConfiguration = {}) => {
+              return (
+                configOrLambda: ConfigOrLambda<InputValues, OutputValues> = {}
+              ) => {
+                const config = nodeFactory.getConfigWithLambda(configOrLambda);
                 const { $id, ...rest } = config;
                 return nodeFactory.create(
-                  this as unknown as Kit,
+                  proxy as unknown as Kit,
                   `${prefix}${prop}`,
                   { ...rest },
                   $id
@@ -194,6 +218,7 @@ export class KitBuilder {
             }
           },
         });
+        return proxy;
       }
     } as KitConstructor<GenericKit<Handlers>>;
   }

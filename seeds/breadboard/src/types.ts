@@ -378,7 +378,7 @@ export interface KitConstructor<T extends Kit> {
 }
 
 export type NodeSugar<In, Out> = (
-  config?: OptionalIdConfiguration
+  config?: ConfigOrLambda<In, Out>
 ) => BreadboardNode<In, Out>;
 
 export type GenericKit<T extends NodeHandlers> = Kit & {
@@ -469,22 +469,17 @@ export type ProbeEvent = CustomEvent<ProbeDetails>;
 export interface BreadboardRunner extends GraphDescriptor {
   kits: Kit[]; // No longer optional
   run(
-    probe?: EventTarget,
-    slots?: BreadboardSlotSpec,
+    context?: NodeHandlerContext,
     result?: BreadboardRunResult
   ): AsyncGenerator<BreadboardRunResult>;
   runOnce(
     inputs: InputValues,
-    context?: NodeHandlerContext,
-    probe?: EventTarget
+    context?: NodeHandlerContext
   ): Promise<OutputValues>;
   addValidator(validator: BreadboardValidator): void;
 }
 
 export interface Breadboard extends BreadboardRunner {
-  passthrough<In = InputValues, Out = OutputValues>(
-    config?: OptionalIdConfiguration
-  ): BreadboardNode<In, Out>;
   input<In = InputValues, Out = OutputValues>(
     config?: OptionalIdConfiguration
   ): BreadboardNode<In, Out>;
@@ -495,17 +490,6 @@ export interface Breadboard extends BreadboardRunner {
     boardOrFunction: LambdaFunction<InL, OutL> | BreadboardRunner,
     config?: OptionalIdConfiguration
   ): BreadboardNode<In, LambdaNodeOutputs>;
-  include<In = InputValues, Out = OutputValues>(
-    $ref: string | GraphDescriptor | BreadboardCapability,
-    config?: OptionalIdConfiguration
-  ): BreadboardNode<IncludeNodeInputs & In, Out>;
-  reflect(
-    config?: OptionalIdConfiguration
-  ): BreadboardNode<never, ReflectNodeOutputs>;
-  slot<In = InputValues, Out = OutputValues>(
-    slot: string,
-    config?: OptionalIdConfiguration
-  ): BreadboardNode<SlotNodeInputs & In, Out>;
 
   addEdge(edge: Edge): void;
   addNode(node: NodeDescriptor): void;
@@ -520,10 +504,12 @@ export type BreadboardCapability = Capability & {
 };
 
 export interface NodeHandlerContext {
-  readonly board: BreadboardRunner;
-  readonly descriptor: NodeDescriptor;
-  readonly parent: GraphDescriptor;
-  readonly slots: BreadboardSlotSpec;
+  readonly board?: BreadboardRunner;
+  readonly descriptor?: NodeDescriptor;
+  readonly kits?: Kit[];
+  readonly base?: string;
+  readonly outerGraph?: GraphDescriptor;
+  readonly slots?: BreadboardSlotSpec;
   readonly probe?: EventTarget;
 }
 
@@ -632,10 +618,6 @@ export type LambdaFunction<In = InputValues, Out = OutputValues> = (
   output: BreadboardNode<In, Out>
 ) => void;
 
-export type ReflectNodeOutputs = OutputValues & {
-  graph: GraphDescriptor;
-};
-
 export type LambdaNodeInputs = InputValues & {
   /**
    * The (lambda) board this node represents. The purpose of the this node is to
@@ -657,32 +639,6 @@ export type LambdaNodeOutputs = OutputValues & {
    * The lambda board that can be run.
    */
   board: BreadboardCapability;
-};
-
-export type ImportNodeInputs = InputValues & {
-  path?: string;
-  graph?: GraphDescriptor;
-  args: InputValues;
-};
-
-export type IncludeNodeInputs = InputValues & {
-  path?: string;
-  $ref?: string;
-  board?: BreadboardCapability;
-  graph?: GraphDescriptor;
-  slotted?: BreadboardSlotSpec;
-  args: InputValues;
-};
-
-export type InvokeNodeInputs = InputValues & {
-  path?: string;
-  board?: BreadboardCapability;
-  graph?: GraphDescriptor;
-};
-
-export type SlotNodeInputs = {
-  slot: string;
-  parent: NodeDescriptor;
 };
 
 export type KitImportMap = Record<string, KitConstructor<Kit>>;

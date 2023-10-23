@@ -4,26 +4,32 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { type NodeValue, Board } from "@google-labs/breadboard";
+import {
+  type NodeValue,
+  Board,
+  GraphDescriptor,
+} from "@google-labs/breadboard";
 import { Starter } from "@google-labs/llm-starter";
 
 import { PromptMaker } from "./template.js";
 
 import { schemishGenerator } from "./schemish-generator.js";
+import { Core } from "@google-labs/core-kit";
 
 const BASE = "v2-multi-agent";
 
 const maker = new PromptMaker(BASE);
 const board = new Board();
 const kit = board.addKit(Starter);
+const core = board.addKit(Core);
 
 const prologuePrompt = kit
   .promptTemplate(
     ...(await maker.prompt("order-agent-prologue", "orderAgentPrologue"))
   )
-  .wire("<-tools.", board.passthrough(await maker.part("tools", "json")));
+  .wire("<-tools.", core.passthrough(await maker.part("tools", "json")));
 
-const schema = board.passthrough(await maker.jsonPart("order-schema"));
+const schema = core.passthrough(await maker.jsonPart("order-schema"));
 
 const epiloguePrompt = kit.promptTemplate(
   ...(await maker.prompt("order-agent-epilogue", "orderAgentEpilogue"))
@@ -33,7 +39,7 @@ const customerMemory = kit.append({ $id: "customerMemory" });
 const agentMemory = kit.append({ $id: "agentMemory" });
 const toolMemory = kit.append({ $id: "toolMemory" });
 
-board.passthrough({ accumulator: "\n" }).wire("accumulator->", customerMemory);
+core.passthrough({ accumulator: "\n" }).wire("accumulator->", customerMemory);
 customerMemory.wire("accumulator->", agentMemory);
 agentMemory
   .wire("accumulator->", toolMemory)
@@ -44,31 +50,31 @@ epiloguePrompt
   .wire("memory<-accumulator", customerMemory)
   .wire("memory<-accumulator", toolMemory);
 
-const checkMenuTool = board.passthrough().wire(
+const checkMenuTool = core.passthrough().wire(
   "checkMenu->json",
   kit.jsonata("actionInput").wire(
     "result->customer",
-    board
-      .slot("checkMenu")
+    core
+      .slot({ slot: "checkMenu" })
       .wire("bot->Tool", toolMemory)
       .wire("bot->", board.output({ $id: "checkMenu-tool-output" }))
-      .wire("error->", board.output({ $id: "error" }))
+      .wire("$error->", board.output({ $id: "error" }))
   )
 );
 
-const summarizeMenuTool = board.passthrough().wire(
+const summarizeMenuTool = core.passthrough().wire(
   "summarizeMenu->json",
   kit.jsonata("actionInput").wire(
     "result->customer",
-    board
-      .slot("summarizeMenu")
+    core
+      .slot({ slot: "summarizeMenu" })
       .wire("bot->Tool", toolMemory)
       .wire("bot->", board.output({ $id: "summarizeMenu-tool-output" }))
-      .wire("error->", board.output({ $id: "error" }))
+      .wire("$error->", board.output({ $id: "error" }))
   )
 );
 
-const customerTool = board
+const customerTool = core
   .passthrough()
   .wire(
     "customer->json",
@@ -82,7 +88,7 @@ const customerTool = board
       )
   );
 
-const finalizeOrderTool = board
+const finalizeOrderTool = core
   .passthrough()
   .wire("finalizeOrder->bot", board.output({ $id: "finalizeOrder" }));
 
@@ -107,14 +113,14 @@ board
   .input({ $id: "first-ask-customer" })
   .wire("customer->Customer", customerMemory);
 
-board
-  .include(schemishGenerator, { $id: "generator" })
+core
+  .include({ graph: schemishGenerator as GraphDescriptor, $id: "generator" })
   .wire("prologue<-prompt.", prologuePrompt)
   .wire("epilogue<-prompt.", epiloguePrompt)
   .wire("schema<-order-schema.", schema)
-  .wire("<-recover.", board.passthrough({ recover: true }))
+  .wire("<-recover.", core.passthrough({ recover: true }))
   .wire("completion->", toolRouter)
   .wire("completion->Agent", agentMemory)
-  .wire("error->", board.output({ $id: "error" }));
+  .wire("$error->", board.output({ $id: "error" }));
 
 export const orderAgent = board;

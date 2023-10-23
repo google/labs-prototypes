@@ -29,14 +29,14 @@ export const run = async (board: Board, slots?: BreadboardSlotSpec) => {
   };
 
   const show = (id: string, outputs: Record<string, NodeValue>) => {
-    const { bot, error } = outputs;
-    if (error) log.error(stringify(error));
+    const { bot, $error } = outputs;
+    if ($error) log.error(stringify($error));
     else log.success(`${id}: ${stringify(bot)}`);
   };
 
   try {
     // Run the board until it finishes. This may run forever.
-    for await (const stop of board.run(probe, slots)) {
+    for await (const stop of board.run({ probe, slots })) {
       if (stop.type === "input") {
         stop.inputs = await ask(stop.inputArguments);
       } else if (stop.type === "output") {

@@ -11,7 +11,7 @@ import type {
   BreadboardCapability,
   GraphDescriptor,
 } from "@google-labs/breadboard";
-import { Board } from "@google-labs/breadboard";
+import { BoardRunner } from "@google-labs/breadboard";
 import { SchemaBuilder } from "@google-labs/breadboard/kits";
 
 export type InvokeNodeInputs = InputValues & {
@@ -52,13 +52,13 @@ export default {
     const { path, board, graph, ...args } = inputs as InvokeNodeInputs;
 
     const runnableBoard = board
-      ? await Board.fromBreadboardCapability(board)
+      ? await BoardRunner.fromBreadboardCapability(board)
       : graph
-      ? await Board.fromGraphDescriptor(graph)
+      ? await BoardRunner.fromGraphDescriptor(graph)
       : path
-      ? await Board.load(path, {
-          base: context.board.url,
-          outerGraph: context.parent,
+      ? await BoardRunner.load(path, {
+          base: context.base,
+          outerGraph: context.outerGraph,
         })
       : undefined;
 

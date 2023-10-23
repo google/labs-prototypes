@@ -51,6 +51,7 @@
     "@google-labs/llm-starter": "*"
   },
   "dependencies": {
-    "@google-labs/breadboard": "*"
+    "@google-labs/breadboard": "*",
+    "@google-labs/core-kit": "*"
   }
 }

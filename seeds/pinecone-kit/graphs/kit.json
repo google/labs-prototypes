@@ -33,7 +33,11 @@
       }
     }
   ],
-  "kits": [],
+  "kits": [
+    {
+      "url": "npm:@google-labs/core-kit"
+    }
+  ],
   "graphs": {
     "config": {
       "title": "Pinecone API configuration helper",
@@ -265,6 +269,9 @@
           "description": "A kit that provides a few necessary components for wiring boards that use PaLM API.",
           "version": "0.0.1",
           "url": "npm:@google-labs/llm-starter"
+        },
+        {
+          "url": "npm:@google-labs/core-kit"
         }
       ]
     },
@@ -365,7 +372,11 @@
           "type": "output"
         }
       ],
-      "kits": []
+      "kits": [
+        {
+          "url": "npm:@google-labs/core-kit"
+        }
+      ]
     },
     "vector": {
       "title": "Pinecone API vector call builder",

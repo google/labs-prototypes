@@ -79,11 +79,9 @@ test("schemish-generator valid", async (t) => {
     return { completion: '{ "type": "drink", "order": "chai latte"}' };
   });
 
-  const outputs = await schemishGenerator.runOnce(
-    inputs,
-    undefined,
-    debugProbe
-  );
+  const outputs = await schemishGenerator.runOnce(inputs, {
+    probe: debugProbe,
+  });
 
   t.like(outputs, { completion: { type: "drink", order: "chai latte" } });
 });
@@ -116,20 +114,21 @@ test("schemish-generator with unparseable JSON", async (t) => {
   debugProbe.replaceNode("generator", (_inputs) => {
     count++;
     if (count > 2) return { completion: '{ "type": "drink" }' };
-    return { completion: '{ type: "drink"}' };
+    return { completion: '{ typish: "drink"}' };
   });
 
-  const outputs = await schemishGenerator.runOnce(
-    inputs,
-    undefined,
-    debugProbe
-  );
+  const outputs = await schemishGenerator.runOnce(inputs, {
+    probe: debugProbe,
+  });
 
   t.is(count, 1);
   t.like(outputs, {
-    error: {
-      message: "Expected property name or '}' in JSON at position 2",
-      type: "parsing",
+    $error: {
+      kind: "error",
+      error: {
+        message: '0: instance requires property "type"\n',
+        type: "validation",
+      },
     },
   });
 });
@@ -165,11 +164,9 @@ test("schemish-generator with unparseable JSON and recovery", async (t) => {
     return { completion: '{ type: "drink"}' };
   });
 
-  const outputs = await schemishGenerator.runOnce(
-    inputs,
-    undefined,
-    debugProbe
-  );
+  const outputs = await schemishGenerator.runOnce(inputs, {
+    probe: debugProbe,
+  });
 
   t.is(count, 3);
   t.like(outputs, {
@@ -210,17 +207,18 @@ test("schemish-generator with invalid JSON", async (t) => {
     return { completion: '{ "type": "automobile"}' };
   });
 
-  const outputs = await schemishGenerator.runOnce(
-    inputs,
-    undefined,
-    debugProbe
-  );
+  const outputs = await schemishGenerator.runOnce(inputs, {
+    probe: debugProbe,
+  });
 
   t.is(count, 1);
   t.like(outputs, {
-    error: {
-      message: "0: instance.type is not one of enum values: drink,food\n",
-      type: "validation",
+    $error: {
+      kind: "error",
+      error: {
+        message: "0: instance.type is not one of enum values: drink,food\n",
+        type: "validation",
+      },
     },
   });
 });
@@ -256,11 +254,9 @@ test("schemish-generator with invalid JSON and recovery", async (t) => {
     return { completion: '{ "type": "automobile"}' };
   });
 
-  const outputs = await schemishGenerator.runOnce(
-    inputs,
-    undefined,
-    debugProbe
-  );
+  const outputs = await schemishGenerator.runOnce(inputs, {
+    probe: debugProbe,
+  });
 
   t.is(count, 3);
   t.like(outputs, {

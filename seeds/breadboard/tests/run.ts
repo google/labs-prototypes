@@ -8,6 +8,7 @@ import test from "ava";
 
 import { RunResult, replacer, reviver } from "../src/run.js";
 import { Board } from "../src/board.js";
+import { TestKit } from "./helpers/_test-kit.js";
 
 test("replacer correctly serializes Maps", async (t) => {
   t.is(JSON.stringify({}, replacer), "{}");
@@ -43,15 +44,13 @@ test("reviver correctly deserializes maps", async (t) => {
 test("correctly saves and loads", async (t) => {
   let runResult = "";
   const board = new Board();
+  const kit = board.addKit(TestKit);
   const input = board.input();
-  input.wire("<-", board.passthrough());
-  input.wire(
-    "*->",
-    board.passthrough().wire("*->", board.output().wire("*->", input))
-  );
+  input.wire("<-", kit.noop());
+  input.wire("*->", kit.noop().wire("*->", board.output().wire("*->", input)));
   {
     const firstBoard = await Board.fromGraphDescriptor(board);
-    for await (const stop of firstBoard.run()) {
+    for await (const stop of firstBoard.run({ kits: [kit] })) {
       t.is(stop.type, "beforehandler");
       runResult = await stop.save();
       break;
@@ -60,8 +59,7 @@ test("correctly saves and loads", async (t) => {
   {
     const secondBoard = await Board.fromGraphDescriptor(board);
     for await (const stop of secondBoard.run(
-      undefined,
-      undefined,
+      { kits: [kit] },
       RunResult.load(runResult)
     )) {
       t.is(stop.type, "input");
@@ -72,8 +70,7 @@ test("correctly saves and loads", async (t) => {
   {
     const thirdBoard = await Board.fromGraphDescriptor(board);
     for await (const stop of thirdBoard.run(
-      undefined,
-      undefined,
+      { kits: [kit] },
       RunResult.load(runResult)
     )) {
       t.is(stop.type, "beforehandler");
@@ -84,8 +81,7 @@ test("correctly saves and loads", async (t) => {
   {
     const fourthBoard = await Board.fromGraphDescriptor(board);
     for await (const stop of fourthBoard.run(
-      undefined,
-      undefined,
+      { kits: [kit] },
       RunResult.load(runResult)
     )) {
       t.is(stop.type, "output");
@@ -96,8 +92,7 @@ test("correctly saves and loads", async (t) => {
   {
     const fifthBoard = await Board.fromGraphDescriptor(board);
     for await (const stop of fifthBoard.run(
-      undefined,
-      undefined,
+      { kits: [kit] },
       RunResult.load(runResult)
     )) {
       t.is(stop.type, "input");
@@ -110,10 +105,11 @@ test("correctly saves and loads", async (t) => {
 
 test("correctly detects exit node", async (t) => {
   const board = new Board();
+  const kit = board.addKit(TestKit);
   const input = board.input();
-  input.wire("*->", board.passthrough().wire("*->", board.output()));
+  input.wire("*->", kit.noop().wire("*->", board.output()));
 
-  const generator = board.run();
+  const generator = board.run({ kits: [kit] });
 
   {
     const stop = await generator.next();

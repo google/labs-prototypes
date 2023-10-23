@@ -12,7 +12,7 @@ import type {
   BreadboardCapability,
   GraphDescriptor,
 } from "@google-labs/breadboard";
-import { Board } from "@google-labs/breadboard";
+import { BoardRunner } from "@google-labs/breadboard";
 import { SchemaBuilder } from "@google-labs/breadboard/kits";
 
 export type IncludeNodeInputs = InputValues & {
@@ -66,7 +66,7 @@ export default {
     const slottedWithUrls: BreadboardSlotSpec = {};
     if (slotted) {
       for (const key in slotted) {
-        slottedWithUrls[key] = { url: context.board.url, ...slotted[key] };
+        slottedWithUrls[key] = { url: context.base, ...slotted[key] };
       }
     }
 
@@ -74,13 +74,13 @@ export default {
     const source = path || $ref || "";
 
     const runnableBoard = board
-      ? await Board.fromBreadboardCapability(board)
+      ? await BoardRunner.fromBreadboardCapability(board)
       : graph
-      ? await Board.fromGraphDescriptor(graph)
-      : await Board.load(source, {
+      ? await BoardRunner.fromGraphDescriptor(graph)
+      : await BoardRunner.load(source, {
           slotted: slottedWithUrls,
-          base: context.board.url,
-          outerGraph: context.parent,
+          base: context.base,
+          outerGraph: context.outerGraph,
         });
 
     return await runnableBoard.runOnce(args, context);

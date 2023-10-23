@@ -5,6 +5,7 @@
  */
 
 import { Board } from "@google-labs/breadboard";
+import { Core } from "@google-labs/core-kit";
 
 const board = new Board({
   title: "Pinecone API upsert invocation",
@@ -12,11 +13,12 @@ const board = new Board({
     "This board invokes the Pinecone [`vectors/upsert`](https://docs.pinecone.io/reference/upsert) API.",
   version: "0.0.1",
 });
+const core = board.addKit(Core);
 
-const apiCall = board
-  .include("#vector", { $id: "vector" })
-  .wire("<-call", board.passthrough({ $id: "upsert", call: "vectors/upsert" }))
-  .wire("<-config", board.include("#config", { $id: "config" }));
+const apiCall = core
+  .include({ $id: "vector", $ref: "#vector" })
+  .wire("<-call", core.passthrough({ $id: "upsert", call: "vectors/upsert" }))
+  .wire("<-config", core.include({ $id: "config", $ref: "#config" }));
 
 board
   .input({

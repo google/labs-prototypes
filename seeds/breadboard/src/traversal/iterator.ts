@@ -39,19 +39,20 @@ export class TraversalMachineIterator
     const { promiseId, outputs, newOpportunities } = completedNodeOutput;
     result.pendingOutputs.delete(promiseId);
 
-    // Process outputs.
-    result.opportunities.push(...newOpportunities);
-    result.state.wireOutputs(newOpportunities, outputs);
+    // If there was an error, ignore all other outputs and hence opportunites.
+    const opportunities = outputs.$error
+      ? newOpportunities.filter((e) => e.out === "$error")
+      : newOpportunities;
 
-    if (
-      outputs.$error &&
-      newOpportunities.filter((e) => e.out === "$error").length === 0
-    ) {
+    // Process outputs.
+    result.opportunities.push(...opportunities);
+    result.state.wireOutputs(opportunities, outputs);
+
+    if (outputs.$error && opportunities.length === 0) {
       // If the node threw an exception and it wasn't routed via $error,
       // throw it again. This will cause the traversal to stop.
       throw new Error(
-        "Uncaught exception in node handler. " +
-          "Catch by wiring up the $error output.",
+        "Uncaught exception in node handler. Catch by wiring up the $error output.",
         {
           cause: outputs.$error,
         }
@@ -86,13 +87,17 @@ export class TraversalMachineIterator
         (outputsPromise || Promise.resolve({} as OutputValues))
           .then((outputs: OutputValues) => {
             // If not already present, add inputs and descriptor along for
-            // context and to support retries.
-            if (outputs.$error)
+            // context and to support retries. If $error came from another node,
+            // the descriptor will remain the original, but new inputs will be
+            // added, though never overwriting prior ones.
+            if (outputs.$error) {
+              const $error = outputs.$error as ErrorCapability;
               outputs.$error = {
                 descriptor,
-                inputs,
-                ...(outputs.$error as object),
+                ...($error as object),
+                inputs: { ...inputs, ...$error.inputs },
               };
+            }
             resolve({ promiseId, outputs, newOpportunities });
           })
           .catch((error) => {

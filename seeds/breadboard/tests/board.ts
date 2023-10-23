@@ -9,21 +9,17 @@ import test from "ava";
 import { Board } from "../src/board.js";
 import type {
   ProbeEvent,
-  Kit,
-  NodeFactory,
-  OptionalIdConfiguration,
   BreadboardCapability,
-  NodeHandlers,
+  GraphDescriptor,
 } from "../src/types.js";
+import { TestKit } from "./helpers/_test-kit.js";
 
 test("correctly skips nodes when asked", async (t) => {
   const board = new Board();
+  const kit = board.addKit(TestKit);
   board
     .input()
-    .wire(
-      "*->",
-      board.passthrough({ $id: "toSkip" }).wire("*->", board.output())
-    );
+    .wire("*->", kit.noop({ $id: "toSkip" }).wire("*->", board.output()));
 
   const skipper = new EventTarget();
   skipper.addEventListener("beforehandler", (event) => {
@@ -34,91 +30,102 @@ test("correctly skips nodes when asked", async (t) => {
     }
   });
 
-  const result = await board.runOnce({ hello: "world" }, undefined, skipper);
+  const result = await board.runOnce({ hello: "world" }, { probe: skipper });
   t.deepEqual(result, { instead: "this" });
 });
 
 test("correctly passes inputs and outputs to included boards", async (t) => {
   const nestedBoard = new Board();
+  const nestedKit = nestedBoard.addKit(TestKit);
   nestedBoard
     .input()
     .wire(
       "hello->",
-      nestedBoard
-        .passthrough()
-        .wire("hello->", nestedBoard.output({ $id: "output" }))
+      nestedKit.noop().wire("hello->", nestedBoard.output({ $id: "output" }))
     );
 
   const board = new Board();
+  const kit = board.addKit(TestKit);
   board
     .input()
     .wire(
       "hello->",
-      board.include(nestedBoard).wire("hello->", board.output())
+      kit
+        .include({ graph: nestedBoard as GraphDescriptor })
+        .wire("hello->", board.output())
     );
 
-  const result = await board.runOnce({ hello: "world" });
+  const result = await board.runOnce({ hello: "world" }, { kits: [nestedKit] });
   t.deepEqual(result, { hello: "world" });
 });
 
 test("correctly passes inputs and outputs to invoked boards", async (t) => {
   const nestedBoard = new Board();
+  const nestedKit = nestedBoard.addKit(TestKit);
   nestedBoard
     .input()
     .wire(
       "hello->",
-      nestedBoard
-        .passthrough()
-        .wire("hello->", nestedBoard.output({ $id: "output" }))
+      nestedKit.noop().wire("hello->", nestedBoard.output({ $id: "output" }))
     );
 
   const board = new Board();
+  const kit = board.addKit(TestKit);
   board
     .input()
-    .wire("hello->", board.invoke(nestedBoard).wire("hello->", board.output()));
+    .wire("hello->", kit.invoke(nestedBoard).wire("hello->", board.output()));
 
-  const result = await board.runOnce({ hello: "world" });
+  const result = await board.runOnce({ hello: "world" }, { kits: [nestedKit] });
   t.deepEqual(result, { hello: "world" });
 });
 
 test("correctly passes inputs and outputs to included boards with a probe", async (t) => {
   const nestedBoard = new Board();
+  const nestedKit = nestedBoard.addKit(TestKit);
   nestedBoard
     .input()
     .wire(
       "hello->",
-      nestedBoard
-        .passthrough()
-        .wire("hello->", nestedBoard.output({ $id: "output" }))
+      nestedKit.noop().wire("hello->", nestedBoard.output({ $id: "output" }))
     );
 
   const board = new Board();
+  const kit = board.addKit(TestKit);
   board
     .input()
     .wire(
       "hello->",
-      board.include(nestedBoard).wire("hello->", board.output())
+      kit
+        .include({ graph: nestedBoard as GraphDescriptor })
+        .wire("hello->", board.output())
     );
 
-  const result = await board.runOnce({ hello: "world" });
+  const result = await board.runOnce({ hello: "world" }, { kits: [nestedKit] });
   t.deepEqual(result, { hello: "world" });
 });
 
 test("correctly skips nodes in nested boards", async (t) => {
   const nestedBoard = new Board();
+  const nestedKit = nestedBoard.addKit(TestKit);
   nestedBoard
     .input()
     .wire(
       "*->",
-      nestedBoard
-        .passthrough({ $id: "toSkip" })
+      nestedKit
+        .noop({ $id: "toSkip" })
         .wire("*->", nestedBoard.output({ $id: "output" }))
     );
 
   const board = new Board();
+  const kit = board.addKit(TestKit);
   board
     .input()
-    .wire("*->", board.include(nestedBoard).wire("*->", board.output()));
+    .wire(
+      "*->",
+      kit
+        .include({ graph: nestedBoard as GraphDescriptor })
+        .wire("*->", board.output())
+    );
 
   const skipper = new EventTarget();
   skipper.addEventListener("beforehandler", (event) => {
@@ -129,78 +136,71 @@ test("correctly skips nodes in nested boards", async (t) => {
     }
   });
 
-  const result = await board.runOnce({ hello: "world" }, undefined, skipper);
+  const result = await board.runOnce(
+    { hello: "world" },
+    { probe: skipper, kits: [nestedKit] }
+  );
   t.deepEqual(result, { instead: "this" });
 });
 
 test("allows pausing and resuming the board", async (t) => {
   let result;
   const board = new Board();
+  const kit = board.addKit(TestKit);
   const input = board.input();
-  input.wire("<-", board.passthrough());
-  input.wire(
-    "*->",
-    board.passthrough().wire("*->", board.output().wire("*->", input))
-  );
+  input.wire("<-", kit.noop());
+  input.wire("*->", kit.noop().wire("*->", board.output().wire("*->", input)));
   {
-    const firstBoard = await Board.fromGraphDescriptor(board);
-    for await (const stop of firstBoard.run()) {
+    const firstBoard = await Board.fromGraphDescriptor(board, {
+      "test-kit": TestKit,
+    });
+    for await (const stop of firstBoard.run({ kits: [kit] })) {
       t.is(stop.type, "beforehandler");
       result = stop;
       break;
     }
   }
   {
-    const secondBoard = await Board.fromGraphDescriptor(board);
-    for await (const stop of secondBoard.run(undefined, undefined, result)) {
+    const secondBoard = await Board.fromGraphDescriptor(board, {
+      "test-kit": TestKit,
+    });
+    for await (const stop of secondBoard.run({ kits: [kit] }, result)) {
       t.is(stop.type, "input");
       result = stop;
       break;
     }
   }
   {
-    const thirdBoard = await Board.fromGraphDescriptor(board);
-    for await (const stop of thirdBoard.run(undefined, undefined, result)) {
+    const thirdBoard = await Board.fromGraphDescriptor(board, {
+      "test-kit": TestKit,
+    });
+    for await (const stop of thirdBoard.run({ kits: [kit] }, result)) {
       t.is(stop.type, "beforehandler");
       result = stop;
       break;
     }
   }
   {
-    const fourthBoard = await Board.fromGraphDescriptor(board);
-    for await (const stop of fourthBoard.run(undefined, undefined, result)) {
+    const fourthBoard = await Board.fromGraphDescriptor(board, {
+      "test-kit": TestKit,
+    });
+    for await (const stop of fourthBoard.run({ kits: [kit] }, result)) {
       t.is(stop.type, "output");
       result = stop;
       break;
     }
   }
   {
-    const fifthBoard = await Board.fromGraphDescriptor(board);
-    for await (const stop of fifthBoard.run(undefined, undefined, result)) {
+    const fifthBoard = await Board.fromGraphDescriptor(board, {
+      "test-kit": TestKit,
+    });
+    for await (const stop of fifthBoard.run({ kits: [kit] }, result)) {
       t.is(stop.type, "input");
       result = stop;
       break;
     }
   }
 });
-
-class TestKit implements Kit {
-  url = "none";
-  #nodeFactory: NodeFactory;
-
-  get handlers() {
-    return {} as NodeHandlers;
-  }
-
-  constructor(nodeFactory: NodeFactory) {
-    this.#nodeFactory = nodeFactory;
-  }
-
-  test(config: OptionalIdConfiguration = {}) {
-    const { $id, ...rest } = config;
-    return this.#nodeFactory.create(this, "test", rest, $id);
-  }
-}
 
 test("lambda node from function with correctly assigned nodes", async (t) => {
   const board = new Board();
@@ -291,17 +291,19 @@ test("nested lambdas reusing kits", async (t) => {
 
 test("corectly invoke a lambda", async (t) => {
   const board = new Board();
+  const kit = board.addKit(TestKit);
 
   board.input().wire(
     "*->",
-    board
+    kit
       .invoke((board, input, output) => {
-        input.wire("*->", board.passthrough().wire("*->", output));
+        const kit = board.addKit(TestKit);
+        input.wire("*->", kit.noop().wire("*->", output));
       })
       .wire("*->", board.output())
   );
 
-  const result = await board.runOnce({ foo: "bar" });
+  const result = await board.runOnce({ foo: "bar" }, { kits: [kit] });
   t.deepEqual(result, { foo: "bar" });
 });
 
@@ -326,20 +328,45 @@ test("throws when incorrectly wiring different boards", async (t) => {
 
 test("allow wiring across boards with lambdas", async (t) => {
   const board = new Board();
-  const passthrough = board.passthrough({ foo: 1 });
+  const kit = board.addKit(TestKit);
+  const noop = kit.noop({ foo: 1 });
   const lambda = board.lambda((board, input, output) => {
-    board
-      .passthrough()
-      .wire("foo<-.", passthrough)
-      .wire("bar<-.", input)
-      .wire("*->.", output);
+    const kit = board.addKit(TestKit);
+    kit.noop().wire("foo<-.", noop).wire("bar<-.", input).wire("*->.", output);
   });
   board
     .input()
     .wire(
       "bar->",
-      board.invoke().wire("board<-", lambda).wire("*->", board.output())
+      kit.invoke().wire("board<-", lambda).wire("*->", board.output())
     );
-  const output = await board.runOnce({ bar: 2 });
+  const output = await board.runOnce({ bar: 2 }, { kits: [kit] });
   t.deepEqual(output, { bar: 2, foo: 1 });
+});
+
+test("when $error is set, all other outputs are ignored, named", async (t) => {
+  const board = new Board();
+  const kit = board.addKit(TestKit);
+  const noop = kit.noop({ foo: 1, $error: { kind: "error" } });
+  noop.wire("foo->", board.output());
+  noop.wire(
+    "$error->",
+    // extra noop so that the above output would be used first
+    kit.noop().wire("$error->", board.output())
+  );
+  const result = await board.runOnce({});
+  t.is(result.foo, undefined);
+  t.like(result.$error, { kind: "error" });
+});
+
+test("when $error is set, all other outputs are ignored, with *", async (t) => {
+  const board = new Board();
+  const kit = board.addKit(TestKit);
+  const noop = kit.noop({ foo: 1, $error: { kind: "error" } });
+  const output = board.output();
+  noop.wire("*->", output);
+  noop.wire("$error->", output);
+  const result = await board.runOnce({});
+  t.is(result.foo, undefined);
+  t.like(result.$error, { kind: "error" });
 });

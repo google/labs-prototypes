@@ -8,10 +8,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
         node-version: [19.x]
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v3

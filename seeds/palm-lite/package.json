@@ -8,12 +8,12 @@
   "type": "module",
   "scripts": {
     "generate:docs": "typedoc --plugin typedoc-plugin-markdown",
-    "test": "FORCE_COLOR=1 ava",
-    "build": "FORCE_COLOR=1 tsc --b",
+    "test": "cross-env FORCE_COLOR=1 ava",
+    "build": "cross-env FORCE_COLOR=1 tsc --b",
     "make-types": "node ./scripts/make-types.js",
     "make-models": "node ./scripts/make-models.js",
-    "watch": "FORCE_COLOR=1 tsc --b --watch",
-    "lint": "FORCE_COLOR=1 eslint . --ext .ts"
+    "watch": "cross-env FORCE_COLOR=1 tsc --b --watch",
+    "lint": "cross-env FORCE_COLOR=1 eslint . --ext .ts"
   },
   "repository": {
     "type": "git",

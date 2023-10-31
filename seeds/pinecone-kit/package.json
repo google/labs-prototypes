@@ -8,10 +8,10 @@
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
-    "test": "FORCE_COLOR=1 ava",
-    "build": "FORCE_COLOR=1 tsc --b && node ./scripts/prepare.js",
-    "watch": "FORCE_COLOR=1 tsc --b --watch",
-    "lint": "FORCE_COLOR=1 eslint . --ext .ts"
+    "test": "cross-env FORCE_COLOR=1 ava",
+    "build": "cross-env FORCE_COLOR=1 tsc --b && node ./scripts/prepare.js",
+    "watch": "cross-env FORCE_COLOR=1 tsc --b --watch",
+    "lint": "cross-env FORCE_COLOR=1 eslint . --ext .ts"
   },
   "repository": {
     "type": "git",

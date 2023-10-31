@@ -8,7 +8,7 @@
   "scripts": {
     "deploy": "./scripts/deploy.sh",
     "dev": "npx turbo build && functions-framework --target=board",
-    "test": "FORCE_COLOR=1 ava"
+    "test": "cross-env FORCE_COLOR=1 ava"
   },
   "repository": {
     "type": "git",

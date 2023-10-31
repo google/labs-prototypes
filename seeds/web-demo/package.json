@@ -8,12 +8,12 @@
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
-    "build:vite": "FORCE_COLOR=1 vite build",
-    "watch": "FORCE_COLOR=1 tsc --b --watch && vite build",
+    "build:vite": "cross-env FORCE_COLOR=1 vite build",
+    "watch": "cross-env FORCE_COLOR=1 tsc --b --watch && vite build",
     "dev": "vite --host",
     "preview": "vite preview",
     "serve": "npx serve dist",
-    "lint": "FORCE_COLOR=1 eslint . --ext .ts"
+    "lint": "cross-env FORCE_COLOR=1 eslint . --ext .ts"
   },
   "repository": {
     "type": "git",

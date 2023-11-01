@@ -6,6 +6,7 @@
 
 import test from "ava";
 import { ResolverResult, resolveURL } from "../src/loader.js";
+import path from "path";
 
 test("resolveURL resolves file URLs", (t) => {
   const url = new URL("file:///foo/bar");
@@ -33,25 +34,6 @@ test("resolveURL resolves https URLs", (t) => {
       type: "fetch",
     },
   ]);
-});
-
-test("resolveURL resolves absolute paths correctly", (t) => {
-  {
-    const url = new URL("file:///foo/bar");
-    const results: ResolverResult[] = [];
-    t.true(resolveURL(url, "/baz", results));
-    t.deepEqual(results, [
-      {
-        href: "file:///baz",
-        location: "/baz",
-        type: "file",
-      },
-    ]);
-  }
-  // windows paths
-  {
-    console.log(process.cwd())
-  }
 });
 
 test("resolveURL resolves URLs with hashes", (t) => {
@@ -148,4 +130,43 @@ test("resolveURL resolves URLs with hashes", (t) => {
   }
 });
 
+test("resolveURL resolves relative Windows style file path", async (t) => {
+  const relativeWindowssPath = "..\\foo\\bar";
 
+  const results: ResolverResult[] = [];
+
+  const metaUrl = import.meta.url;
+  const metaUrlUrl = new URL(metaUrl);
+
+  const resolved = resolveURL(metaUrlUrl, relativeWindowssPath, results);
+
+  const metaUrlPath = path.dirname(metaUrl);
+
+  t.true(resolved);
+  t.deepEqual(results, [
+    {
+      href: new URL(path.join(metaUrlPath, relativeWindowssPath)).toString(),
+      location: new URL(path.join(metaUrlPath, relativeWindowssPath)).pathname,
+      type: "file",
+    },
+  ]);
+});
+
+test("resolveURL resolves absolute Windows style file path", async (t) => {
+  const absoluteWindowssPath = "C:\\foo\\bar";
+
+  const results: ResolverResult[] = [];
+
+  const metaUrlUrl = new URL(import.meta.url);
+
+  const resolved = resolveURL(metaUrlUrl, absoluteWindowssPath, results);
+
+  t.true(resolved);
+  t.deepEqual(results, [
+    {
+      href: new URL(absoluteWindowssPath).toString(),
+      location: new URL(absoluteWindowssPath).toString(),
+      type: "file",
+    },
+  ]);
+});

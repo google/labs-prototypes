@@ -35,6 +35,25 @@ test("resolveURL resolves https URLs", (t) => {
   ]);
 });
 
+test("resolveURL resolves absolute paths correctly", (t) => {
+  {
+    const url = new URL("file:///foo/bar");
+    const results: ResolverResult[] = [];
+    t.true(resolveURL(url, "/baz", results));
+    t.deepEqual(results, [
+      {
+        href: "file:///baz",
+        location: "/baz",
+        type: "file",
+      },
+    ]);
+  }
+  // windows paths
+  {
+    console.log(process.cwd())
+  }
+});
+
 test("resolveURL resolves URLs with hashes", (t) => {
   {
     const url = new URL("https://example.com/foo/bar");
@@ -128,3 +147,5 @@ test("resolveURL resolves URLs with hashes", (t) => {
     ]);
   }
 });
+
+

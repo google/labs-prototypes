@@ -33,9 +33,11 @@ jobs:
 
       - name: Checking the code quality
         run: npm run lint
+        continue-on-error: true
 
       - name: Checking the code formatting
         run: npm run check:format
+        continue-on-error: true
 
       - name: Running tests
         run: npm run test

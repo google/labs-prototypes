@@ -14,11 +14,51 @@ type ResolveFunction<T extends ControllerMessage = ControllerMessage> = (
   value: T
 ) => void;
 
-export class MessageController {
-  mailboxes: Record<string, ResolveFunction<RoundTripControllerMessage>> = {};
-  #listener?: ResolveFunction;
+type MessageHandler = (e: ControllerMessage) => void;
+
+export interface MessageControllerTransport {
+  setMessageHandler(messageHandler: MessageHandler): void;
+  sendMessage<T extends ControllerMessage>(message: T): void;
+  sendRoundTripMessage<T extends RoundTripControllerMessage>(message: T): void;
+}
+
+export class WorkerTransport implements MessageControllerTransport {
   worker: Worker;
   #direction: string;
+  #messageHandler?: MessageHandler;
+
+  constructor(worker: Worker) {
+    this.worker = worker;
+    this.worker.addEventListener("message", this.#onMessage.bind(this));
+    // TODO: Remove this later. This is only used to illustrate communication
+    // for demos.
+    this.#direction = globalThis.window ? "<-" : "->";
+  }
+
+  setMessageHandler(messageHandler: MessageHandler) {
+    this.#messageHandler = messageHandler;
+  }
+
+  sendRoundTripMessage<T extends RoundTripControllerMessage>(message: T) {
+    this.worker.postMessage(message);
+  }
+
+  sendMessage<T extends ControllerMessage>(message: T) {
+    this.worker.postMessage(message);
+  }
+
+  #onMessage(e: MessageEvent) {
+    const message = e.data as ControllerMessage;
+    console.log(`[${this.#direction}]`, message.type, message.data);
+    this.#messageHandler && this.#messageHandler(message);
+  }
+}
+
+export class MessageController {
+  mailboxes: Record<string, ResolveFunction<RoundTripControllerMessage>> = {};
+  receivedMessages: ControllerMessage[] = [];
+  #listener?: ResolveFunction;
+  #transport: MessageControllerTransport;
 
   /**
    * This class establishes structured communication between
@@ -27,22 +67,15 @@ export class MessageController {
    *
    * @param worker The worker to communicate with.
    */
-  constructor(worker: Worker) {
-    this.worker = worker;
-    this.worker.addEventListener("message", this.#onMessage.bind(this));
-
-    // TODO: Remove this later. This is only used to illustrate communication
-    // for demos.
-    this.#direction = globalThis.window ? "<-" : "->";
+  constructor(transport: MessageControllerTransport) {
+    this.#transport = transport;
+    transport.setMessageHandler(this.#onMessage.bind(this));
   }
 
-  #onMessage(e: MessageEvent) {
-    const message = e.data as ControllerMessage;
+  #onMessage(message: ControllerMessage) {
     if (!message.type || !VALID_MESSAGE_TYPES.includes(message.type)) {
-      console.error("Invalid message type. Message:", message);
       throw new Error(`Invalid message type "${message.type}"`);
     }
-    console.log(`[${this.#direction}]`, message.type, message.data);
     if (message.id) {
       const roundTripMessage = message as RoundTripControllerMessage;
       const resolve = this.mailboxes[message.id];
@@ -52,7 +85,11 @@ export class MessageController {
         return;
       }
     }
-    this.#listener && this.#listener(message);
+    if (this.#listener) {
+      this.#listener(message);
+    } else {
+      this.receivedMessages.push(message);
+    }
   }
 
   async ask<
@@ -60,7 +97,7 @@ export class MessageController {
     Res extends RoundTripControllerMessage
   >(data: T["data"], type: T["type"]): Promise<Res> {
     const id = Math.random().toString(36).substring(2, 9);
-    this.worker.postMessage({ id, type, data });
+    this.#transport.sendRoundTripMessage({ id, type, data });
     return new Promise((resolve) => {
       this.mailboxes[id] =
         resolve as ResolveFunction<RoundTripControllerMessage>;
@@ -68,6 +105,9 @@ export class MessageController {
   }
 
   async listen(): Promise<ControllerMessage> {
+    const message = this.receivedMessages.shift();
+    if (message) return Promise.resolve(message);
+
     return new Promise((resolve) => {
       this.#listener = (message: ControllerMessage) => {
         resolve(message);
@@ -77,7 +117,7 @@ export class MessageController {
   }
 
   inform<T extends ControllerMessage>(data: T["data"], type: T["type"]) {
-    this.worker.postMessage({ type, data });
+    this.#transport.sendMessage({ type, data });
   }
 
   reply<T extends ControllerMessage>(
@@ -85,6 +125,6 @@ export class MessageController {
     data: T["data"],
     type: T["type"]
   ) {
-    this.worker.postMessage({ id, type, data });
+    this.#transport.sendRoundTripMessage({ id, type, data });
   }
 }

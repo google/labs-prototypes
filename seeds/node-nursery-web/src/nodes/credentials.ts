@@ -13,27 +13,46 @@ import {
 } from "@google-labs/breadboard";
 
 export type CredentialsInputs = InputValues & {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  scopes: string[];
+  API_KEY: string;
+  AUTH_DOMAIN: string;
+  PROJECT_ID: string;
+  scopes?: string[];
 };
 
 export type CredentialsOutputs = OutputValues & {
   accessToken: string;
 };
 
+const CREDENTIALS_KEY = "google:credentials:accessToken";
+
 export default {
   invoke: async (inputs: InputValues): Promise<OutputValues> => {
-    const { apiKey, authDomain, projectId, scopes } =
+    const { API_KEY, AUTH_DOMAIN, PROJECT_ID, scopes } =
       inputs as CredentialsInputs;
-    initializeApp({ apiKey, authDomain, projectId });
-    const provider = new GoogleAuthProvider();
-    scopes.forEach((scope) => provider.addScope(scope));
+    if (!API_KEY) throw "API Key is required to get credentials.";
+    if (!AUTH_DOMAIN)
+      throw "The domain for the popup is required to get credentials.";
+    if (!PROJECT_ID) throw "The GCP project ID is required to get credentials.";
+    initializeApp({
+      apiKey: API_KEY,
+      authDomain: AUTH_DOMAIN,
+      projectId: PROJECT_ID,
+    });
 
     const auth = getAuth();
-    const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    return { accessToken: credential?.accessToken };
+
+    const provider = new GoogleAuthProvider();
+    (scopes || []).forEach((scope) => provider.addScope(scope));
+
+    let accessToken =
+      globalThis.sessionStorage.getItem(CREDENTIALS_KEY) || undefined;
+    if (!accessToken) {
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      accessToken = credential?.accessToken;
+      accessToken &&
+        globalThis.sessionStorage.setItem(CREDENTIALS_KEY, accessToken);
+    }
+    return { accessToken };
   },
 } satisfies NodeHandler;

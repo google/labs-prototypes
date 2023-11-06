@@ -34,11 +34,11 @@ jobs:
 
     - name: Checking the code quality
       run: npm run lint
-      continue-on-error: true
+      continue-on-error: ${{ github.ref != 'refs/heads/main' }}
 
     - name: Checking the code formatting
       run: npm run check:format
-      continue-on-error: true
+      continue-on-error: ${{ github.ref != 'refs/heads/main' }}
 
     - name: Running tests
       run: npm run test

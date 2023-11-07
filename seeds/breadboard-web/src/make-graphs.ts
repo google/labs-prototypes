@@ -69,7 +69,7 @@ async function saveBoard(filePath: string): Promise<ManifestItem> {
   return manifestEntry;
 }
 
-const saveAllBoards = async () => {
+async function saveAllBoards(): Promise<void> {
   const tsFiles = await findTsFiles(PATH);
   const manifest = [];
   for (const file of tsFiles) {
@@ -83,6 +83,6 @@ const saveAllBoards = async () => {
     path.join(MANIFEST_PATH, "local-boards.json"),
     JSON.stringify(manifest, null, 2),
   );
-};
+}
 
 await saveAllBoards();

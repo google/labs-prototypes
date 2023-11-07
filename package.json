@@ -8,9 +8,11 @@
     "test": "turbo test",
     "build": "turbo build",
     "lint": "turbo lint",
+    "lint:fix": "turbo lint -- --fix",
     "clean:build": "rimraf -g seeds/*/dist seeds/*/.turbo",
     "ci": "npm ci",
-    "check:format": "prettier --check --config .prettierrc seeds/**/*.ts",
+    "check:format": "prettier --check --config .prettierrc './{core,seeds}/**/*.ts'",
+    "format": "prettier --write --config .prettierrc './{core,seeds}/**/*.ts'",
     "ci:local": "npm run clean:build && turbo build && turbo lint && npm run check:format && turbo test"
   },
   "keywords": [],

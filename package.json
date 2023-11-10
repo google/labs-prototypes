@@ -11,7 +11,8 @@
     "clean:build": "rimraf -g seeds/*/dist seeds/*/.turbo",
     "ci": "npm ci",
     "check:format": "prettier --check --config .prettierrc seeds/**/*.ts",
-    "ci:local": "npm run clean:build && turbo build && turbo lint && npm run check:format && turbo test"
+    "ci:local": "npm run clean:build && turbo build && turbo lint && npm run check:format && turbo test",
+    "detect-cycles": "npx -y madge --circular --image cycles.svg --extensions ts ./"
   },
   "keywords": [],
   "author": "Google Labs Team",

@@ -118,3 +118,43 @@ test("KitBuilder can call a function that has more than one input", async (t) =>
 
   t.is((<number>output["result"]), 3);
 });
+
+test("KitBuilder can call a function from an external import", async (t) => {
+
+  const js = await import("jsonschema");
+
+
+  const MyKit = KitBuilder.wrap({ url: "test" }, { validate: js.default.validate });
+
+  const board = new Board({
+    title: "Test Echo",
+    description: "Test Breadboard Kit",
+    version: "0.0.1",
+  });
+
+  const myKit = board.addKit(MyKit);
+
+  const inputA = board.input();
+  const inputB = board.input();
+  const inputC = board.input();
+
+
+  const validateNode = myKit.validate();
+
+  inputA.wire("a->instance", validateNode);
+  inputB.wire("b->schema", validateNode);
+  inputC.wire("c->options", validateNode);
+
+  // result because it's just a string from a dynamic function
+  validateNode.wire("errors->", board.output());
+
+  const output = await board.runOnce({
+    "a": { "hello": "world" },
+    "b": { "type": "object" },
+    "c": {allowUnknownAttributes: true}
+  });
+
+  const result =js.default.validate({ "hello": "world" }, { "type": "object" }, { allowUnknownAttributes: true});
+
+  t.is(((<Array<string>>output["errors"]).length), result.errors.length);
+});

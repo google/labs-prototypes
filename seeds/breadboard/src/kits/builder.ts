@@ -103,8 +103,6 @@ export class KitBuilder {
     } as KitConstructor<GenericKit<Handlers>>;
   }
 
-
-  // eslint-disable-next-line @typescript-eslint/ban-types
   static wrap<F extends FunctionsToWrap>(params: KitBuilderOptions, functions: F): KitConstructor<GenericKit<{[x in keyof F]: NodeHandler}>> {
 
     // eslint-disable-next-line @typescript-eslint/ban-types

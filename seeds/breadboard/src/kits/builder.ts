@@ -24,7 +24,7 @@ export type KitBuilderOptions = {
   namespacePrefix?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 type FunctionsKeysOnly<T> = ({ [P in keyof T]: T[P] extends (...args: any[]) => void ? P : never })[keyof T];
 type FunctionsOnly<T> = Pick<T, FunctionsKeysOnly<T>>;
 
@@ -104,11 +104,8 @@ export class KitBuilder {
     } as KitConstructor<GenericKit<Handlers>>;
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
   static wrap<F extends Record<string, Function>>(params: KitBuilderOptions, functions: F): KitConstructor<GenericKit<{ [x in keyof FunctionsOnly<F>]: NodeHandler }>> {
-    // NOTE: The use of Function means that Class types will be included, which will fail when called.
-
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    
     const createHandler = (previous: NodeHandlers, current: [string, Function]) => {
       const [name, fn] = current;
 

@@ -24,8 +24,8 @@ export type KitBuilderOptions = {
   namespacePrefix?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type FunctionsToWrap = Record<string, Function>;
+type FunctionsKeysOnly<T> = ({ [P in keyof T]: T[P] extends (...args: any[]) => void ? P : never })[keyof T];
+type FunctionsOnly<T> = Pick<T, FunctionsKeysOnly<T>>;
 
 export class KitBuilder {
   url: string;
@@ -103,18 +103,20 @@ export class KitBuilder {
     } as KitConstructor<GenericKit<Handlers>>;
   }
 
-  static wrap<F extends FunctionsToWrap>(params: KitBuilderOptions, functions: F): KitConstructor<GenericKit<{[x in keyof F]: NodeHandler}>> {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  static wrap<F extends Record<string, Function>>(params: KitBuilderOptions, functions: F): KitConstructor<GenericKit<{ [x in keyof FunctionsOnly<F>]: NodeHandler }>> {
+    // NOTE: The use of Function means that Class types will be included, which will fail when called.
 
     // eslint-disable-next-line @typescript-eslint/ban-types
     const createHandler = (previous: NodeHandlers, current: [string, Function]) => {
       const [name, fn] = current;
-     
+
       previous[name] = {
         invoke: async (inputs: InputValues) => {
           const argNames = fn.toString().match(/\((.*?)\)/)?.[1].split(",") ?? [];
 
           // Validate the input names.
-          for(const argName of argNames) {
+          for (const argName of argNames) {
             if (argName.trim() in inputs === false) { // Maybe we should use hasOwnProperty here?
               throw new Error(`Missing input: ${argName.trim()}. Valid inputs are: ${Object.keys(inputs).join(", ")}`);
             }
@@ -128,18 +130,18 @@ export class KitBuilder {
             // Number, Boolean, Array, String, will output to `result`.
             return { result: results };
           }
-    
+
           // Objects will destructured into the output.
-          return {...results};
+          return { ...results };
         }
       };
       return previous;
     }
 
     const handlers = Object.entries(functions).reduce<NodeHandlers>(createHandler, {});
-    
+
     const builder = new KitBuilder(params);
 
-    return builder.build(handlers) as KitConstructor<GenericKit<{[x in keyof F]: NodeHandler}>>;
+    return builder.build(handlers) as KitConstructor<GenericKit<{ [x in keyof FunctionsOnly<F>]: NodeHandler }>>;
   }
 }

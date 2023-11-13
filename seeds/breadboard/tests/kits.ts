@@ -56,8 +56,8 @@ test("KitBuilder can call a function that returns a string", async (t) => {
 test("KitBuilder can call a function that returns an object", async (t) => {
 
   // A normal function that will be wrapped.
-  const echo = (echo_this: string) => { 
-    return { "out": echo_this, "other": "stuff" } 
+  const echo = (echo_this: string) => {
+    return { "out": echo_this, "other": "stuff" }
   };
 
   const MyKit = KitBuilder.wrap({ url: "test" }, { echo });
@@ -88,8 +88,8 @@ test("KitBuilder can call a function that returns an object", async (t) => {
 test("KitBuilder can call a function that has more than one input", async (t) => {
 
   // A normal function that will be wrapped.
-  const add = (a: number, b: number) => { 
-    return a + b; 
+  const add = (a: number, b: number) => {
+    return a + b;
   };
 
   const MyKit = KitBuilder.wrap({ url: "test" }, { add });
@@ -104,6 +104,7 @@ test("KitBuilder can call a function that has more than one input", async (t) =>
 
   const inputA = board.input();
   const inputB = board.input();
+
   const addNode = myKit.add();
 
   inputA.wire("a->a", addNode);
@@ -123,7 +124,7 @@ test("KitBuilder can call a function from an external import", async (t) => {
 
   const js = await import("jsonschema");
 
-
+  // Wrap the jsonschema validate function in a kit and expose function as a node.
   const MyKit = KitBuilder.wrap({ url: "test" }, { validate: js.default.validate });
 
   const board = new Board({
@@ -138,7 +139,6 @@ test("KitBuilder can call a function from an external import", async (t) => {
   const inputB = board.input();
   const inputC = board.input();
 
-
   const validateNode = myKit.validate();
 
   inputA.wire("a->instance", validateNode);
@@ -151,10 +151,31 @@ test("KitBuilder can call a function from an external import", async (t) => {
   const output = await board.runOnce({
     "a": { "hello": "world" },
     "b": { "type": "object" },
-    "c": {allowUnknownAttributes: true}
+    "c": { allowUnknownAttributes: true }
   });
 
-  const result =js.default.validate({ "hello": "world" }, { "type": "object" }, { allowUnknownAttributes: true});
+  const result = js.default.validate({ "hello": "world" }, { "type": "object" }, { allowUnknownAttributes: true });
 
   t.is(((<Array<string>>output["errors"]).length), result.errors.length);
+});
+
+test("KitBuilder can splat all the functions in the extenral library and make nodes", async (t) => {
+
+  const js = await import("jsonschema");
+
+  // Wrap the jsonschema validate function in a kit and expose function as a node.
+  const MyKit = KitBuilder.wrap({ url: "test" }, { ...js.default });
+
+  const board = new Board({
+    title: "Test Echo",
+    description: "Test Breadboard Kit",
+    version: "0.0.1",
+  });
+
+  const myKit = board.addKit(MyKit);
+
+  myKit.validate()
+
+  // We really need to pick a library with more than one function.
+  t.true(myKit.validate instanceof Function);
 });

@@ -24,6 +24,7 @@ export type KitBuilderOptions = {
   namespacePrefix?: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type FunctionsKeysOnly<T> = ({ [P in keyof T]: T[P] extends (...args: any[]) => void ? P : never })[keyof T];
 type FunctionsOnly<T> = Pick<T, FunctionsKeysOnly<T>>;
 

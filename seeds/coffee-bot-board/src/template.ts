@@ -111,7 +111,7 @@ export class Template {
   async loadTemplate(filename: string): Promise<TemplateNodeType> {
     const { kit } = this;
     const text = await readFile(`${this.path}/${filename}`, "utf-8");
-    this.textPrompt = kit.promptTemplate(text, { $id: "bot-prompt" });
+    this.textPrompt = kit.promptTemplate({ $id: "bot-prompt", text });
     return this.textPrompt;
   }
 

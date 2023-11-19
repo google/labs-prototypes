@@ -66,6 +66,7 @@ math
               })
             )
               .wire("<-PALM_KEY", kit.secrets({ keys: ["PALM_KEY"] })),
+          )
       )
   );
 

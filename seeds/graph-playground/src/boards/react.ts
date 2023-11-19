@@ -25,7 +25,9 @@ const palm = board.addKit(PaLMKit);
  */
 
 // The single node where all the important keys come from.
-const secrets = kit.secrets(["PALM_KEY", "GOOGLE_CSE_ID"]);
+const secrets = kit.secrets({
+  keys: ["PALM_KEY", "GOOGLE_CSE_ID"],
+});
 
 // This is the main ingredient: the template that makes the algo tick.
 const reActTemplate = kit

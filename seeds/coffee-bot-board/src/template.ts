@@ -38,9 +38,15 @@ export class PromptMaker {
 
   async prompt(
     filename: string,
-    id: string
-  ): Promise<[string, OptionalIdConfiguration]> {
-    return [await this.loader.load(filename, "txt"), { $id: id }];
+    id: string,
+  ): Promise<{
+    $id: string;
+    template: string;
+  }> {
+    return {
+      $id: id,
+      template: await this.loader.load(filename, "txt")
+    };
   }
 
   async part(name: string, extension: string) {

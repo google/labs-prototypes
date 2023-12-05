@@ -5,7 +5,7 @@ import { dirname } from 'path';
 import handler from 'serve-handler';
 import http from 'http';
 
-const debug = async (file: string) => {
+export const debug = async (file: string) => {
   let fileStat: any;
   let fileUrl: URL;
 
@@ -44,5 +44,3 @@ const debug = async (file: string) => {
     console.log(`Running at http://localhost:3000/${(fileUrl != undefined ? `?board=${fileUrl.pathname}` : '')}`);
   });
 };
-
-export { debug }

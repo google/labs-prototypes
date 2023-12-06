@@ -1,5 +1,4 @@
-import { BoardRunner, InputValues, Kit, LogProbe } from '@google-labs/breadboard';
-import { Command } from 'commander';
+import { BoardRunner, InputValues, Kit } from '@google-labs/breadboard';
 import { watch as fsWatch } from 'fs';
 import { loadBoard, parseStdin, resolveFilePath } from './lib/utils.js';
 
@@ -15,9 +14,8 @@ async function runBoard(board: BoardRunner, inputs: InputValues) {
   }
 }
 
-export const run = async (file: string, options: Record<string, string>, command: Command) => {
+export const run = async (file: string, options: Record<string, string>) => {
   if (file != undefined) {
-    const controller = new AbortController();
     const input = JSON.parse(options.input) as InputValues;
 
     const filePath = resolveFilePath(file);
@@ -28,6 +26,8 @@ export const run = async (file: string, options: Record<string, string>, command
 
     // If we are watching, we need to run the board again when the file changes.
     if ('watch' in options) {
+      const controller = new AbortController();
+
       fsWatch(file, { signal: controller.signal }, async (eventType: string, filename: string | Buffer | null) => {
         if (typeof (filename) != 'string') return;
 

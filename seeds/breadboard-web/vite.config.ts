@@ -15,8 +15,6 @@ export default defineConfig(async (_) => {
     build: {
       lib: {
         entry: {
-          index: "src/index.ts",
-          dist: "src/dist.ts",
           worker: "src/worker.ts",
           sample: "./index.html",
         },

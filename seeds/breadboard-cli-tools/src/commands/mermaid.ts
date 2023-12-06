@@ -1,19 +1,18 @@
 import { BoardRunner } from '@google-labs/breadboard';
 import { watch } from 'fs';
 import { loadBoard, parseStdin, resolveFilePath } from './lib/utils.js';
-import { Command } from 'commander';
 
-export const mermaid = async (file: string, options: Record<string, string>, command: Command) => {
+export const mermaid = async (file: string, options: Record<string, string>) => {
 
   if (file != undefined) {
     let filePath = resolveFilePath(file);
-
-    const controller = new AbortController();
 
     let board = await loadBoard(filePath);
     console.log(board.mermaid());
 
     if ('watch' in options) {
+      const controller = new AbortController();
+
       watch(file, { signal: controller.signal }, async (eventType: string, filename: string | Buffer | null) => {
         if (typeof (filename) != 'string') return;
 

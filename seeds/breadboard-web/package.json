@@ -3,18 +3,16 @@
   "private": true,
   "version": "0.0.1",
   "description": "The Web runtime for Breadboard",
-  "main": "./dist/index.js",
-  "exports": {
-    ".": "./dist/index.js",
-    "./dist": "./dist/dist.js",
-    "./worker": "./dist/worker.js"
+  "main": "./dist/src/index.js",
+  "exports": { 
+    ".": "./dist/src/runtime.js",
+    "./worker": "./dist/src/worker.js"
   },
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "deploy": "npm run build:vite && firebase deploy",
-    "build": "npm run build:vite",
     "build:vite": "FORCE_COLOR=1 vite build",
     "test": "FORCE_COLOR=1 vitest --run",
     "watch": "vitest",

@@ -1,6 +1,6 @@
 import { fileURLToPath, pathToFileURL } from 'url'
 import { stat } from 'fs/promises';
-import { Stats, createReadStream } from 'fs';
+import { createReadStream } from 'fs';
 import { dirname } from 'path';
 import handler from 'serve-handler';
 import http from 'http';

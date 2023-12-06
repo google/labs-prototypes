@@ -1,46 +1,9 @@
-import { Board, BoardRunner } from '@google-labs/breadboard';
+import { BoardRunner } from '@google-labs/breadboard';
 import { watch } from 'fs';
-import path from 'path';
+import { loadBoard, parseStdin, resolveFilePath } from './lib/utils.js';
+import { Command } from 'commander';
 
-const loadBoard = async (file: string) => {
-  const board = await Board.load(file);
-  return board;
-}
-
-const resolveFilePath = (file: string) => {
-  return path.resolve(process.cwd(), path.join(path.dirname(file), path.basename(file)));
-}
-
-const parseStdin = () : Promise<string> => {
-  let resolveStdin: (value: string) => void;
-  let rejectStdin: (reason?: any) => void;
-
-  const p = new Promise<string>((resolve, reject) => {
-    resolveStdin = resolve;
-    rejectStdin = reject;
-  });
-
-  let stdin = '';
-
-  process.stdin.on('readable', () => {
-    let chunk = process.stdin.read();
-    if (chunk !== null) {
-       stdin += chunk;
-    }
-  });
-  
-  process.stdin.on('end', function() {
-    resolveStdin(stdin);
-  });
-
-  process.stdin.on('error', (err) => {
-    rejectStdin(err);
-  });
-
-  return p;
-}
-
-export const mermaid = async (file: string, options: {}) => {
+export const mermaid = async (file: string, options: Record<string, string>, command: Command) => {
 
   if (file != undefined) {
     let filePath = resolveFilePath(file);

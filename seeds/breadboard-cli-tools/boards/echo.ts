@@ -26,7 +26,6 @@ const query = board.input({
   },
 });
 
-query.wire("text->text", board.output())
-
+query.wire("text->text", board.output());
 
 export default board;

@@ -1,22 +1,9 @@
-import { Board } from '@google-labs/breadboard';
 import { watch } from 'fs';
 import path from 'path';
+import { loadBoardFromModule, resolveFilePath } from './lib/utils.js';
+import { Command } from 'commander';
 
-const loadBoard = async (file: string) => {
-  const board = (await import(file)).default;
-
-  if (board == undefined) throw new Error(`Board ${file} does not have a default export`);
-
-  if (board instanceof Board == false) throw new Error(`Board ${file} does not have a default export of type Board`);
-
-  return board;
-}
-
-const resolveFilePath = (file: string) => {
-  return path.resolve(process.cwd(), path.join(path.dirname(file), path.basename(file)));
-}
-
-export const makeGraph = async (file: string, options: {}) => {
+export const makeGraph = async (file: string, options: Record<string, string>, command: Command) => {
   let filePath = resolveFilePath(file);
 
   if (file != undefined) {
@@ -25,7 +12,7 @@ export const makeGraph = async (file: string, options: {}) => {
     }
 
     const controller = new AbortController();
-    const board = await loadBoard(filePath);
+    const board = await loadBoardFromModule(filePath);
 
     console.log(JSON.stringify(board, null, 2));
 
@@ -34,8 +21,8 @@ export const makeGraph = async (file: string, options: {}) => {
         if (typeof (filename) != 'string') return;
 
         if (eventType === 'change') {
-          let board = await loadBoard(filePath);
-          
+          let board = await loadBoardFromModule(filePath);
+
           console.log(JSON.stringify(board, null, 2));
         }
         else if (eventType === 'rename') {

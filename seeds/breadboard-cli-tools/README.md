@@ -38,3 +38,12 @@ Creates a graph json from a breadboard javascript file.
 
 Pipe it to mermaid
 `npx breadboard make seeds/breadboard-cli-tools/boards/echo.js | npx breadboard mermaid`
+
+### Run
+
+Creates a graph json from a breadboard javascript file.
+
+`npx breadboard make seeds/breadboard-cli-tools/boards/echo.js`
+
+Pipe it to mermaid
+`npx breadboard make seeds/breadboard-cli-tools/boards/echo.js | npx breadboard mermaid`

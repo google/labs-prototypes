@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "The Web runtime for Breadboard",
   "main": "./dist/src/index.js",
-  "exports": { 
+  "exports": {
     ".": "./dist/src/runtime.js",
     "./worker": "./dist/src/worker.js"
   },

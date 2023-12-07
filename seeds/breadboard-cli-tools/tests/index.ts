@@ -50,14 +50,14 @@ test("calling CLI with no parameters shows usage text", async (t) => {
   t.true(output.includes(expected));
 });
 
-test("'memraid' command produces mermaid diagram from relative path to board.json", async (t) => {
+test("'mermaid' command produces mermaid diagram from relative path to board.json", async (t) => {
   const commandString = ["mermaid", `"${relativeBoardPath}"`].join(" ");
   const output = await execCli(commandString);
   t.true(output.length > 0);
   t.true(output.includes("graph TD"));
 });
 
-test("'memraid' command produces mermaid diagram from absolute path to board.json", async (t) => {
+test("'mermaid' command produces mermaid diagram from absolute path to board.json", async (t) => {
   t.false(absoluteBoardPath.startsWith("tests"));
   t.true(fs.existsSync(absoluteBoardPath));
 

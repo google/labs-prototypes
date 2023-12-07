@@ -27,7 +27,8 @@ function execCli(args = ""): Promise<string> {
   });
 }
 
-const originalBoardPath = path.join(packageDir, "tests/data/echo.json");
+const testDataDir = path.resolve(path.join(packageDir, "tests/data"));
+const originalBoardPath = path.join(testDataDir, "echo.json");
 
 const relativeBoardPath = path.relative(packageDir, originalBoardPath);
 const absoluteBoardPath = path.resolve(relativeBoardPath);

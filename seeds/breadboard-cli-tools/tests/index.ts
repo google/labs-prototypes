@@ -102,17 +102,16 @@ const absoluteBoardPath = path.resolve(relativeBoardPath);
 const filenameWithSpaces = path.resolve(
   path.join(testDataDir, "test board.json")
 );
+
 const directoryWithSpaces = path.resolve(
   path.join(testDataDir, "test folder", "board.json")
 );
 
-const typescriptBoardPath = path.resolve(
-  path.join(process.cwd(), "src", "temp", "ts_board.ts")
-);
+const srcTemp = [process.cwd(), "src", "temp"];
 
-const jsBoardPath = path.resolve(
-  path.join(process.cwd(), "dist", "js_board.js")
-);
+const typescriptBoardPath = path.resolve(path.join(...srcTemp, "ts_board.ts"));
+const dist = [process.cwd(), "dist"];
+const jsBoardPath = path.resolve(path.join(...dist, "js_board.js"));
 
 const testFiles: {
   path: string;
@@ -156,6 +155,7 @@ test.after.always(() => {
   });
   const jsBoardPath = typescriptBoardPath.replace(".ts", ".js");
   fs.unlinkSync(jsBoardPath);
+  fs.rmdirSync(path.resolve(...srcTemp));
 });
 
 //////////////////////////////////////////////////

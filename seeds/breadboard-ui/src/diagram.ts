@@ -5,9 +5,11 @@
  */
 
 import {
-  assertElement,
+  assertHTMLElement,
+  assertMouseWheelEvent,
   assertPointerEvent,
   assertRoot,
+  assertSVGElement,
 } from "./utils/assertions.js";
 
 const MERMAID_URL = "https://cdn.jsdelivr.net/npm/mermaid@10.6.1/+esm";
@@ -120,6 +122,7 @@ export class Diagram extends HTMLElement {
           border: 1px solid rgb(237, 237, 237);
           border-radius: calc(var(--bb-grid-size) * 2);
           cursor: auto;
+          z-index: 1;
         }
 
         #controls > button {
@@ -194,13 +197,34 @@ export class Diagram extends HTMLElement {
     });
 
     root.addEventListener("click", (evt: Event) => this.#onClick(evt));
+    this.addEventListener("mousewheel", (evt: Event) =>
+      this.#onMouseWheel(evt)
+    );
 
     window.addEventListener("resize", () => this.#onWindowResize());
   }
 
+  #onMouseWheel(evt: Event) {
+    assertMouseWheelEvent(evt);
+    evt.preventDefault();
+
+    this.#scale *= 1 + evt.deltaY / 200;
+
+    this.#clampScale();
+    this.#attemptUpdateViewBox();
+  }
+
+  #clampScale() {
+    if (this.#scale < 0.1) {
+      this.#scale = 0.1;
+    } else if (this.#scale > 10) {
+      this.#scale = 10;
+    }
+  }
+
   #onClick(evt: Event) {
     const target = evt.target;
-    assertElement(target);
+    assertHTMLElement(target);
 
     switch (target.id) {
       case "select":
@@ -236,6 +260,7 @@ export class Diagram extends HTMLElement {
             this.#scale *= 0.8;
           }
 
+          this.#clampScale();
           this.#attemptUpdateViewBox();
         }
         break;
@@ -285,7 +310,7 @@ export class Diagram extends HTMLElement {
     assertRoot(root);
 
     const svgImage = root.querySelector("svg");
-    assertElement(svgImage);
+    assertSVGElement(svgImage);
 
     this.#diagramElementDimensions.w = svgImage.clientWidth;
     this.#diagramElementDimensions.h = svgImage.clientHeight;
@@ -298,7 +323,7 @@ export class Diagram extends HTMLElement {
     assertRoot(root);
 
     const controls = root.querySelector("#controls");
-    assertElement(controls);
+    assertHTMLElement(controls);
 
     const buttons = Array.from(controls.querySelectorAll("button"));
     for (const button of buttons) {
@@ -367,7 +392,7 @@ export class Diagram extends HTMLElement {
     const viewBoxHeight = this.#diagramDimensions.h;
 
     const innerGraphic = svgImage.querySelector("g");
-    assertElement(innerGraphic);
+    assertSVGElement(innerGraphic);
     innerGraphic.style.transformOrigin = `${this.#transformOrigin.x} ${
       this.#transformOrigin.y
     }`;
@@ -431,7 +456,7 @@ export class Diagram extends HTMLElement {
 
     // Do a little tidy up.
     const svgImage = root.querySelector("svg");
-    assertElement(svgImage);
+    assertSVGElement(svgImage);
 
     svgImage.removeAttribute("style");
     svgImage.setAttribute("width", "100%");

@@ -70,18 +70,20 @@ const testBoardData = {
   kits: [],
 };
 
+// language=typescript
 const typescriptTestBoardContent = `
 import { Board, BreadboardNode } from "@google-labs/breadboard";
 
 const board: Board = new Board();
-const input:BreadboardNode<unknown, unknown> = board.input({
-	message: "Hello World!",
+const input: BreadboardNode<unknown, unknown> = board.input({
+  message: "Hello World!",
 });
 const output: BreadboardNode<unknown, unknown> = board.output();
 input.wire("message", output);
 export default board;
 `;
 
+// language=javascript
 const jsTestBoardContent = `
 import { Board } from "@google-labs/breadboard";
 const board = new Board();

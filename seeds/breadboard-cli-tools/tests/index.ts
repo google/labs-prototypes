@@ -5,23 +5,29 @@
  */
 
 import test from "ava";
-import { exec } from "child_process";
+import { ExecException, exec } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 import * as fs from "fs";
 
 const packageDir = process.cwd();
+
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const cliPath = path.resolve(path.join(__dirname, "../src/index.js"));
 
-function execCli(args = ""): Promise<string> {
+type ChildProcessCallback = {
+  error?: ExecException | null;
+  stdout: string;
+  stderr: string;
+};
+
+function execCli(args = ""): Promise<ChildProcessCallback> {
   return new Promise((resolve, reject) => {
     exec(`node "${cliPath}" ${args}`, (error, stdout, stderr) => {
       if (error) {
-        // reject({ error, stdout, stderr });
-        resolve(stderr);
+        reject({ error, stdout, stderr });
       } else {
-        resolve(stdout);
+        resolve({ stdout, stderr });
       }
     });
   });
@@ -64,10 +70,33 @@ const testBoardData = {
   kits: [],
 };
 
+const typescriptTestBoardContent = `
+import { Board, BreadboardNode } from "@google-labs/breadboard";
+
+const board: Board = new Board();
+const input:BreadboardNode<unknown, unknown> = board.input({
+	message: "Hello World!",
+});
+const output: BreadboardNode<unknown, unknown> = board.output();
+input.wire("message", output);
+export default board;
+`;
+
+const jsTestBoardContent = `
+import { Board } from "@google-labs/breadboard";
+const board = new Board();
+const input = board.input({
+  message: "Hello World!",
+});
+const output = board.output();
+input.wire("message", output);
+export default board;
+`;
+
 const testDataDir = path.resolve(path.join(packageDir, "tests/data"));
 const originalBoardPath = path.join(testDataDir, "echo.json");
 
-const relativeBoardPath = path.relative(packageDir, originalBoardPath);
+const relativeBoardPath = path.relative(process.cwd(), originalBoardPath);
 const absoluteBoardPath = path.resolve(relativeBoardPath);
 
 const filenameWithSpaces = path.resolve(
@@ -77,34 +106,67 @@ const directoryWithSpaces = path.resolve(
   path.join(testDataDir, "test folder", "board.json")
 );
 
-const testFiles = [originalBoardPath, filenameWithSpaces, directoryWithSpaces];
+const typescriptBoardPath = path.resolve(
+  path.join(process.cwd(), "src", "temp", "ts_board.ts")
+);
+
+const jsBoardPath = path.resolve(
+  path.join(process.cwd(), "dist", "js_board.js")
+);
+
+const testFiles: {
+  path: string;
+  content: string;
+}[] = [
+  {
+    path: path.resolve(originalBoardPath),
+    content: JSON.stringify(testBoardData, null, 2),
+  },
+  {
+    path: path.resolve(filenameWithSpaces),
+    content: JSON.stringify(testBoardData, null, 2),
+  },
+  {
+    path: path.resolve(directoryWithSpaces),
+    content: JSON.stringify(testBoardData, null, 2),
+  },
+  {
+    path: path.resolve(typescriptBoardPath),
+    content: typescriptTestBoardContent,
+  },
+  {
+    path: path.resolve(jsBoardPath),
+    content: jsTestBoardContent,
+  },
+];
 
 //////////////////////////////////////////////////
 
 test.before(() => {
   testFiles.forEach((p) => {
-    fs.mkdirSync(path.dirname(p), { recursive: true });
-    fs.writeFileSync(p, JSON.stringify(testBoardData, null, 2));
+    fs.mkdirSync(path.dirname(p.path), { recursive: true });
+    fs.writeFileSync(p.path, p.content);
+    console.debug(`Wrote ${p.content.length} characters to "${p.path}"`);
   });
 });
 
 test.after.always(() => {
   testFiles.forEach((p) => {
-    fs.unlinkSync(p);
+    fs.unlinkSync(p.path);
   });
+  const jsBoardPath = typescriptBoardPath.replace(".ts", ".js");
+  fs.unlinkSync(jsBoardPath);
+});
+
+//////////////////////////////////////////////////
+test("all test files exist", (t) => {
   testFiles.forEach((p) => {
-    if (fs.existsSync(path.dirname(p))) {
-      fs.rmdirSync(path.dirname(p), { recursive: true });
-    }
+    t.true(fs.existsSync(p.path));
+    t.true(fs.readFileSync(p.path).length > 0);
   });
 });
 
 //////////////////////////////////////////////////
-test("board json exists", (t) => {
-  t.true(absoluteBoardPath == path.resolve(relativeBoardPath));
-  t.true(fs.existsSync(absoluteBoardPath));
-});
-
 test("relative path is relative and valid", (t) => {
   t.false(relativeBoardPath == path.resolve(relativeBoardPath));
   t.true(fs.existsSync(relativeBoardPath));
@@ -112,16 +174,24 @@ test("relative path is relative and valid", (t) => {
 
 test("calling CLI with no parameters shows usage text", async (t) => {
   const expected = "Usage: index [options] [command]";
-  const output = await execCli();
-  t.true(output.length > expected.length);
-  t.true(output.includes(expected));
+  try {
+    await execCli();
+  } catch (error: unknown) {
+    const output = error as ChildProcessCallback;
+    t.assert(output.stderr);
+    if (output.stderr) {
+      t.true(output.stderr.length > expected.length);
+      t.true(output.stderr.includes(expected));
+    }
+  }
 });
 
 test("'mermaid' command produces mermaid diagram from relative path to board.json", async (t) => {
   const commandString = ["mermaid", `"${relativeBoardPath}"`].join(" ");
   const output = await execCli(commandString);
-  t.true(output.length > 0);
-  t.true(output.includes("graph TD"));
+  t.assert(output.stdout);
+  t.true(output.stdout.length > 0);
+  t.true(output.stdout.includes("graph TD"));
 });
 
 test("'mermaid' command produces mermaid diagram from absolute path to board.json", async (t) => {
@@ -130,21 +200,15 @@ test("'mermaid' command produces mermaid diagram from absolute path to board.jso
 
   const commandString = ["mermaid", `"${absoluteBoardPath}"`].join(" ");
   const output = await execCli(commandString);
-  t.true(output.length > 0);
-  t.true(output.includes("graph TD"));
+  t.assert(output.stdout);
+  t.true(output.stdout.length > 0);
+  t.true(output.stdout.includes("graph TD"));
 });
 
 //////////////////////////////////////////////////
 
 test("filename does contain spaces", (t) => {
-  const directory = path.dirname(filenameWithSpaces);
-  const basename = path.basename(filenameWithSpaces);
-  t.false(directory.includes(" "));
-  t.true(basename.includes(" "));
-});
-
-test("file name with spaces exists", (t) => {
-  t.true(fs.existsSync(filenameWithSpaces));
+  t.true(path.basename(filenameWithSpaces).includes(" "));
 });
 
 test("can handle a relative file with spaces in the file name", async (t) => {
@@ -154,24 +218,21 @@ test("can handle a relative file with spaces in the file name", async (t) => {
 
   const commandString = ["mermaid", `"${relativePath}"`].join(" ");
   const output = await execCli(commandString);
-  t.true(output.length > 0);
-  t.true(output.includes("graph TD"));
+  t.true(output.stdout.length > 0);
+  t.true(output.stdout.includes("graph TD"));
 });
 
 test("can handle an absolute file with spaces in the name", async (t) => {
   const commandString = ["mermaid", `"${filenameWithSpaces}"`].join(" ");
   const output = await execCli(commandString);
-  t.true(output.length > 0);
-  t.true(output.includes("graph TD"));
+  t.true(output.stdout.length > 0);
+  t.true(output.stdout.includes("graph TD"));
 });
 
 //////////////////////////////////////////////////
 
 test("directory name with spaces does contain spaces", (t) => {
-  const directory = path.dirname(directoryWithSpaces);
-  const basename = path.basename(directoryWithSpaces);
-  t.true(directory.includes(" "));
-  t.false(basename.includes(" "));
+  t.true(path.dirname(directoryWithSpaces).includes(" "));
 });
 
 test("board file exists in dictory with spaces in the name", (t) => {
@@ -185,13 +246,51 @@ test("can handle a relative path with spaces in the directory name", async (t) =
 
   const commandString = ["mermaid", `"${relativePath}"`].join(" ");
   const output = await execCli(commandString);
-  t.true(output.length > 0);
-  t.true(output.includes("graph TD"));
+  t.true(output.stdout.length > 0);
+  t.true(output.stdout.includes("graph TD"));
 });
 
 test("can handle an absolute path with spaces in the directory name", async (t) => {
   const commandString = ["mermaid", `"${directoryWithSpaces}"`].join(" ");
   const output = await execCli(commandString);
-  t.true(output.length > 0);
-  t.true(output.includes("graph TD"));
+  t.true(output.stdout.length > 0);
+  t.true(output.stdout.includes("graph TD"));
+});
+
+//////////////////////////////////////////////////
+
+test("can make a graph from a typescript file", async (t) => {
+  const tscCommand = [
+    "npx",
+    "-y",
+    "tsc",
+    "--target ES2022",
+    "--module NodeNext",
+    `--outDir "${path.dirname(typescriptBoardPath)}"`,
+    `"${typescriptBoardPath}"`,
+  ].join(" ");
+  await new Promise((resolve, reject) => {
+    exec(tscCommand, (error, stdout, stderr) => {
+      if (error) {
+        reject({ error, stdout, stderr });
+      } else {
+        resolve({ stdout, stderr });
+      }
+    });
+  });
+
+  const jsPath = typescriptBoardPath.replace(".ts", ".js");
+  t.true(fs.existsSync(jsPath));
+
+  const commandString = ["make", `"${jsPath}"`].join(" ");
+  const output = await execCli(commandString);
+  t.true(output.stdout.length > 0);
+});
+
+//////////////////////////////////////////////////
+
+test("can make a graph from a javascript file", async (t) => {
+  const commandString = ["make", `"${jsBoardPath}"`].join(" ");
+  const output = await execCli(commandString);
+  t.true(output.stdout.length > 0);
 });

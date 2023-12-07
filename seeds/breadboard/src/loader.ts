@@ -52,7 +52,7 @@ export const loadFromFile = async (path: string) => {
   if (typeof globalThis.process === "undefined")
     throw new Error("Unable to use `path` when not running in node");
   const { readFile } = await import(/* @vite-ignore */ "node:fs/promises");
-  return JSON.parse(await readFile(path, "utf-8"));
+  return JSON.parse(await readFile(decodeURIComponent(path), "utf-8"));
 };
 
 export const loadWithFetch = async (url: string) => {

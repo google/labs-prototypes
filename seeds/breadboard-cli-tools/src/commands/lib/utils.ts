@@ -7,7 +7,6 @@
 import { Board } from '@google-labs/breadboard';
 import { readFile } from 'fs/promises';
 import path from "path";
-import * as fs from 'fs';
 
 export const loadBoardFromModule = async (file: string) => {
   const board = (await import(file)).default;

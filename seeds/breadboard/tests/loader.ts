@@ -8,9 +8,10 @@ import test from "ava";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { fileURLToPath, pathToFileURL } from "url";
 import { Board } from "../src/board.js";
 import { ResolverResult, resolveURL } from "../src/loader.js";
-import { pathToFileURL, fileURLToPath } from "url";
+import { GraphDescriptor } from "../src/types.js";
 
 test("resolveURL resolves file URLs", (t) => {
   const url = new URL("file:///foo/bar");
@@ -205,6 +206,23 @@ test("board can be loaded while using a file:// URL", async (t) => {
   t.deepEqual(fileURLToPath(url), boardPath);
 
   const board = await Board.load(url.href);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
+});
+
+test("Board.fromGraphDescriptor can be used to load a board from a local file", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(testBoard, "board");
+  t.true(fs.existsSync(boardPath));
+
+  const graphDescriptor: GraphDescriptor = JSON.parse(
+    fs.readFileSync(boardPath).toString()
+  );
+
+  const board = await Board.fromGraphDescriptor(graphDescriptor);
 
   t.deepEqual(board.title, testBoard.title);
   t.deepEqual(board.edges, testBoard.edges);

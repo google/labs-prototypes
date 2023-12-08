@@ -82,9 +82,6 @@ export const run = async (file: string, options: Record<string, any>) => {
     }
   } else {
     const stdin = await parseStdin();
-    const url = URL.createObjectURL(
-      new Blob([stdin], { type: "application/json" })
-    );
 
     // We should validate it looks like a board...
     const board = await BoardRunner.fromGraphDescriptor(JSON.parse(stdin));
@@ -94,7 +91,5 @@ export const run = async (file: string, options: Record<string, any>) => {
       <InputValues>(<unknown>options["input"]),
       kitDeclarations
     );
-
-    URL.revokeObjectURL(url);
   }
 };

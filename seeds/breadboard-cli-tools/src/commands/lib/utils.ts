@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Board, GraphDescriptor } from '@google-labs/breadboard';
+import { Board } from '@google-labs/breadboard';
+import { readFile } from 'fs/promises';
 import path from "path";
 import * as fs from 'fs';
 
@@ -26,10 +27,8 @@ export const resolveFilePath = (file: string) => {
 };
 
 export const loadBoard = async (file: string) => {
-  const boardFile: GraphDescriptor = JSON.parse(
-    fs.readFileSync(file).toString()
-  );
-  const board = Board.fromGraphDescriptor(boardFile);
+  const fileContents = await readFile(file, 'utf-8');
+  const board = await Board.fromGraphDescriptor(JSON.parse(fileContents));
   return board;
 };
 
@@ -61,4 +60,3 @@ export const parseStdin = (): Promise<string> => {
 
   return p;
 };
-

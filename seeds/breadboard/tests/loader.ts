@@ -181,7 +181,7 @@ function writeBoard(
   return filename;
 }
 
-test("new Board.load() loads a file correctly", async (t) => {
+test("Board.load can load a file correctly", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(testBoard, "board");
 
@@ -196,7 +196,7 @@ test("new Board.load() loads a file correctly", async (t) => {
   t.deepEqual(board.kits, testBoard.kits);
 });
 
-test("new Board.load() loads a file with a space in the directory name", async (t) => {
+test("Board.load can load a file with a space in the directory name", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(
     testBoard,
@@ -215,7 +215,7 @@ test("new Board.load() loads a file with a space in the directory name", async (
   t.deepEqual(board.kits, testBoard.kits);
 });
 
-test("new Board.load() loads a file with a space in the filename", async (t) => {
+test("Board.load can load a file with a space in the filename", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(testBoard, "board with space");
 
@@ -230,7 +230,24 @@ test("new Board.load() loads a file with a space in the filename", async (t) => 
   t.deepEqual(board.kits, testBoard.kits);
 });
 
-test("can load a file url with a space in the directory name", async (t) => {
+test("Board.load can load a file url", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(testBoard, "board");
+
+  const url = pathToFileURL(boardPath);
+  t.true(url.href.startsWith("file://"));
+  t.true(fs.existsSync(url));
+  t.deepEqual(fileURLToPath(url), boardPath);
+
+  const board = await Board.load(url.href);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
+});
+
+test("Board.load can load a file url with a space in the directory name", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(
     testBoard,
@@ -251,7 +268,7 @@ test("can load a file url with a space in the directory name", async (t) => {
   t.deepEqual(board.kits, testBoard.kits);
 });
 
-test("can load a file url with a space in the filename", async (t) => {
+test("Board.load can load a file url with a space in the filename", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(testBoard, "board with space");
 
@@ -268,24 +285,7 @@ test("can load a file url with a space in the filename", async (t) => {
   t.deepEqual(board.kits, testBoard.kits);
 });
 
-test("board can be loaded while using a file:// URL", async (t) => {
-  const testBoard = generateBoard();
-  const boardPath = writeBoard(testBoard, "board");
-
-  const url = pathToFileURL(boardPath);
-  t.true(url.href.startsWith("file://"));
-  t.true(fs.existsSync(url));
-  t.deepEqual(fileURLToPath(url), boardPath);
-
-  const board = await Board.load(url.href);
-
-  t.deepEqual(board.title, testBoard.title);
-  t.deepEqual(board.edges, testBoard.edges);
-  t.deepEqual(board.nodes, testBoard.nodes);
-  t.deepEqual(board.kits, testBoard.kits);
-});
-
-test("Board.fromGraphDescriptor can be used to load a board from a local file", async (t) => {
+test("Board.fromGraphDescriptor handles a board read from a local file", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(testBoard, "board");
   t.true(fs.existsSync(boardPath));

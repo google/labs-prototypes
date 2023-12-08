@@ -10,6 +10,7 @@ import os from "os";
 import path from "path";
 import { Board } from "../src/board.js";
 import { ResolverResult, resolveURL } from "../src/loader.js";
+import { pathToFileURL, fileURLToPath } from "url";
 
 test("resolveURL resolves file URLs", (t) => {
   const url = new URL("file:///foo/bar");
@@ -183,9 +184,27 @@ test("new Board.load() loads a file correctly", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(testBoard, "board");
 
+  t.false(boardPath.startsWith("file://"));
   t.true(fs.existsSync(boardPath));
 
   const board = await Board.load(boardPath);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
+});
+
+test("board can be loaded while using a file:// URL", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(testBoard, "board");
+
+  const url = pathToFileURL(boardPath);
+  t.true(url.href.startsWith("file://"));
+  t.true(fs.existsSync(url));
+  t.deepEqual(fileURLToPath(url), boardPath);
+
+  const board = await Board.load(url.href);
 
   t.deepEqual(board.title, testBoard.title);
   t.deepEqual(board.edges, testBoard.edges);

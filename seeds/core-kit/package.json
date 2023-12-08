@@ -15,6 +15,7 @@
     "build": {
       "dependencies": [
         "../breadboard:build",
+        "../llm-starter:build",
         "build:tsc"
       ]
     },
@@ -24,7 +25,8 @@
         "FORCE_COLOR": "1"
       },
       "dependencies": [
-        "../breadboard:build:tsc"
+        "../breadboard:build:tsc",
+        "../llm-starter:build:tsc"
       ],
       "files": [
         "src/**/*.ts",

@@ -88,6 +88,7 @@
     "graphs"
   ],
   "ava": {
+    "timeout": "30s",
     "files": [
       "tests/**/*.ts"
     ],

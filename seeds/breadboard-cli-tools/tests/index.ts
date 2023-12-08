@@ -312,6 +312,7 @@ test("can run a json board", async (t) => {
   let resultString = output.stdout;
 
   // remove ANSI escape codes
+  // eslint-disable-next-line no-control-regex
   resultString = resultString.replace(/\u001b\[[0-9]{1,2}m/g, "");
 
   // replace single quotes with double quotes

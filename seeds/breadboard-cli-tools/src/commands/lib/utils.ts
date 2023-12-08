@@ -5,6 +5,7 @@
  */
 
 import { Board } from '@google-labs/breadboard';
+import { readFile } from 'fs/promises';
 import path from "path";
 
 export const loadBoardFromModule = async (file: string) => {
@@ -15,14 +16,15 @@ export const loadBoardFromModule = async (file: string) => {
   if (board instanceof Board == false) throw new Error(`Board ${file} does not have a default export of type Board`);
 
   return board;
-}; 
+};
 
 export const resolveFilePath = (file: string) => {
   return path.resolve(process.cwd(), path.join(path.dirname(file), path.basename(file)));
 };
 
 export const loadBoard = async (file: string) => {
-  const board = await Board.load(file);
+  const fileContents = await readFile(file, 'utf-8');
+  const board = await Board.fromGraphDescriptor(JSON.parse(fileContents));
   return board;
 }
 
@@ -54,4 +56,3 @@ export const parseStdin = (): Promise<string> => {
 
   return p;
 };
-

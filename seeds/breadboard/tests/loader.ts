@@ -5,6 +5,10 @@
  */
 
 import test from "ava";
+import fs from "fs";
+import os from "os";
+import path from "path";
+import { Board } from "../src/board.js";
 import { ResolverResult, resolveURL } from "../src/loader.js";
 
 test("resolveURL resolves file URLs", (t) => {
@@ -127,4 +131,64 @@ test("resolveURL resolves URLs with hashes", (t) => {
       },
     ]);
   }
+});
+
+function generateBoard(title = "Hello, world!") {
+  const board = new Board({
+    title,
+  });
+  const input = board.input();
+  const ouput = board.output({
+    message: "Hello, world!",
+  });
+  input.wire("*", ouput);
+  return board;
+}
+
+function writeBoard(
+  board: Board,
+  filename = board.title,
+  directory: string = os.tmpdir()
+): string {
+  if (!filename) {
+    throw new Error(
+      "The board must have a title or a filename must be provided"
+    );
+  }
+
+  filename = filename.trim();
+
+  // replace multiple spaces with with a single space
+  filename = filename.replace(/\s+/g, " ");
+
+  // replace spaces with underscores
+  filename = filename.replace(/\s/g, "_");
+
+  // remove punctuation
+  filename = filename.replace(/[^\w\s]/gi, "");
+
+  if (!filename.endsWith(".json")) {
+    filename += ".json";
+  }
+
+  const json = JSON.stringify(board, null, 2);
+  fs.mkdirSync(directory, { recursive: true });
+
+  filename = path.resolve(directory, filename);
+  fs.writeFileSync(filename, json);
+  return filename;
+}
+
+test("new Board.load() loads a file correctly", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(testBoard, "board");
+
+  t.true(fs.existsSync(boardPath));
+
+  const board = await Board.load(boardPath);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
 });

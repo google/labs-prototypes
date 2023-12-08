@@ -308,5 +308,16 @@ test("can run a json board", async (t) => {
   ].join(" ");
   const output = await execCli(commandString);
   t.true(output.stdout.length > 0);
-  t.deepEqual(JSON.parse(output.stdout), inputData);
+
+  let resultString = output.stdout;
+
+  // remove ANSI escape codes
+  resultString = resultString.replace(/\u001b\[[0-9]{1,2}m/g, "");
+
+  // replace single quotes with double quotes
+  resultString = resultString
+    .replace(/(\w+)(?=:)/g, '"$1"')
+    .replace(/:\s*'([^']+)'/g, ': "$1"');
+
+  t.deepEqual(JSON.parse(resultString), inputData);
 });

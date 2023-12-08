@@ -65,8 +65,7 @@
       },
       "files": [
         "src/**/*.ts",
-        "tests/**/*.ts",
-        ".eslintrc"
+        "tests/**/*.ts"
       ],
       "output": []
     }

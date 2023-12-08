@@ -15,8 +15,8 @@ import { loadBoard, parseStdin, resolveFilePath } from "./lib/utils.js";
 
 async function runBoard(
   board: BoardRunner,
-  inputs?: InputValues | undefined,
-  kitDeclarations?: string[] | undefined
+  inputs: InputValues,
+  kitDeclarations: string[] | undefined
 ) {
   const kits: Kit[] = [];
 
@@ -30,16 +30,9 @@ async function runBoard(
 
   for await (const stop of board.run({ kits })) {
     if (stop.type === "input") {
-      if (!inputs) {
-        throw new Error(
-            `Node ${stop.node.id} is an input node, but no input values were provided.`
-            );
-      } else {
-        stop.inputs = inputs;
-      }
-    }
-    if (stop.type === "output") {
-      console.log(JSON.stringify(stop.outputs, null, 2))
+      stop.inputs = inputs;
+    } else if (stop.type === "output") {
+      console.log(stop.outputs);
     }
   }
 }
@@ -48,7 +41,7 @@ export const run = async (file: string, options: Record<string, any>) => {
   const kitDeclarations = options.kit as string[] | undefined;
 
   if (file != undefined) {
-    const input = options.input ? JSON.parse(options.input) as InputValues : undefined;
+    const input = JSON.parse(options.input) as InputValues;
     const filePath = resolveFilePath(file);
 
     let board = await loadBoard(filePath);

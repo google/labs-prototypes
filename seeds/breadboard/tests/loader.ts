@@ -196,6 +196,78 @@ test("new Board.load() loads a file correctly", async (t) => {
   t.deepEqual(board.kits, testBoard.kits);
 });
 
+test("new Board.load() loads a file with a space in the directory name", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(
+    testBoard,
+    undefined,
+    path.join(os.tmpdir(), "space in directory name")
+  );
+
+  t.false(boardPath.startsWith("file://"));
+  t.true(fs.existsSync(boardPath));
+
+  const board = await Board.load(boardPath);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
+});
+
+test("new Board.load() loads a file with a space in the filename", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(testBoard, "board with space");
+
+  t.false(boardPath.startsWith("file://"));
+  t.true(fs.existsSync(boardPath));
+
+  const board = await Board.load(boardPath);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
+});
+
+test("can load a file url with a space in the directory name", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(
+    testBoard,
+    undefined,
+    path.join(os.tmpdir(), "space in directory name")
+  );
+
+  const url = pathToFileURL(boardPath);
+  t.true(url.href.startsWith("file://"));
+  t.true(fs.existsSync(url));
+  t.deepEqual(fileURLToPath(url), boardPath);
+
+  const board = await Board.load(url.href);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
+});
+
+test("can load a file url with a space in the filename", async (t) => {
+  const testBoard = generateBoard();
+  const boardPath = writeBoard(testBoard, "board with space");
+
+  const url = pathToFileURL(boardPath);
+  t.true(url.href.startsWith("file://"));
+  t.true(fs.existsSync(url));
+  t.deepEqual(fileURLToPath(url), boardPath);
+
+  const board = await Board.load(url.href);
+
+  t.deepEqual(board.title, testBoard.title);
+  t.deepEqual(board.edges, testBoard.edges);
+  t.deepEqual(board.nodes, testBoard.nodes);
+  t.deepEqual(board.kits, testBoard.kits);
+});
+
 test("board can be loaded while using a file:// URL", async (t) => {
   const testBoard = generateBoard();
   const boardPath = writeBoard(testBoard, "board");

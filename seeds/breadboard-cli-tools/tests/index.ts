@@ -300,8 +300,12 @@ test("can make a graph from a javascript file", async (t) => {
 test("can run a json board", async (t) => {
   const inputData = {
     text: "Hi",
-  }
-  const commandString = ["run", `"${absoluteBoardPath}"`, `--input "${JSON.stringify(inputData).replaceAll('\"', '\\\"')}"`].join(" ");
+  };
+  const commandString = [
+    "run",
+    `"${absoluteBoardPath}"`,
+    `--input "${JSON.stringify(inputData).replaceAll('"', '\\"')}"`,
+  ].join(" ");
   const output = await execCli(commandString);
   t.true(output.stdout.length > 0);
   t.deepEqual(JSON.parse(output.stdout), inputData);

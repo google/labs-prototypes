@@ -29,7 +29,7 @@
         "src/**/*.ts",
         "tests/**/*.ts",
         "tsconfig.json",
-        "../tsconfig/base.json"
+        "../../core/tsconfig/base.json"
       ],
       "output": [
         "dist/",
@@ -64,7 +64,7 @@
       "files": [
         "src/**/*.ts",
         "tsconfig.json",
-        "../tsconfig/base.json"
+        "../../core/tsconfig/base.json"
       ],
       "output": [
         "docs/api/"

@@ -34,7 +34,7 @@
         "src/**/*.ts",
         "tests/**/*.ts",
         "tsconfig.json",
-        "../tsconfig/base.json"
+        "../../core/tsconfig/base.json"
       ],
       "output": [
         "dist/"

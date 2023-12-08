@@ -36,7 +36,7 @@
         "src/",
         "vite.config.ts",
         "tsconfig.json",
-        "../tsconfig/base.json"
+        "../../core/tsconfig/base.json"
       ]
     },
     "build:vite": {

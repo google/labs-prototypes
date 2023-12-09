@@ -111,13 +111,13 @@ export class BoardLoader {
       base = new URL(results[results.length - 1].href);
     }
     let graph: GraphDescriptor | undefined;
-    let subgraphs = this.#graphs;
+    let subGraphs = this.#graphs;
     let isSubgraph = true;
     for (const result of results) {
       if (result.type === "file" || result.type === "fetch") isSubgraph = false;
-      const step = new BoardLoadingStep(subgraphs);
+      const step = new BoardLoadingStep(subGraphs);
       graph = await step.load(result);
-      subgraphs = graph.graphs;
+      subGraphs = graph.graphs;
     }
     if (!graph)
       throw new Error(

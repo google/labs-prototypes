@@ -12,7 +12,7 @@ const board = new Board({
   title: "Board Caller",
   description:
     "Takes a tool-calling-capable generator and a list of board URLs, and helps generator call these boards as tools",
-  version: "0.0.5",
+  version: "0.0.6",
 });
 
 const starter = board.addKit(Starter);
@@ -33,6 +33,11 @@ const output = board.output({
         title: "Tool Name",
         description: "The name of the tool that generated the text",
       },
+      context: {
+        type: "array",
+        title: "Context",
+        description: "The conversation context",
+      },
     },
   },
 });
@@ -44,14 +49,24 @@ const parameters = board.input({
     properties: {
       text: {
         type: "string",
+        title: "Text",
         description: "The text to use with tool calling",
-        default: "What is the square root of e?",
+        examples: ["What is the square root of e?"],
+      },
+      context: {
+        type: "array",
+        title: "Context",
+        description: "An array of messages to use as conversation context",
+        items: {
+          type: "object",
+        },
+        default: "[]",
       },
       generator: {
         type: "string",
         title: "Generator",
         description: "The URL of the generator to call",
-        default: "/graphs/openai-gpt-35-turbo.json",
+        examples: ["/graphs/openai-gpt-35-turbo.json"],
       },
       boards: {
         type: "array",
@@ -60,10 +75,12 @@ const parameters = board.input({
         items: {
           type: "string",
         },
-        default:
+        examples: [
           '[ "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/graph-playground/graphs/math.json", "/graphs/search-summarize.json" ]',
+        ],
       },
     },
+    required: ["text", "boards"],
   },
 });
 
@@ -120,10 +137,12 @@ const generate = core
     core.passthrough({ $id: "noStreaming", useStreaming: false })
   );
 
-const getBoardPath = starter.jsonata({
-  $id: "getBoardPath",
+const getBoardArgs = starter.jsonata({
+  $id: "getBoardArgs",
   expression: `$merge([{
-    "path": $lookup(urlMap, tool_calls[0].name) },
+      "path": $lookup(urlMap, tool_calls[0].name)
+    },
+    { "generator": generator },
     tool_calls[0].args
   ])`,
   raw: true,
@@ -132,30 +151,35 @@ const getBoardPath = starter.jsonata({
 const formatOutput = starter
   .jsonata({
     $id: "formatOutput",
-    expression: `{ "text": text, "name": tool_calls[0].name }`,
+    expression: `{ "text": text, "name": tool_calls[0].name, "context": context }`,
     raw: true,
   })
   .wire("<-tool_calls", generate);
 
 parameters
   .wire("text->", generate)
+  .wire("context->", generate)
   .wire(
     "boards->",
     formatFunctionDeclarations
       .wire("tools->", generate)
-      .wire("urlMap->", getBoardPath)
+      .wire("urlMap->", getBoardArgs)
   )
   .wire(
     "generator->path",
-    generate.wire(
-      "tool_calls->",
-      getBoardPath.wire(
-        "*->",
-        core
-          .invoke({ $id: "callBoardAsTool" })
-          .wire("text->", formatOutput.wire("*->", output))
+    generate
+      .wire(
+        "tool_calls->",
+        getBoardArgs
+          .wire(
+            "*->",
+            core
+              .invoke({ $id: "callBoardAsTool" })
+              .wire("text->", formatOutput.wire("*->", output))
+          )
+          .wire("<-generator", parameters)
       )
-    )
+      .wire("context->", formatOutput)
   );
 
 export default board;

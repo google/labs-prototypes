@@ -17,38 +17,45 @@ const board = new Board({
 const starter = board.addKit(Starter);
 const nursery = board.addKit(NodeNurseryWeb);
 
-// const sampleTools = [
-//   {
-//     name: "The_Calculator_Recipe",
-//     description:
-//       "A simple AI pattern that leans on the power of the LLMs to generate language to solve math problems.",
-//     parameters: {
-//       type: "object",
-//       properties: {
-//         text: {
-//           type: "string",
-//           description: "Ask a math question",
-//         },
-//       },
-//       required: ["text"],
-//     },
-//   },
-//   {
-//     name: "The_Search_Summarizer_Recipe",
-//     description:
-//       "A simple AI pattern that first uses Google Search to find relevant bits of information and then summarizes them using LLM.",
-//     parameters: {
-//       type: "object",
-//       properties: {
-//         text: {
-//           type: "string",
-//           description: "What would you like to search for?",
-//         },
-//       },
-//       required: ["text"],
-//     },
-//   },
-// ];
+const toolsExample = [
+  {
+    name: "The_Calculator_Recipe",
+    description:
+      "A simple AI pattern that leans on the power of the LLMs to generate language to solve math problems.",
+    parameters: {
+      type: "object",
+      properties: {
+        text: {
+          type: "string",
+          description: "Ask a math question",
+        },
+      },
+      required: ["text"],
+    },
+  },
+  {
+    name: "The_Search_Summarizer_Recipe",
+    description:
+      "A simple AI pattern that first uses Google Search to find relevant bits of information and then summarizes them using LLM.",
+    parameters: {
+      type: "object",
+      properties: {
+        text: {
+          type: "string",
+          description: "What would you like to search for?",
+        },
+      },
+      required: ["text"],
+    },
+  },
+];
+
+const contextExample = [
+  {
+    role: "system",
+    content: "You are a pirate. Please talk like a pirate.",
+  },
+];
 
 const input = board.input({
   $id: "input",
@@ -62,13 +69,23 @@ const input = board.input({
       },
       tools: {
         type: "array",
-        format: "multiline",
         title: "Tools",
         description: "An array of functions to use for tool-calling",
         items: {
           type: "string",
         },
-        default: JSON.stringify([], null, 2),
+        default: "[]",
+        examples: [JSON.stringify(toolsExample, null, 2)],
+      },
+      context: {
+        type: "array",
+        title: "Context",
+        description: "An array of messages to use as conversation context",
+        items: {
+          type: "object",
+        },
+        default: "[]",
+        examples: [JSON.stringify(contextExample, null, 2)],
       },
       useStreaming: {
         type: "boolean",
@@ -91,6 +108,11 @@ const textOutput = board.output({
         title: "Text",
         description: "The generated text",
       },
+      context: {
+        type: "array",
+        title: "Context",
+        description: "The conversation context",
+      },
     },
   },
 });
@@ -104,6 +126,11 @@ const toolCallsOutput = board.output({
         type: "object",
         title: "Tool Calls",
         description: "The generated tool calls",
+      },
+      context: {
+        type: "array",
+        title: "Context",
+        description: "The conversation context",
       },
     },
   },
@@ -134,16 +161,18 @@ const headers = starter
   })
   .wire("json<-OPENAI_API_KEY", starter.secrets({ keys: ["OPENAI_API_KEY"] }));
 
+const makeMessages = starter
+  .jsonata({
+    $id: "makeMessages",
+    expression: `$append($boolean($.context) ? $.context, [{ "role": "user", "content": $.text }])`,
+  })
+  .wire("<-context", input);
+
 const body = starter.jsonata({
   $id: "makeBody",
   expression: `{
     "model": "gpt-3.5-turbo-1106",
-    "messages": [
-      {
-        "role": "user",
-        "content": $.text
-      }
-    ],
+    "messages": $.messages,
     "stream": $.useStreaming,
     "temperature": 1,
     "top_p": 1,
@@ -163,12 +192,20 @@ const fetch = starter
   .wire("headers<-result", headers);
 
 const getResponse = starter.jsonata({
+  $id: "getResponse",
   expression: `choices[0].message.{
     "text": $boolean(content) ? content,
     "tool_calls": tool_calls.function ~> | $ | { "args": $eval(arguments) }, "arguments" |
 }`,
   raw: true,
 });
+
+const getNewContext = starter
+  .jsonata({
+    $id: "getNewContext",
+    expression: `$append(messages, response.choices[0].message)`,
+  })
+  .wire("messages<-result", makeMessages);
 
 const streamTransform = nursery.transformStream(
   (transformBoard, input, output) => {
@@ -195,16 +232,25 @@ input.wire("tools->json", formatTools.wire("result->tools", body));
 input.wire("useStreaming->", body);
 input.wire(
   "text->",
-  body.wire(
-    "result->body",
-    fetch
-      .wire(
-        "response->json",
-        getResponse
-          .wire("text->", textOutput)
-          .wire("tool_calls->", toolCallsOutput)
-      )
-      .wire("stream->", streamTransform.wire("stream->", streamOutput))
+  makeMessages.wire(
+    "result->messages",
+    body.wire(
+      "result->body",
+      fetch
+        .wire(
+          "response->json",
+          getResponse
+            .wire("text->", textOutput)
+            .wire("tool_calls->", toolCallsOutput)
+        )
+        .wire(
+          "response->",
+          getNewContext
+            .wire("result->context", textOutput)
+            .wire("result->context", toolCallsOutput)
+        )
+        .wire("stream->", streamTransform.wire("stream->", streamOutput))
+    )
   )
 );
 

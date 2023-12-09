@@ -39,11 +39,16 @@ export const resolveURL = (
     results.push({ type: "hash", location: hash.substring(1), href });
     return true;
   }
-  const result: ResolverResult = path
-    ? { type: "file", location: path, href }
-    : href
-    ? { type: "fetch", location: hrefWithoutHash, href }
-    : { type: "unknown", location: "", href };
+  let result: ResolverResult;
+
+  if (path) {
+    result = { type: "file", location: path, href };
+  } else if (href) {
+    result = { type: "fetch", location: hrefWithoutHash, href };
+  } else {
+    result = { type: "unknown", location: "", href };
+  }
+
   results.push(result);
   return !hash;
 };

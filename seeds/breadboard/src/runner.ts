@@ -311,8 +311,11 @@ export class BoardRunner implements BreadboardRunner {
   /**
    * Loads a board from a URL or a file path.
    *
-   * @param url - the URL or a file path to the board.
-   * @param slots - optional slots to provide to the board.
+   * @param {string} url - the URL or a file path to the board.
+   * @param {Object} options - optional options.
+   * @param {BreadboardSlotSpec} options.slotted - optional map of slotted graphs
+   * @param {string} options.base - optional base URL to use when loading the board.
+   * @param {GraphDescriptor} options.outerGraph - optional outer graph to use when loading the board.
    * @returns - a new `Board` instance.
    */
   static async load(

@@ -62,9 +62,6 @@
       "env": {
         "FORCE_COLOR": "1"
       },
-      "dependencies": [
-        "build:tsc"
-      ],
       "files": [],
       "output": []
     },
@@ -115,17 +112,17 @@
     "dist/*.js.map"
   ],
   "ava": {
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--import=tsx"
+    ],
     "timeout": "30s",
     "files": [
       "tests/**/*.ts"
     ],
-    "workerThreads": false,
-    "typescript": {
-      "rewritePaths": {
-        "./": "dist/"
-      },
-      "compile": false
-    }
+    "workerThreads": false
   },
   "keywords": [],
   "author": "Google Labs Team",
@@ -145,6 +142,7 @@
     "ava": "^5.2.0",
     "jsonschema": "^1.4.1",
     "rollup": "^4.1.4",
+    "tsx": "^4.6.2",
     "typedoc": "^0.25.1",
     "typedoc-plugin-markdown": "^3.16.0",
     "typescript": "^5.0.4"

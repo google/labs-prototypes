@@ -13,7 +13,7 @@ import * as fs from "fs";
 const packageDir = process.cwd();
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const cliPath = path.resolve(path.join(__dirname, "../src/index.js"));
+const cliPath = path.resolve(path.join(__dirname, "../src/index.ts"));
 
 type ChildProcessCallback = {
   error?: ExecException | null;
@@ -23,7 +23,7 @@ type ChildProcessCallback = {
 
 function execCli(args = ""): Promise<ChildProcessCallback> {
   return new Promise((resolve, reject) => {
-    exec(`node "${cliPath}" ${args}`, (error, stdout, stderr) => {
+    exec(`node --import=tsx "${cliPath}" ${args}`, (error, stdout, stderr) => {
       if (error) {
         reject({ error, stdout, stderr });
       } else {

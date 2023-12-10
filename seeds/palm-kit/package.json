@@ -44,10 +44,10 @@
       "env": {
         "FORCE_COLOR": "1"
       },
-      "dependencies": [
-        "build:tsc"
+      "files": [
+        "src/**/*.ts",
+        "tests/**/*.ts"
       ],
-      "files": [],
       "output": []
     },
     "lint": {
@@ -75,12 +75,12 @@
       "tests/**/*.ts"
     ],
     "workerThreads": false,
-    "typescript": {
-      "rewritePaths": {
-        "./": "dist/"
-      },
-      "compile": false
-    }
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--import=tsx"
+    ]
   },
   "keywords": [],
   "author": "Google Labs Team",
@@ -90,6 +90,7 @@
   },
   "homepage": "https://github.com/google/labs-prototypes#readme",
   "devDependencies": {
+    "tsx": "^4.6.2",
     "@ava/typescript": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",

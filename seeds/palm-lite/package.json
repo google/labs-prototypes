@@ -42,10 +42,10 @@
       "env": {
         "FORCE_COLOR": "1"
       },
-      "dependencies": [
-        "build:tsc"
+      "files": [
+        "src/**/*.ts",
+        "tests/**/*.ts"
       ],
-      "files": [],
       "output": []
     },
     "lint": {
@@ -105,12 +105,12 @@
       "tests/**/*.ts"
     ],
     "workerThreads": false,
-    "typescript": {
-      "rewritePaths": {
-        "./": "dist/"
-      },
-      "compile": false
-    }
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--import=tsx"
+    ]
   },
   "keywords": [],
   "author": "Google Labs Team",
@@ -120,6 +120,7 @@
   },
   "homepage": "https://github.com/google/labs-prototypes/seeds/palm-lite#readme",
   "devDependencies": {
+    "tsx": "^4.6.2",
     "@ava/typescript": "^4.0.0",
     "@google-labs/discovery-types": "*",
     "@google-labs/tsconfig": "*",

@@ -43,9 +43,6 @@
       "env": {
         "FORCE_COLOR": "1"
       },
-      "dependencies": [
-        "build"
-      ],
       "files": [
         "src/**/*.js",
         "tests/**/*.js"

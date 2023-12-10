@@ -62,7 +62,10 @@
       "env": {
         "FORCE_COLOR": "1"
       },
-      "files": [],
+      "files": [
+        "src/**/*.ts",
+        "tests/**/*.ts"
+      ],
       "output": []
     },
     "lint": {

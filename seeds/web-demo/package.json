@@ -101,19 +101,6 @@
   "files": [
     "dist/src"
   ],
-  "ava": {
-    "timeout": "30s",
-    "files": [
-      "tests/**/*.ts"
-    ],
-    "workerThreads": false,
-    "typescript": {
-      "rewritePaths": {
-        "./": "dist/"
-      },
-      "compile": false
-    }
-  },
   "keywords": [],
   "author": "Google Labs Team",
   "license": "Apache-2.0",

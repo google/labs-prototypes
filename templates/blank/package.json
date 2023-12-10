@@ -8,10 +8,10 @@
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
-    "test": "FORCE_COLOR=1 ava",
-    "build": "FORCE_COLOR=1 tsc --b",
-    "watch": "FORCE_COLOR=1 tsc --b --watch",
-    "lint": "FORCE_COLOR=1 eslint . --ext .ts"
+    "test": "wireit",
+    "build": "wireit",
+    "watch": "wireit",
+    "lint": "wireit"
   },
   "repository": {
     "type": "git",
@@ -26,11 +26,47 @@
       "tests/**/*.ts"
     ],
     "workerThreads": false,
-    "typescript": {
-      "rewritePaths": {
-        "./": "dist/"
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--import=tsx"
+    ]
+  },
+  "wireit": {
+    "build": {
+      "command": "tsc -b",
+      "env": {
+        "FORCE_COLOR": "1"
       },
-      "compile": false
+      "files": [
+        "src/**/*.ts"
+      ],
+      "output": [
+        "dist/"
+      ]
+    },
+    "watch": {
+      "command": "tsc -b -w",
+      "env": {
+        "FORCE_COLOR": "1"
+      }
+    },
+    "test": {
+      "command": "ava",
+      "env": {
+        "FORCE_COLOR": "1"
+      },
+      "files": [
+        "src/**/*.ts",
+        "tests/**/*.ts"
+      ]
+    },
+    "lint": {
+      "command": "eslint . --ext .ts",
+      "env": {
+        "FORCE_COLOR": "1"
+      }
     }
   },
   "keywords": [],
@@ -41,6 +77,7 @@
   },
   "homepage": "https://github.com/google/labs-prototypes#readme",
   "devDependencies": {
+    "tsx": "^4.6.2",
     "@ava/typescript": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",

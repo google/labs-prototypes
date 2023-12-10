@@ -3,6 +3,8 @@
     "composite": true,
     "outDir": "./dist"
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": [
+    "src/**/*"
+  ],
   "extends": "@google-labs/tsconfig/base.json"
 }

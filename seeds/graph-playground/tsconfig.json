@@ -3,7 +3,10 @@
     "composite": true,
     "outDir": "./dist"
   },
-  "include": ["src/**/*", "wild/**/*", "tests/**/*"],
+  "include": [
+    "src/**/*",
+    "wild/**/*"
+  ],
   "extends": "@google-labs/tsconfig/base.json",
   "typedocOptions": {
     "entryPoints": "./src/index.ts",

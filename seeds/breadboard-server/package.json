@@ -89,12 +89,12 @@
       "tests/**/*.ts"
     ],
     "workerThreads": false,
-    "typescript": {
-      "rewritePaths": {
-        "./": "dist/"
-      },
-      "compile": false
-    }
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--import=tsx"
+    ]
   },
   "keywords": [],
   "author": "Google Labs Team",
@@ -104,6 +104,7 @@
   },
   "homepage": "https://github.com/google/labs-prototypes/tree/main/seeds/breadboard-server#readme",
   "devDependencies": {
+    "tsx": "^4.6.2",
     "@ava/typescript": "^4.0.0",
     "@google-labs/tsconfig": "*",
     "@types/express": "^4.17.17",

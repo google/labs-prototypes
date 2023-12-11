@@ -12,7 +12,8 @@
     "clean:build": "rimraf -g seeds/*/dist seeds/*/.wireit",
     "ci": "npm ci",
     "check:format": "prettier --check --config .prettierrc seeds/**/*.ts",
-    "ci:local": "wireit"
+    "ci:local": "wireit",
+    "tap": "wireit"
   },
   "wireit": {
     "build": {
@@ -98,6 +99,11 @@
         "check:format",
         "lint",
         "test"
+      ]
+    },
+    "tap": {
+      "dependencies": [
+        "./seeds/breadboard:tap"
       ]
     }
   },

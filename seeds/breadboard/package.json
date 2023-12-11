@@ -14,6 +14,7 @@
   "scripts": {
     "generate:docs": "wireit",
     "test": "wireit",
+    "tap": "wireit",
     "build": "wireit",
     "build:tsc": "wireit",
     "build:rollup": "wireit",
@@ -102,6 +103,20 @@
       ],
       "output": [
         "docs/api/"
+      ]
+    },
+    "tap": {
+      "command": "ava --tap | tee results.tap",
+      "dependencies": [
+        "build:tsc"
+      ],
+      "files": [
+        "tests/**/*.ts",
+        "src/**/*.ts",
+        "dist/"
+      ],
+      "output": [
+        "results.tap"
       ]
     }
   },

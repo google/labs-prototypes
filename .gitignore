@@ -110,7 +110,6 @@ dist
 
 .DS_Store
 
-
 */__pycache__/
 *.py[cod]
 
@@ -122,3 +121,5 @@ dist
 *.local.md
 
 .wireit
+
+*.tap

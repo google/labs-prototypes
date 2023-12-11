@@ -36,6 +36,10 @@
     "url": "/graphs/math-imperative.json"
   },
   {
+    "title": "The Calculator Recipe",
+    "url": "/graphs/math.json"
+  },
+  {
     "title": "Mock Text Generator",
     "url": "/graphs/mock-text-generator.json"
   },
@@ -66,10 +70,6 @@
   {
     "title": "Text Generator",
     "url": "/graphs/text-generator.json"
-  },
-  {
-    "title": "Tour Guide Writer, Take Two",
-    "url": "/graphs/tour-guide-writer-2.json"
   },
   {
     "title": "Tour Guide Writer",

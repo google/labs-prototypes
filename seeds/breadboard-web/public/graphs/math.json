@@ -1,0 +1,124 @@
+{
+  "title": "The Calculator Recipe",
+  "description": "A simple AI pattern that leans on the power of the LLMs to generate language to solve math problems.",
+  "version": "0.0.2",
+  "edges": [
+    {
+      "from": "math-question",
+      "to": "generator",
+      "out": "generator",
+      "in": "path"
+    },
+    {
+      "from": "compute",
+      "to": "print",
+      "out": "result",
+      "in": "text"
+    },
+    {
+      "from": "secrets-1",
+      "to": "compute",
+      "out": "PALM_KEY",
+      "in": "PALM_KEY"
+    },
+    {
+      "from": "generator",
+      "to": "compute",
+      "out": "text",
+      "in": "code"
+    },
+    {
+      "from": "math-function",
+      "to": "generator",
+      "out": "prompt",
+      "in": "text"
+    },
+    {
+      "from": "math-question",
+      "to": "math-function",
+      "out": "text",
+      "in": "question"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "math-question",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "Math problem",
+              "description": "Ask a math question"
+            },
+            "generator": {
+              "type": "string",
+              "title": "Generator",
+              "description": "The URL of the generator to call",
+              "default": "/graphs/text-generator.json"
+            }
+          },
+          "required": [
+            "text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "math-function",
+      "type": "promptTemplate",
+      "configuration": {
+        "template": "Translate the math problem below into a JavaScript function named `compute` that can be executed to provide the answer to the problem\nMath Problem: {{question}}\nSolution:"
+      }
+    },
+    {
+      "id": "generator",
+      "type": "invoke"
+    },
+    {
+      "id": "compute",
+      "type": "runJavascript",
+      "configuration": {
+        "name": "compute"
+      }
+    },
+    {
+      "id": "print",
+      "type": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "Answer",
+              "description": "The answer to the math problem"
+            }
+          },
+          "required": [
+            "text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "secrets-1",
+      "type": "secrets",
+      "configuration": {
+        "keys": [
+          "PALM_KEY"
+        ]
+      }
+    }
+  ],
+  "kits": [
+    {
+      "url": "npm:@google-labs/llm-starter"
+    },
+    {
+      "url": "npm:@google-labs/core-kit"
+    }
+  ]
+}

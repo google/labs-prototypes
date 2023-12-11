@@ -106,27 +106,18 @@ const formatFunctionDeclarations = core.invoke((board, input, output) => {
       .wire("item->boardURL", output);
   });
 
+  const formatResults = starter.jsonata({
+    $id: "formatResults",
+    expression: `{
+      "tools": [function],
+      "urlMap": $merge([{ function.name: boardURL }])
+  }`,
+    raw: true,
+  });
+
   input.wire(
     "boards->list",
-    turnBoardsToFunctions
-      .wire(
-        "list->json",
-        starter
-          .jsonata({
-            $id: "formatAsTools",
-            expression: `[function]`,
-          })
-          .wire("result->tools", output)
-      )
-      .wire(
-        "list->json",
-        starter
-          .jsonata({
-            expression: `$merge([$.{ function.name: boardURL }])`,
-            $id: "makeURLMap",
-          })
-          .wire("result->urlMap", output)
-      )
+    turnBoardsToFunctions.wire("list->json", formatResults.wire("*->", output))
   );
 });
 
@@ -140,10 +131,10 @@ const generate = core
 const getBoardArgs = starter.jsonata({
   $id: "getBoardArgs",
   expression: `$merge([{
-      "path": $lookup(urlMap, tool_calls[0].name)
+      "path": $lookup(urlMap, toolCalls[0].name)
     },
     { "generator": generator },
-    tool_calls[0].args
+    toolCalls[0].args
   ])`,
   raw: true,
 });
@@ -151,10 +142,10 @@ const getBoardArgs = starter.jsonata({
 const formatOutput = starter
   .jsonata({
     $id: "formatOutput",
-    expression: `{ "text": text, "name": tool_calls[0].name, "context": context }`,
+    expression: `{ "text": text, "name": toolCalls[0].name, "context": context }`,
     raw: true,
   })
-  .wire("<-tool_calls", generate);
+  .wire("<-toolCalls", generate);
 
 parameters
   .wire("text->", generate)
@@ -169,7 +160,7 @@ parameters
     "generator->path",
     generate
       .wire(
-        "tool_calls->",
+        "toolCalls->",
         getBoardArgs
           .wire(
             "*->",

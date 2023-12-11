@@ -11,7 +11,6 @@
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
-    "run-debug": "wireit",
     "test": "wireit",
     "build": "wireit",
     "build:tsc": "wireit",
@@ -21,7 +20,8 @@
     "build": {
       "dependencies": [
         "../breadboard:build",
-        "build:tsc"
+        "build:tsc",
+        "build:breadboard-web"
       ]
     },
     "build:tsc": {
@@ -40,6 +40,22 @@
       ],
       "output": [
         "dist/"
+      ],
+      "clean": "if-file-deleted"
+    },
+    "build:breadboard-web": {
+      "command": "mkdir -p dist/ui && cp -r ../breadboard-web/dist/ dist/ui/",
+      "env": {
+        "FORCE_COLOR": "1"
+      },
+      "dependencies": [
+        "../breadboard-web:build"
+      ],
+      "files": [
+        "../breadboard-web/dist/**/*"
+      ],
+      "output": [
+        "dist/ui/"
       ],
       "clean": "if-file-deleted"
     },
@@ -64,17 +80,6 @@
         "tests/**/*.ts"
       ],
       "output": []
-    },
-    "run-debug": {
-      "command": "breadboard",
-      "env": {
-        "FORCE_COLOR": "1"
-      },
-      "dependencies": [
-        "build:tsc"
-      ],
-      "files": [],
-      "output": []
     }
   },
   "repository": {
@@ -82,7 +87,8 @@
     "url": "https://github.com/google/labs-prototypes"
   },
   "files": [
-    "dist/src"
+    "dist/src",
+    "dist/ui"
   ],
   "ava": {
     "timeout": "30s",

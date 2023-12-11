@@ -19,8 +19,8 @@
     {
       "from": "generate",
       "to": "formatOutput",
-      "out": "tool_calls",
-      "in": "tool_calls"
+      "out": "toolCalls",
+      "in": "toolCalls"
     },
     {
       "from": "parameters",
@@ -77,8 +77,8 @@
     {
       "from": "generate",
       "to": "getBoardArgs",
-      "out": "tool_calls",
-      "in": "tool_calls"
+      "out": "toolCalls",
+      "in": "toolCalls"
     },
     {
       "from": "generate",
@@ -187,26 +187,13 @@
                 "in": "board"
               },
               {
-                "from": "formatAsTools",
+                "from": "formatResults",
                 "to": "output-2",
-                "out": "result",
-                "in": "tools"
+                "out": "*"
               },
               {
                 "from": "map-4",
-                "to": "formatAsTools",
-                "out": "list",
-                "in": "json"
-              },
-              {
-                "from": "makeURLMap",
-                "to": "output-2",
-                "out": "result",
-                "in": "urlMap"
-              },
-              {
-                "from": "map-4",
-                "to": "makeURLMap",
+                "to": "formatResults",
                 "out": "list",
                 "in": "json"
               },
@@ -285,17 +272,11 @@
                 "configuration": {}
               },
               {
-                "id": "formatAsTools",
+                "id": "formatResults",
                 "type": "jsonata",
                 "configuration": {
-                  "expression": "[function]"
-                }
-              },
-              {
-                "id": "makeURLMap",
-                "type": "jsonata",
-                "configuration": {
-                  "expression": "$merge([$.{ function.name: boardURL }])"
+                  "expression": "{\n      \"tools\": [function],\n      \"urlMap\": $merge([{ function.name: boardURL }])\n  }",
+                  "raw": true
                 }
               }
             ],
@@ -331,7 +312,7 @@
       "id": "getBoardArgs",
       "type": "jsonata",
       "configuration": {
-        "expression": "$merge([{\n      \"path\": $lookup(urlMap, tool_calls[0].name)\n    },\n    { \"generator\": generator },\n    tool_calls[0].args\n  ])",
+        "expression": "$merge([{\n      \"path\": $lookup(urlMap, toolCalls[0].name)\n    },\n    { \"generator\": generator },\n    toolCalls[0].args\n  ])",
         "raw": true
       }
     },
@@ -339,7 +320,7 @@
       "id": "formatOutput",
       "type": "jsonata",
       "configuration": {
-        "expression": "{ \"text\": text, \"name\": tool_calls[0].name, \"context\": context }",
+        "expression": "{ \"text\": text, \"name\": toolCalls[0].name, \"context\": context }",
         "raw": true
       }
     },

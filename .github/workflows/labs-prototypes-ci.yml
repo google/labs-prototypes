@@ -37,3 +37,13 @@ jobs:
 
       - name: Running tests
         run: npm run test
+
+      - name: Generate TAP results
+        run: npm run tap
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        with:
+          paths: |
+            **/results.tap
+        if: always()

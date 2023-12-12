@@ -1,6 +1,6 @@
 {
   "name": "@google-labs/palm-lite",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A zero-dependency client for PaLM APIs",
   "main": "./dist/src/index.js",
   "exports": "./dist/src/index.js",

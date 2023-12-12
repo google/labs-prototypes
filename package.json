@@ -17,79 +17,23 @@
   "wireit": {
     "build": {
       "dependencies": [
-        "./seeds/breadboard:build",
-        "./seeds/breadboard-cli-tools:build",
-        "./seeds/breadboard-server:build",
-        "./seeds/breadboard-ui:build",
-        "./seeds/breadboard-web:build",
         "./seeds/chunker:build",
-        "./seeds/cloud-function:build",
-        "./seeds/coffee-bot-board:build",
-        "./seeds/core-kit:build",
-        "./seeds/create-breadboard:build",
-        "./seeds/create-breadboard-kit:build",
         "./seeds/discovery-types:build",
-        "./seeds/graph-integrity:build",
-        "./seeds/graph-playground:build",
-        "./seeds/graph-runner:build",
-        "./seeds/hello-world:build",
-        "./seeds/json-kit:build",
-        "./seeds/llm-starter:build",
-        "./seeds/node-nursery:build",
-        "./seeds/node-nursery-web:build",
-        "./seeds/palm-kit:build",
-        "./seeds/palm-lite:build",
-        "./seeds/pinecone-kit:build"
+        "./seeds/palm-lite:build"
       ]
     },
     "test": {
       "dependencies": [
-        "./seeds/breadboard:test",
-        "./seeds/breadboard-cli-tools:test",
-        "./seeds/breadboard-server:test",
-        "./seeds/breadboard-ui:test",
-        "./seeds/breadboard-web:test",
         "./seeds/chunker:test",
-        "./seeds/cloud-function:test",
-        "./seeds/coffee-bot-board:test",
-        "./seeds/core-kit:test",
         "./seeds/discovery-types:test",
-        "./seeds/graph-integrity:test",
-        "./seeds/graph-playground:test",
-        "./seeds/graph-runner:test",
-        "./seeds/hello-world:test",
-        "./seeds/json-kit:test",
-        "./seeds/llm-starter:test",
-        "./seeds/node-nursery:test",
-        "./seeds/node-nursery-web:test",
-        "./seeds/palm-kit:test",
-        "./seeds/palm-lite:test",
-        "./seeds/pinecone-kit:test"
+        "./seeds/palm-lite:test"
       ]
     },
     "lint": {
       "dependencies": [
-        "./seeds/breadboard:lint",
-        "./seeds/breadboard-cli-tools:lint",
-        "./seeds/breadboard-server:lint",
-        "./seeds/breadboard-ui:lint",
         "./seeds/chunker:lint",
-        "./seeds/coffee-bot-board:lint",
-        "./seeds/core-kit:lint",
-        "./seeds/create-breadboard:lint",
-        "./seeds/create-breadboard-kit:lint",
         "./seeds/discovery-types:lint",
-        "./seeds/graph-integrity:lint",
-        "./seeds/graph-playground:lint",
-        "./seeds/graph-runner:lint",
-        "./seeds/hello-world:lint",
-        "./seeds/json-kit:lint",
-        "./seeds/llm-starter:lint",
-        "./seeds/node-nursery:lint",
-        "./seeds/node-nursery-web:lint",
-        "./seeds/palm-kit:lint",
-        "./seeds/palm-lite:lint",
-        "./seeds/pinecone-kit:lint"
+        "./seeds/palm-lite:lint"
       ]
     },
     "ci:local": {
@@ -117,7 +61,6 @@
   },
   "workspaces": [
     "./core/*",
-    "./seeds/*",
-    "./seeds/node-proxy-server/functions"
+    "./seeds/*"
   ]
 }

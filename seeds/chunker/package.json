@@ -1,6 +1,5 @@
 {
   "name": "@google-labs/chunker",
-  "private": true,
   "version": "0.0.1",
   "description": "A simple chunker for breaking up structured data into chunks, suitable for RAG",
   "main": "./dist/src/index.js",

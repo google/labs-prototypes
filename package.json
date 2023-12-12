@@ -11,7 +11,7 @@
     "deep-clean:build": "rm -rf node_modules seeds/*/node_modules package-lock.json && npm run sync",
     "clean:build": "rimraf -g seeds/*/dist seeds/*/.wireit",
     "ci": "npm ci",
-    "check:format": "prettier --check --config .prettierrc seeds/**/*.ts",
+    "check:format": "prettier --check --config .prettierrc seeds/*/src/**/*.ts",
     "ci:local": "wireit"
   },
   "wireit": {

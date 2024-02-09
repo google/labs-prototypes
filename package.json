@@ -19,6 +19,7 @@
       "dependencies": [
         "./seeds/chunker:build",
         "./seeds/discovery-types:build",
+        "./seeds/gemini-guide:build",
         "./seeds/palm-lite:build"
       ]
     },

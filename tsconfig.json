@@ -4,6 +4,7 @@
   "references": [
     { "path": "seeds/chunker" },
     { "path": "seeds/discovery-types" },
+    { "path": "seeds/gemini-guide" },
     { "path": "seeds/palm-lite" }
   ]
 }

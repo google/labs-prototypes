@@ -8,6 +8,7 @@
   "types": "dist/src/index.d.ts",
   "type": "module",
   "scripts": {
+    "dev": "breadboard debug src --watch -n",
     "build": "FORCE_COLOR=1 tsc --b",
     "watch": "FORCE_COLOR=1 tsc --b --watch",
     "lint": "FORCE_COLOR=1 eslint . --ext .ts"

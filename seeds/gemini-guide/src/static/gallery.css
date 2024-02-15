@@ -1,0 +1,58 @@
+/**
+ * @license
+ * Copyright 2024 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 30px;
+}
+
+.card {
+  background: #1a1c1e;
+  color: white;
+  text-decoration: none;
+  border: 1px solid #45474f;
+  border-radius: 20px;
+  width: 300px;
+  min-height: 150px;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover {
+  background: #2a2c2e;
+}
+
+.card > h2 {
+  color: #adc4ff;
+  font-weight: normal;
+  font-size: 22px;
+}
+
+.card > p {
+  font-size: 15px;
+  padding-bottom: 0;
+  line-height: 28px;
+}
+
+.card.green > h2 {
+  color: #a5d6a7;
+}
+
+.card.blue > h2 {
+  color: #90caf9;
+}
+
+.card.yellow > h2 {
+  color: #fff59d;
+}
+
+.card.red > h2 {
+  color: #ef9a9a;
+}

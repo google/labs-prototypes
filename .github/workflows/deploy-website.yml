@@ -40,14 +40,14 @@ jobs:
       - run: npm ci
 
       - name: Build production website
-        working-directory: packages/gemini-guide
+        working-directory: seeds/gemini-guide
         run: npm run build:prod
 
       - name: Upload website artifact
         uses: actions/upload-pages-artifact@v3
         with:
           name: labs-prototypes-website
-          path: packages/gemini-guide/dist/prod/labs-prototypes
+          path: seeds/gemini-guide/dist/prod/labs-prototypes
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4

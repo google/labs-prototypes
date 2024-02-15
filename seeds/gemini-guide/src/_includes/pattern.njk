@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include "head.njk" %}
+    <title>{{ title }} | Gemini Patterns</title>
+    <link rel="stylesheet" href="static/common.css" />
+    <link rel="stylesheet" href="static/pattern.css" />
+  </head>
+  <body>
+    {% include "header.njk" %}
+
+    <main>
+      {{content | safe}}
+    </main>
+
+    {% include "footer.njk" %}
+  </body>
+</html>

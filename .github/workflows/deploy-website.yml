@@ -40,16 +40,16 @@ jobs:
       - run: npm ci
 
       - name: Build production website
-        working-directory: packages/website
+        working-directory: packages/gemini-guide
         run: npm run build:prod
 
       - name: Upload website artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          name: breadboard-website
-          path: packages/website/dist/prod/breadboard
+          name: labs-prototypes-website
+          path: packages/gemini-guide/dist/prod/labs-prototypes
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
         with:
-          artifact_name: breadboard-website
+          artifact_name: labs-prototypes-website

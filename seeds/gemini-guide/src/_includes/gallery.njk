@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include "head.njk" %}
+    <title>Gemini Patterns</title>
+    <link rel="stylesheet" href="static/gallery.css" />
+  </head>
+  <body>
+    {% include "header.njk" %}
+
+    <main>
+      <section id="cards">
+        {%- for item in collections.patterns -%}
+        <a class="card {{ item.data.color }}" href="/labs-prototypes{{ item.url }}">
+          <h2>{{ item.data.title }}</h2>
+          <p>{{ item.data.description }}</p>
+        </a>
+        {%- endfor -%}
+      </section>
+    </main>
+
+    {% include "footer.njk" %}
+  </body>
+</html>

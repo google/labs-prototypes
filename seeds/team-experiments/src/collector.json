@@ -1,0 +1,192 @@
+{
+  "title": "Media Collector",
+  "description": "A worker that knows how collect materials for the social media.",
+  "$schema": "https://raw.githubusercontent.com/breadboard-ai/breadboard/@google-labs/breadboard-schema@1.4.0/packages/schema/breadboard.schema.json",
+  "version": "0.0.1",
+  "edges": [
+    {
+      "from": "fn-5",
+      "to": "output-6",
+      "out": "exit",
+      "in": "exit"
+    },
+    {
+      "from": "fn-5",
+      "to": "output-2",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "structuredWorker-4",
+      "to": "fn-5",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "human-3",
+      "to": "structuredWorker-4",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "input-1",
+      "to": "human-3",
+      "out": "context",
+      "in": "context"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "output-2",
+      "type": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "type": "string",
+              "title": "context"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "fn-5",
+      "type": "runJavascript",
+      "configuration": {
+        "code": "function fn_5({ context }) {\n  const c = context;\n  const last = c[c.length - 1];\n  if (last.parts.text.includes(\"~EXIT~\")) {\n    return { exit: context };\n  }\n  return { context };\n}",
+        "name": "fn_5",
+        "raw": true
+      },
+      "metadata": {
+        "title": "Check for Exit Condition"
+      }
+    },
+    {
+      "id": "structuredWorker-4",
+      "type": "structuredWorker",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "reflect": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            },
+            "updated_state": {
+              "type": "object",
+              "properties": {
+                "send_date": {
+                  "type": "string",
+                  "description": "The date that the post will be sent. Leave as empty string when the value is not available."
+                },
+                "send_time": {
+                  "type": "string",
+                  "description": "The time that the post will be sent. Leave as empty string when the value is not available"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "A short text string, typically 50 characters or less. Leave as empty string when the value is not available"
+                },
+                "caption": {
+                  "type": "string",
+                  "description": "Up to 2,200 characters of text, hashtags, and emojis"
+                },
+                "images": {
+                  "type": "array",
+                  "description": "photos, logos, animated GIFs, Boomerangs, etc.",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "videos": {
+                  "type": "array",
+                  "description": "Reels, videos",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "sponsors": {
+                  "type": "array",
+                  "description": "sponsor information",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "response": {
+              "type": "string"
+            }
+          }
+        },
+        "instruction": "You are part of a team that works together to create and send instagram posts for small business owners.\nBut you are only responsible for the first step, which is to find out what kinds of things will be part of the post, title, send time, send date, etc.\nYou  do this by having a multi turn conversation with the author.\n\nConversation-wise, you will take specific steps to ensure you are responding appropriately. Those steps are explained below.\n1. reflect:  think about what the author said in the current turn and consider the context of previous turns to inform what you will say and do\n2. action: explain what you will say in your response and what you need to update in the conversation state.\n3. updated_state: this is the set of key, value pairs that describe what the author wants in the instagram post they are setting up.\n4. response: this is the conversational utterance that is appropriate at this stage of the conversation given (1-3)\n\nMake sure the 'updated_state' values for the post are maintained as the conversation progresses. Never erase them unless told to by the author.\nIf a value is never given, leave it as an empty string.\n\nFor images and videos, you do NOT need to ask for filenames. Just get a reasonably detailed description. If the author knows and gives you the actual file name, you can use it.\n\nAsk the author questions until you believe you and the author understand and agree on what they want in the post.\nAlways ask if the author wants to include anything else in the post before you finish.\n\nTo finish: If the author communicates that they are finished specifying what is in the post, check that they have included the three required fields of 'send_date', 'send_time' and 'title'. If so, you should\nrespond with \"~EXIT~\".\nMake sure the json object is populated with all the information you've gotten from the author, as shown in the example below.\n\nBelow is an example of what you'll do  responding to the author's input turns.\n\nStudy this example conversation so you are clear what to do.\nRemember that it's a multi turn conversation, so if the author replies 'no' it needs to be taken in context of the previous turn. So, it might mean \"nothing more\" or \"that is all\"."
+      },
+      "metadata": {
+        "title": "Collect Media"
+      }
+    },
+    {
+      "id": "output-6",
+      "type": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "exit": {
+              "type": "string",
+              "title": "exit"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "title": "Exit"
+      }
+    },
+    {
+      "id": "human-3",
+      "type": "human",
+      "configuration": {
+        "description": "Reply here"
+      },
+      "metadata": {
+        "title": "Ask User"
+      }
+    },
+    {
+      "id": "input-1",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "title": "Context",
+              "description": "Incoming conversation context",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "behavior": [
+                  "llm-content"
+                ]
+              },
+              "examples": [
+                "[{\"parts\":[{\"text\":\"{\\\"adCampaign\\\":{\\\"headlines\\\":[\\\"Breadboard: AI Playground\\\",\\\"Exp. AI Patterns\\\",\\\"Rapid Prototyping\\\",\\\"AI Power, Gemini\\\",\\\"Integrate AI Seamlessly\\\",\\\"Create Graphs, Prompts\\\",\\\"Accessible AI\\\",\\\"Breadboard: Dev's AI Kit\\\",\\\"Supercharge Dev, Breadboard\\\",\\\"Accelerate Innovation\\\",\\\"Revolutionize Dev, AI\\\",\\\"Breadboard: AI, Ingenuity\\\",\\\"Elevate Projects, Breadboard\\\",\\\"Unlock AI Power, Breadboard\\\"],\\\"descriptions\\\":[\\\"Breadboard: Play, experiment, prototype with AI. Integrate AI with Gemini.\\\",\\\"Stunning graphs with prompts. Accessible AI for devs.\\\",\\\"Accelerate innovation with Breadboard. Experiment with AI risk-free.\\\",\\\"Elevate projects with Breadboard AI. Integrate AI seamlessly.\\\"]},\\\"voteRequest\\\":\\\"Does this ad campaign seem ok to you?\\\"}\"}],\"role\":\"model\"}]"
+              ],
+              "default": "[]"
+            }
+          },
+          "required": [
+            "context"
+          ]
+        }
+      }
+    }
+  ],
+  "kits": [],
+  "graphs": {}
+}

@@ -4,7 +4,7 @@
   "description": "Experimenting with teams of workers",
   "type": "module",
   "scripts": {
-    "dev": "breadboard debug src/ --watch -n"
+    "dev": "breadboard debug src/ --watch"
   },
   "keywords": [],
   "author": "Your Name Here",

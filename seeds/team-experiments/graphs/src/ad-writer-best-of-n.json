@@ -1,0 +1,371 @@
+{
+  "title": "Ad Writer (variant 2)",
+  "description": "An example of chain of agents working on writing an ad",
+  "$schema": "https://raw.githubusercontent.com/breadboard-ai/breadboard/@google-labs/breadboard-schema@1.4.0/packages/schema/breadboard.schema.json",
+  "version": "0.0.2",
+  "edges": [
+    {
+      "from": "map-8",
+      "to": "output-2",
+      "out": "list",
+      "in": "list"
+    },
+    {
+      "from": "lambda-7",
+      "to": "map-8",
+      "out": "board",
+      "in": "board"
+    },
+    {
+      "from": "fn-4",
+      "to": "map-8",
+      "out": "list",
+      "in": "list"
+    },
+    {
+      "from": "fn-5",
+      "to": "lambda-7",
+      "out": "prompt",
+      "in": "critic"
+    },
+    {
+      "from": "input-1",
+      "to": "structuredWorker-3",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "input-1",
+      "to": "lambda-7",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "structuredWorker-3",
+      "to": "fn-5",
+      "out": "json",
+      "in": "json"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "output-2",
+      "type": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "list": {
+              "title": "List",
+              "type": "array",
+              "description": "The list of outputs from the board."
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "map-8",
+      "type": "map",
+      "configuration": {},
+      "metadata": {
+        "title": "Delegate to 3 writing sub-teams"
+      }
+    },
+    {
+      "id": "lambda-7",
+      "type": "lambda",
+      "configuration": {
+        "board": {
+          "kind": "board",
+          "board": {
+            "kits": [],
+            "edges": [
+              {
+                "from": "fn-6",
+                "to": "output-2",
+                "out": "json",
+                "in": "item"
+              },
+              {
+                "from": "structuredWorker-5",
+                "to": "fn-6",
+                "out": "context",
+                "in": "context"
+              },
+              {
+                "from": "structuredWorker-4",
+                "to": "structuredWorker-5",
+                "out": "context",
+                "in": "context"
+              },
+              {
+                "from": "input-1",
+                "to": "structuredWorker-3",
+                "out": "context",
+                "in": "context"
+              },
+              {
+                "from": "input-1",
+                "to": "structuredWorker-4",
+                "out": "critic",
+                "in": "instruction"
+              },
+              {
+                "from": "structuredWorker-3",
+                "to": "structuredWorker-4",
+                "out": "context",
+                "in": "context"
+              }
+            ],
+            "nodes": [
+              {
+                "id": "output-2",
+                "type": "output",
+                "configuration": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "item": {
+                        "type": "string",
+                        "title": "item"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "fn-6",
+                "type": "runJavascript",
+                "configuration": {
+                  "code": "function fn_6({ context }) {\n  const list = context || [];\n  const last = list[list.length - 1];\n  const json2 = JSON.parse(last.parts.text);\n  return { json: json2 };\n}",
+                  "name": "fn_6",
+                  "raw": true
+                },
+                "metadata": {
+                  "title": "Campaign Extractor"
+                }
+              },
+              {
+                "id": "structuredWorker-5",
+                "type": "structuredWorker",
+                "configuration": {
+                  "instruction": "Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document.",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "adCampaign": {
+                        "type": "object",
+                        "description": "the ad campaign",
+                        "properties": {
+                          "headlines": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "an ad headline (30 character limit, up to 15 headlines)"
+                            }
+                          },
+                          "descriptions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "the  description (90 character limit, up to 4 descriptions)"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "metadata": {
+                  "title": "Ad Editor"
+                }
+              },
+              {
+                "id": "structuredWorker-4",
+                "type": "structuredWorker",
+                "configuration": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "requirements": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "requirement": {
+                              "type": "string",
+                              "description": "the requirement"
+                            },
+                            "justification": {
+                              "type": "string",
+                              "description": "reasoning behind including this requirement"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "metadata": {
+                  "title": "Customer"
+                }
+              },
+              {
+                "id": "input-1",
+                "type": "input",
+                "configuration": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "context": {
+                        "title": "Context",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "behavior": [
+                            "llm-content"
+                          ]
+                        },
+                        "default": "[]",
+                        "examples": [
+                          "the universe within us"
+                        ]
+                      },
+                      "critic": {
+                        "title": "Instruction",
+                        "format": "multiline",
+                        "examples": [
+                          "You are a brilliant poet who specializes in two-line rhyming poems.\nGiven any topic, you can quickly whip up three two-line rhyming poems about it.\nLook at the topic below and do your magic"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "context",
+                      "critic"
+                    ]
+                  }
+                }
+              },
+              {
+                "id": "structuredWorker-3",
+                "type": "structuredWorker",
+                "configuration": {
+                  "instruction": "Write an ad campaign (up to 15 headlines and and 4 descriptions) and that transforms the search engine marketing overview into a compelling, engaging ad.",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "adCampaign": {
+                        "type": "object",
+                        "description": "the ad campaign",
+                        "properties": {
+                          "headlines": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "an ad headline (30 character limit, up to 15 headlines)"
+                            }
+                          },
+                          "descriptions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "the  description (90 character limit, up to 4 descriptions)"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "metadata": {
+                  "title": "Ad Writer"
+                }
+              }
+            ],
+            "graphs": {}
+          }
+        },
+        "$id": "promptSupplier"
+      }
+    },
+    {
+      "id": "fn-4",
+      "type": "runJavascript",
+      "configuration": {
+        "n": 3,
+        "code": "function fn_4({ n }) {\n  return { list: [...Array(n).keys()] };\n}",
+        "name": "fn_4",
+        "raw": true
+      },
+      "metadata": {
+        "title": "Worker Allocator"
+      }
+    },
+    {
+      "id": "fn-5",
+      "type": "runJavascript",
+      "configuration": {
+        "code": "function fn_5({ json: json2 }) {\n  const { prompt } = json2;\n  return { prompt };\n}",
+        "name": "fn_5",
+        "raw": true
+      },
+      "metadata": {
+        "title": "Prompt Extractor"
+      }
+    },
+    {
+      "id": "input-1",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "title": "Ad specs",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "behavior": [
+                  "llm-content"
+                ]
+              },
+              "default": "[]",
+              "examples": [
+                "\n# Search Engine Marketing Document\n\nWrite an ad for Breadboard. The ad must incorporate the following key messages: \n- Breadboard for Developers\n- Play and experiment with AI Patterns\n- Prototype quickly\n- Use with Gemini APIs \n- Integrate AI Into Your Project\n- Create graphs with prompts\n- Accessible AI for Developers"
+              ],
+              "format": "multiline"
+            }
+          },
+          "required": [
+            "context"
+          ]
+        }
+      }
+    },
+    {
+      "id": "structuredWorker-3",
+      "type": "structuredWorker",
+      "configuration": {
+        "instruction": "Using the audience information in the search engine marketing overview, create a prompt for a bot who will pretend to be the target audience for the ad. The prompt needs to incorporate the sense of skepticism and weariness of ads, yet willingness to provide constructive feedback. The prompt needs to be in the form of:\n    \n    \"You are [persona]. You are [list of traits].\"",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "description": "the prompt for the bot"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "title": "Customer Prompt Maker",
+        "description": "Conjuring up a persona to represent a customer",
+        "logLevel": "info"
+      }
+    }
+  ],
+  "kits": [],
+  "graphs": {}
+}

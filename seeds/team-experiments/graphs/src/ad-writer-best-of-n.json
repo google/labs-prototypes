@@ -1,6 +1,6 @@
 {
-  "title": "Ad Writer (variant 2)",
-  "description": "An example of chain of agents working on writing an ad",
+  "title": "Ad Writer (Best of N)",
+  "description": "An example of a team of workers writing an ad",
   "$schema": "https://raw.githubusercontent.com/breadboard-ai/breadboard/@google-labs/breadboard-schema@1.4.0/packages/schema/breadboard.schema.json",
   "version": "0.0.2",
   "edges": [
@@ -69,7 +69,7 @@
       "type": "map",
       "configuration": {},
       "metadata": {
-        "title": "Delegate to 3 writing sub-teams"
+        "title": "Delegate to 4 writing sub-teams"
       }
     },
     {
@@ -83,13 +83,25 @@
             "edges": [
               {
                 "from": "fn-6",
+                "to": "structuredWorker-3",
+                "out": "context",
+                "in": "context"
+              },
+              {
+                "from": "fn-6",
                 "to": "output-2",
-                "out": "json",
+                "out": "adCampaign",
                 "in": "item"
               },
               {
                 "from": "structuredWorker-5",
                 "to": "fn-6",
+                "out": "context",
+                "in": "context"
+              },
+              {
+                "from": "structuredWorker-3",
+                "to": "structuredWorker-4",
                 "out": "context",
                 "in": "context"
               },
@@ -109,13 +121,8 @@
                 "from": "input-1",
                 "to": "structuredWorker-4",
                 "out": "critic",
-                "in": "instruction"
-              },
-              {
-                "from": "structuredWorker-3",
-                "to": "structuredWorker-4",
-                "out": "context",
-                "in": "context"
+                "in": "instruction",
+                "constant": true
               }
             ],
             "nodes": [
@@ -138,19 +145,19 @@
                 "id": "fn-6",
                 "type": "runJavascript",
                 "configuration": {
-                  "code": "function fn_6({ context }) {\n  const list = context || [];\n  const last = list[list.length - 1];\n  const json2 = JSON.parse(last.parts.text);\n  return { json: json2 };\n}",
+                  "code": "function fn_6({ context }) {\n  const list = context || [];\n  const last = list[list.length - 1];\n  const json2 = JSON.parse(last.parts.text);\n  const { adCampaign } = json2;\n  const headlines = [];\n  for (const headline of adCampaign.headlines) {\n    if (headline.length > 30)\n      continue;\n    headlines.push(headline);\n  }\n  const descriptions = [];\n  for (const description of adCampaign.descriptions) {\n    if (description.length > 90)\n      continue;\n    descriptions.push(description);\n  }\n  if (descriptions.length === 0 && headlines.length === 0) {\n    const again = [list[0]];\n    return { context: again };\n  }\n  adCampaign.descriptions = descriptions;\n  adCampaign.headlines = headlines;\n  return { adCampaign };\n}",
                   "name": "fn_6",
                   "raw": true
                 },
                 "metadata": {
-                  "title": "Campaign Extractor"
+                  "title": "Discard Ads That Don't Fit"
                 }
               },
               {
                 "id": "structuredWorker-5",
                 "type": "structuredWorker",
                 "configuration": {
-                  "instruction": "Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document.",
+                  "instruction": "Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document. The headlines must be very short to fit into 30 character limit, and descriptions must fit into 90 characters. Pack the punch into as few words as possible. Follow the best practices for Google Ads.",
                   "schema": {
                     "type": "object",
                     "properties": {
@@ -162,14 +169,14 @@
                             "type": "array",
                             "items": {
                               "type": "string",
-                              "description": "an ad headline (30 character limit, up to 15 headlines)"
+                              "description": "an ad headline (each must fit into 30 characters, up to 20  headlines)"
                             }
                           },
                           "descriptions": {
                             "type": "array",
                             "items": {
                               "type": "string",
-                              "description": "the  description (90 character limit, up to 4 descriptions)"
+                              "description": "the  description (each must fit into 90 characters, up to 20 descriptions)"
                             }
                           }
                         }
@@ -179,6 +186,41 @@
                 },
                 "metadata": {
                   "title": "Ad Editor"
+                }
+              },
+              {
+                "id": "structuredWorker-3",
+                "type": "structuredWorker",
+                "configuration": {
+                  "instruction": "You are a professional Google Ads writer. Write an ad campaign of 20 headlines and 20 descriptions that transforms the search engine marketing overview into a compelling, engaging set of ads. The headlines must be very short to fit into 30 character limit, and descriptions must fit into 90 characters. Pack the punch into as few words as possible. Follow the best practices for Google Ads.",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "adCampaign": {
+                        "type": "object",
+                        "description": "the ad campaign",
+                        "properties": {
+                          "headlines": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "an ad headline (each must fit into 30 characters, up to 20  headlines)"
+                            }
+                          },
+                          "descriptions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "the  description (each must fit into 90 characters, up to 20 descriptions)"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "metadata": {
+                  "title": "Ad Writer"
                 }
               },
               {
@@ -247,54 +289,18 @@
                     ]
                   }
                 }
-              },
-              {
-                "id": "structuredWorker-3",
-                "type": "structuredWorker",
-                "configuration": {
-                  "instruction": "Write an ad campaign (up to 15 headlines and and 4 descriptions) and that transforms the search engine marketing overview into a compelling, engaging ad.",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "adCampaign": {
-                        "type": "object",
-                        "description": "the ad campaign",
-                        "properties": {
-                          "headlines": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "description": "an ad headline (30 character limit, up to 15 headlines)"
-                            }
-                          },
-                          "descriptions": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "description": "the  description (90 character limit, up to 4 descriptions)"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "metadata": {
-                  "title": "Ad Writer"
-                }
               }
             ],
             "graphs": {}
           }
-        },
-        "$id": "promptSupplier"
+        }
       }
     },
     {
       "id": "fn-4",
       "type": "runJavascript",
       "configuration": {
-        "n": 3,
+        "n": 4,
         "code": "function fn_4({ n }) {\n  return { list: [...Array(n).keys()] };\n}",
         "name": "fn_4",
         "raw": true

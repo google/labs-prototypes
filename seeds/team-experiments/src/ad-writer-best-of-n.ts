@@ -202,6 +202,8 @@ export default await board(({ context }) => {
     const adWriter = agents.structuredWorker({
       $metadata: {
         title: "Ad Writer",
+        description: "Writing a draft of the ad",
+        logLevel: "info",
       },
       instruction: `You are a professional Google Ads writer. Write an ad campaign of ${NUMBER_OF_HEADLINES} headlines and ${NUMBER_OF_DESCRIPTIONS} descriptions that transforms the search engine marketing overview into a compelling, engaging set of ads. ${INSIST_ON_SHORT}`,
       context,
@@ -211,6 +213,8 @@ export default await board(({ context }) => {
     const customer = agents.structuredWorker({
       $metadata: {
         title: "Customer",
+        description: "Critiquing the ads from customer's perspective",
+        logLevel: "info",
       },
       instruction: critic.memoize(),
       context: adWriter.context,
@@ -220,6 +224,8 @@ export default await board(({ context }) => {
     const editor = agents.structuredWorker({
       $metadata: {
         title: "Ad Editor",
+        description: "Editing the ads to incorporate customer feedback",
+        logLevel: "info",
       },
       instruction: `Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document. ${INSIST_ON_SHORT}`,
       context: customer,
@@ -244,7 +250,11 @@ export default await board(({ context }) => {
   });
 
   const generateN = core.map({
-    $metadata: { title: `Delegate to ${NUMBER_OF_WORKERS} writing sub-teams` },
+    $metadata: {
+      title: `Run ${NUMBER_OF_WORKERS} writing sub-teams`,
+      description: `Delegating to ${NUMBER_OF_WORKERS} ad-writing sub-teams`,
+      logLevel: "info",
+    },
     board: writingSubteam.in({
       critic: promptExtractor.prompt,
       context,
@@ -258,9 +268,13 @@ export default await board(({ context }) => {
   });
 
   const headlinesRanker = agents.structuredWorker({
-    $metadata: { title: "Rank Headlines" },
+    $metadata: {
+      title: "Rank Headlines",
+      description: "Ranking the ad headlines",
+      logLevel: "info",
+    },
     instruction: templates.promptTemplate({
-      $metadata: { title: "Create Headline Ranker Template" },
+      $metadata: { title: "Create Headline Ranker Template", logLevel: "info" },
       template: `The following ad headlines were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}`,
       headlines: rankingListMaker.headlines,
     }).prompt,
@@ -269,7 +283,11 @@ export default await board(({ context }) => {
   });
 
   const descriptionsRanker = agents.structuredWorker({
-    $metadata: { title: "Rank Descriptions" },
+    $metadata: {
+      title: "Rank Descriptions",
+      description: "Ranking the ad descriptions",
+      logLevel: "info",
+    },
     instruction: templates.promptTemplate({
       $metadata: { title: "Create Descriptions Ranker Template" },
       template: `The following ad descriptions were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}`,

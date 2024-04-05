@@ -157,7 +157,9 @@
         }
       },
       "metadata": {
-        "title": "Rank Headlines"
+        "title": "Rank Headlines",
+        "description": "Ranking the ad headlines",
+        "logLevel": "info"
       }
     },
     {
@@ -187,7 +189,9 @@
         }
       },
       "metadata": {
-        "title": "Rank Descriptions"
+        "title": "Rank Descriptions",
+        "description": "Ranking the ad descriptions",
+        "logLevel": "info"
       }
     },
     {
@@ -197,7 +201,8 @@
         "template": "The following ad headlines were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}"
       },
       "metadata": {
-        "title": "Create Headline Ranker Template"
+        "title": "Create Headline Ranker Template",
+        "logLevel": "info"
       }
     },
     {
@@ -385,7 +390,9 @@
                   }
                 },
                 "metadata": {
-                  "title": "Ad Editor"
+                  "title": "Ad Editor",
+                  "description": "Editing the ads to incorporate customer feedback",
+                  "logLevel": "info"
                 }
               },
               {
@@ -420,7 +427,9 @@
                   }
                 },
                 "metadata": {
-                  "title": "Ad Writer"
+                  "title": "Ad Writer",
+                  "description": "Writing a draft of the ad",
+                  "logLevel": "info"
                 }
               },
               {
@@ -450,7 +459,9 @@
                   }
                 },
                 "metadata": {
-                  "title": "Customer"
+                  "title": "Customer",
+                  "description": "Critiquing the ads from customer's perspective",
+                  "logLevel": "info"
                 }
               },
               {
@@ -501,7 +512,9 @@
       "type": "map",
       "configuration": {},
       "metadata": {
-        "title": "Delegate to 3 writing sub-teams"
+        "title": "Run 3 writing sub-teams",
+        "description": "Delegating to 3 ad-writing sub-teams",
+        "logLevel": "info"
       }
     },
     {

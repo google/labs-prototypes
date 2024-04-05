@@ -4,11 +4,17 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Schema, base, board, code } from "@google-labs/breadboard";
+import { Schema, board, code } from "@google-labs/breadboard";
 import { agents } from "@google-labs/agent-kit";
 import { core } from "@google-labs/core-kit";
+import { templates } from "@google-labs/template-kit";
 
 const NUMBER_OF_WORKERS = 3;
+const NUMBER_OF_HEADLINES = 10;
+const NUMBER_OF_DESCRIPTIONS = 10;
+
+const INSIST_ON_SHORT =
+  "The headlines must be very short to fit into 30 character limit, and descriptions must fit into 90 characters. Pack the punch few words. Follow the best practices for Google Ads.";
 
 const adCampaignSchema = {
   type: "object",
@@ -21,16 +27,36 @@ const adCampaignSchema = {
           type: "array",
           items: {
             type: "string",
-            description:
-              "an ad headline (30 character limit, up to 15 headlines)",
+            description: `an ad headline (each must fit into 30 characters, up to ${NUMBER_OF_HEADLINES}  headlines)`,
           },
         },
         descriptions: {
           type: "array",
           items: {
             type: "string",
-            description:
-              "the  description (90 character limit, up to 4 descriptions)",
+            description: `the  description (each must fit into 90 characters, up to ${NUMBER_OF_DESCRIPTIONS} descriptions)`,
+          },
+        },
+      },
+    },
+  },
+} satisfies Schema;
+
+const rankerSchema = {
+  type: "object",
+  properties: {
+    ranked: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          item: {
+            type: "string",
+            description: "The item in the order of their relevance.",
+          },
+          reasoning: {
+            type: "string",
+            description: "The reason why this rank is the appropriate.",
           },
         },
       },
@@ -44,20 +70,6 @@ type AdCampaign = {
     descriptions: string[];
   };
 };
-
-// const adSchema = {
-//   type: "object",
-//   properties: {
-//     headline: {
-//       type: "string",
-//       description: "a headline that fits into the 30 character limit",
-//     },
-//     description: {
-//       type: "string",
-//       description: "a description that fits into the 90 character limit",
-//     },
-//   },
-// } satisfies Schema;
 
 const requirementsSchema = {
   type: "object",
@@ -86,76 +98,35 @@ const extractPrompt = code(({ json }) => {
   return { prompt };
 });
 
-const extractJson = code(({ context }) => {
+const discardByLength = code(({ context }) => {
   const list = (context as ContextItem[]) || [];
   const last = list[list.length - 1];
   const json = JSON.parse(last.parts.text);
-  return { json };
+  const { adCampaign } = json as AdCampaign;
+  const headlines: string[] = [];
+  for (const headline of adCampaign.headlines) {
+    if (headline.length > 30) continue;
+    headlines.push(headline);
+  }
+  const descriptions: string[] = [];
+  for (const description of adCampaign.descriptions) {
+    if (description.length > 90) continue;
+    descriptions.push(description);
+  }
+  if (descriptions.length === 0 && headlines.length === 0) {
+    // Let's try again.
+    const again = [list[0]];
+    return { context: again };
+  }
+  adCampaign.descriptions = descriptions;
+  adCampaign.headlines = headlines;
+  return { item: { adCampaign } };
 });
 
 type ContextItem = {
   role: string;
   parts: { text: string };
 };
-
-/**
- * Will check character limits and insert a special prompt
- * if the limits are exceeded.
- */
-const checkCharacterLimits = code(({ context }) => {
-  const list = (context as ContextItem[]) || [];
-  const last = list[list.length - 1] as ContextItem;
-  const json = JSON.parse(last.parts.text);
-  const { adCampaign } = json as AdCampaign;
-  const warning = [
-    `You are a brilliant copy editor who is famous brevity, making ads in the ad campaign fit into the character limits while retaining their meaning and impact. Given the ad, follow instructions below:`,
-  ];
-  for (const headline of adCampaign.headlines) {
-    if (headline.length > 30) {
-      warning.push(
-        `The headline "${headline}" is ${headline.length} characters long, but needs to be 30 characters. Shorten it.`
-      );
-    }
-  }
-  for (const description of adCampaign.descriptions) {
-    if (description.length > 90) {
-      warning.push(
-        `The description "${description}" is ${description.length} characters long, but needs to be 90 characters. Shorten it.`
-      );
-    }
-  }
-  if (warning.length > 1) {
-    return { warning: warning.join("\n\n") };
-  }
-  return { context };
-});
-
-const refineAd = board(({ context }) => {
-  const limitChecker = checkCharacterLimits({
-    $metadata: {
-      title: "Character Limit Checker",
-    },
-    context: context,
-  });
-
-  const shortener = agents.structuredWorker({
-    $metadata: {
-      title: "Ad Shortener",
-    },
-    instruction: limitChecker.warning,
-    context,
-    schema: adCampaignSchema,
-  });
-
-  base.output({
-    $metadata: {
-      title: "Successful exit",
-    },
-    exit: limitChecker.context,
-  });
-
-  return { context: shortener.context };
-});
 
 const adExample = `
 # Search Engine Marketing Document
@@ -171,6 +142,31 @@ Write an ad for Breadboard. The ad must incorporate the following key messages:
 
 const createList = code(({ n }) => {
   return { list: [...Array(n).keys()] };
+});
+
+const arrangeForRanking = code(({ list }) => {
+  const campaigns = list as { item: AdCampaign }[];
+  const headlines: string[] = [];
+  const descriptions: string[] = [];
+  for (const campaign of campaigns) {
+    const c = campaign.item.adCampaign;
+    headlines.push(...c.headlines);
+    descriptions.push(...c.descriptions);
+  }
+  return { headlines, descriptions };
+});
+
+const formatOutput = code(({ headlines, descriptions }) => {
+  type Item = { item: string };
+  type Ranked = { ranked: Item[] };
+  const formatItems = (ranked: unknown) => {
+    const items = (ranked as Ranked).ranked;
+    return items.map((item) => `- ${item.item}`).join("\n");
+  };
+  const h = formatItems(headlines);
+  const d = formatItems(descriptions);
+  const text = `# Headlines\n${h}\n\n# Descriptions\n${d}`;
+  return { text };
 });
 
 export default await board(({ context }) => {
@@ -202,21 +198,12 @@ export default await board(({ context }) => {
     n: NUMBER_OF_WORKERS,
   });
 
-  // const adWriter = agents.structuredWorker({
-  //   $metadata: {
-  //     title: "Ad Writer",
-  //   },
-  //   instruction: `Write an ad campaign (up to 15 headlines and and 4 descriptions) and that transforms the search engine marketing overview into a compelling, engaging ad.`,
-  //   context,
-  //   schema: adCampaignSchema,
-  // });
-
   const writingSubteam = board(({ context, critic }) => {
     const adWriter = agents.structuredWorker({
       $metadata: {
         title: "Ad Writer",
       },
-      instruction: `Write an ad campaign (up to 15 headlines and and 4 descriptions) and that transforms the search engine marketing overview into a compelling, engaging ad.`,
+      instruction: `You are a professional Google Ads writer. Write an ad campaign of ${NUMBER_OF_HEADLINES} headlines and ${NUMBER_OF_DESCRIPTIONS} descriptions that transforms the search engine marketing overview into a compelling, engaging set of ads. ${INSIST_ON_SHORT}`,
       context,
       schema: adCampaignSchema,
     });
@@ -225,7 +212,7 @@ export default await board(({ context }) => {
       $metadata: {
         title: "Customer",
       },
-      instruction: critic,
+      instruction: critic.memoize(),
       context: adWriter.context,
       schema: requirementsSchema,
     });
@@ -234,17 +221,19 @@ export default await board(({ context }) => {
       $metadata: {
         title: "Ad Editor",
       },
-      instruction: `Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document.`,
+      instruction: `Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document. ${INSIST_ON_SHORT}`,
       context: customer,
       schema: adCampaignSchema,
     });
 
-    const justCampaign = extractJson({
-      $metadata: { title: "Campaign Extractor" },
+    const qualityAssurance = discardByLength({
+      $metadata: { title: "Discard Ads That Don't Fit" },
       context: editor.context,
     });
 
-    return { item: justCampaign.json };
+    qualityAssurance.context.to(adWriter);
+
+    return { item: qualityAssurance.item };
   });
 
   const promptExtractor = extractPrompt({
@@ -257,52 +246,48 @@ export default await board(({ context }) => {
   const generateN = core.map({
     $metadata: { title: `Delegate to ${NUMBER_OF_WORKERS} writing sub-teams` },
     board: writingSubteam.in({
-      $id: "promptSupplier",
       critic: promptExtractor.prompt,
       context,
     }),
     list: listMaker.list,
   });
 
-  // const customer = agents.structuredWorker({
-  //   $metadata: {
-  //     title: "Customer",
-  //   },
-  //   instruction: promptExtractor.prompt,
-  //   context: adWriter.context,
-  //   schema: requirementsSchema,
-  // });
+  const rankingListMaker = arrangeForRanking({
+    $metadata: { title: `Prepare Ads For Ranking` },
+    list: generateN.list,
+  });
 
-  return { list: generateN.list };
+  const headlinesRanker = agents.structuredWorker({
+    $metadata: { title: "Rank Headlines" },
+    instruction: templates.promptTemplate({
+      $metadata: { title: "Create Headline Ranker Template" },
+      template: `The following ad headlines were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}`,
+      headlines: rankingListMaker.headlines,
+    }).prompt,
+    context,
+    schema: rankerSchema,
+  });
 
-  // const editor = agents.structuredWorker({
-  //   $metadata: {
-  //     title: "Ad Editor",
-  //   },
-  //   instruction: `Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document. Remove any uses of the word "free".`,
-  //   context: customer,
-  //   schema: adCampaignSchema,
-  // });
+  const descriptionsRanker = agents.structuredWorker({
+    $metadata: { title: "Rank Descriptions" },
+    instruction: templates.promptTemplate({
+      $metadata: { title: "Create Descriptions Ranker Template" },
+      template: `The following ad descriptions were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}`,
+      headlines: rankingListMaker.descriptions,
+    }).prompt,
+    context,
+    schema: rankerSchema,
+  });
 
-  // const adRefinery = agents.repeater({
-  //   $metadata: {
-  //     title: "Ad refinery",
-  //   },
-  //   context: editor.context,
-  //   worker: refineAd,
-  //   max: 4,
-  // });
+  const outputFormatter = formatOutput({
+    $metadata: { title: "Format Output" },
+    headlines: headlinesRanker.json,
+    descriptions: descriptionsRanker.json,
+  });
 
-  // const jsonExtractor = extractJson({
-  //   $metadata: {
-  //     title: "JSON Extractor",
-  //   },
-  //   context: adRefinery.context,
-  // });
-
-  // return { context: adRefinery.context, json: jsonExtractor.json };
+  return { text: outputFormatter.text.isString().format("markdown") };
 }).serialize({
-  title: "Ad Writer (variant 2)",
-  description: "An example of chain of agents working on writing an ad",
+  title: "Ad Writer (Best of N)",
+  description: "An example of a team of workers writing an ad",
   version: "0.0.2",
 });

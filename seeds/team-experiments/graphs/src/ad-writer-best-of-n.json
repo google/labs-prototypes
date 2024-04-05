@@ -1,32 +1,32 @@
 {
-  "title": "Ad Writer (variant 2)",
-  "description": "An example of chain of agents working on writing an ad",
+  "title": "Ad Writer (Best of N)",
+  "description": "An example of a team of workers writing an ad",
   "$schema": "https://raw.githubusercontent.com/breadboard-ai/breadboard/@google-labs/breadboard-schema@1.4.0/packages/schema/breadboard.schema.json",
   "version": "0.0.2",
   "edges": [
     {
-      "from": "map-8",
+      "from": "fn-14",
       "to": "output-2",
-      "out": "list",
-      "in": "list"
+      "out": "text",
+      "in": "text"
     },
     {
-      "from": "lambda-7",
-      "to": "map-8",
-      "out": "board",
-      "in": "board"
+      "from": "structuredWorker-11",
+      "to": "fn-14",
+      "out": "json",
+      "in": "headlines"
     },
     {
-      "from": "fn-4",
-      "to": "map-8",
-      "out": "list",
-      "in": "list"
+      "from": "structuredWorker-13",
+      "to": "fn-14",
+      "out": "json",
+      "in": "descriptions"
     },
     {
-      "from": "fn-5",
-      "to": "lambda-7",
+      "from": "promptTemplate-10",
+      "to": "structuredWorker-11",
       "out": "prompt",
-      "in": "critic"
+      "in": "instruction"
     },
     {
       "from": "input-1",
@@ -41,10 +41,64 @@
       "in": "context"
     },
     {
+      "from": "input-1",
+      "to": "structuredWorker-11",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "input-1",
+      "to": "structuredWorker-13",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "promptTemplate-12",
+      "to": "structuredWorker-13",
+      "out": "prompt",
+      "in": "instruction"
+    },
+    {
+      "from": "fn-9",
+      "to": "promptTemplate-10",
+      "out": "headlines",
+      "in": "headlines"
+    },
+    {
+      "from": "fn-9",
+      "to": "promptTemplate-12",
+      "out": "descriptions",
+      "in": "headlines"
+    },
+    {
       "from": "structuredWorker-3",
       "to": "fn-5",
       "out": "json",
       "in": "json"
+    },
+    {
+      "from": "lambda-7",
+      "to": "map-8",
+      "out": "board",
+      "in": "board"
+    },
+    {
+      "from": "map-8",
+      "to": "fn-9",
+      "out": "list",
+      "in": "list"
+    },
+    {
+      "from": "fn-5",
+      "to": "lambda-7",
+      "out": "prompt",
+      "in": "critic"
+    },
+    {
+      "from": "fn-4",
+      "to": "map-8",
+      "out": "list",
+      "in": "list"
     }
   ],
   "nodes": [
@@ -55,21 +109,167 @@
         "schema": {
           "type": "object",
           "properties": {
-            "list": {
-              "title": "List",
-              "type": "array",
-              "description": "The list of outputs from the board."
+            "text": {
+              "type": "string",
+              "format": "markdown",
+              "title": "text"
             }
           }
         }
       }
     },
     {
-      "id": "map-8",
-      "type": "map",
-      "configuration": {},
+      "id": "fn-14",
+      "type": "runJavascript",
+      "configuration": {
+        "code": "function fn_14({ headlines, descriptions }) {\n  const formatItems = (ranked) => {\n    const items = ranked.ranked;\n    return items.map((item) => `- ${item.item}`).join(\"\\n\");\n  };\n  const h = formatItems(headlines);\n  const d = formatItems(descriptions);\n  const text = `# Headlines\n${h}\n\n# Descriptions\n${d}`;\n  return { text };\n}",
+        "name": "fn_14",
+        "raw": true
+      },
       "metadata": {
-        "title": "Delegate to 3 writing sub-teams"
+        "title": "Format Output"
+      }
+    },
+    {
+      "id": "structuredWorker-11",
+      "type": "structuredWorker",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "ranked": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "item": {
+                    "type": "string",
+                    "description": "The item in the order of their relevance."
+                  },
+                  "reasoning": {
+                    "type": "string",
+                    "description": "The reason why this rank is the appropriate."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "metadata": {
+        "title": "Rank Headlines"
+      }
+    },
+    {
+      "id": "structuredWorker-13",
+      "type": "structuredWorker",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "ranked": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "item": {
+                    "type": "string",
+                    "description": "The item in the order of their relevance."
+                  },
+                  "reasoning": {
+                    "type": "string",
+                    "description": "The reason why this rank is the appropriate."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "metadata": {
+        "title": "Rank Descriptions"
+      }
+    },
+    {
+      "id": "promptTemplate-10",
+      "type": "promptTemplate",
+      "configuration": {
+        "template": "The following ad headlines were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}"
+      },
+      "metadata": {
+        "title": "Create Headline Ranker Template"
+      }
+    },
+    {
+      "id": "input-1",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "context": {
+              "title": "Ad specs",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "behavior": [
+                  "llm-content"
+                ]
+              },
+              "default": "[]",
+              "examples": [
+                "\n# Search Engine Marketing Document\n\nWrite an ad for Breadboard. The ad must incorporate the following key messages: \n- Breadboard for Developers\n- Play and experiment with AI Patterns\n- Prototype quickly\n- Use with Gemini APIs \n- Integrate AI Into Your Project\n- Create graphs with prompts\n- Accessible AI for Developers"
+              ],
+              "format": "multiline"
+            }
+          },
+          "required": [
+            "context"
+          ]
+        }
+      }
+    },
+    {
+      "id": "promptTemplate-12",
+      "type": "promptTemplate",
+      "configuration": {
+        "template": "The following ad descriptions were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}"
+      },
+      "metadata": {
+        "title": "Create Descriptions Ranker Template"
+      }
+    },
+    {
+      "id": "fn-9",
+      "type": "runJavascript",
+      "configuration": {
+        "code": "function fn_9({ list }) {\n  const campaigns = list;\n  const headlines = [];\n  const descriptions = [];\n  for (const campaign of campaigns) {\n    const c = campaign.item.adCampaign;\n    headlines.push(...c.headlines);\n    descriptions.push(...c.descriptions);\n  }\n  return { headlines, descriptions };\n}",
+        "name": "fn_9",
+        "raw": true
+      },
+      "metadata": {
+        "title": "Prepare Ads For Ranking"
+      }
+    },
+    {
+      "id": "structuredWorker-3",
+      "type": "structuredWorker",
+      "configuration": {
+        "instruction": "Using the audience information in the search engine marketing overview, create a prompt for a bot who will pretend to be the target audience for the ad. The prompt needs to incorporate the sense of skepticism and weariness of ads, yet willingness to provide constructive feedback. The prompt needs to be in the form of:\n    \n    \"You are [persona]. You are [list of traits].\"",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "description": "the prompt for the bot"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "title": "Customer Prompt Maker",
+        "description": "Conjuring up a persona to represent a customer",
+        "logLevel": "info"
       }
     },
     {
@@ -83,13 +283,25 @@
             "edges": [
               {
                 "from": "fn-6",
+                "to": "structuredWorker-3",
+                "out": "context",
+                "in": "context"
+              },
+              {
+                "from": "fn-6",
                 "to": "output-2",
-                "out": "json",
+                "out": "item",
                 "in": "item"
               },
               {
                 "from": "structuredWorker-5",
                 "to": "fn-6",
+                "out": "context",
+                "in": "context"
+              },
+              {
+                "from": "structuredWorker-3",
+                "to": "structuredWorker-4",
                 "out": "context",
                 "in": "context"
               },
@@ -109,13 +321,8 @@
                 "from": "input-1",
                 "to": "structuredWorker-4",
                 "out": "critic",
-                "in": "instruction"
-              },
-              {
-                "from": "structuredWorker-3",
-                "to": "structuredWorker-4",
-                "out": "context",
-                "in": "context"
+                "in": "instruction",
+                "constant": true
               }
             ],
             "nodes": [
@@ -138,19 +345,19 @@
                 "id": "fn-6",
                 "type": "runJavascript",
                 "configuration": {
-                  "code": "function fn_6({ context }) {\n  const list = context || [];\n  const last = list[list.length - 1];\n  const json2 = JSON.parse(last.parts.text);\n  return { json: json2 };\n}",
+                  "code": "function fn_6({ context }) {\n  const list = context || [];\n  const last = list[list.length - 1];\n  const json2 = JSON.parse(last.parts.text);\n  const { adCampaign } = json2;\n  const headlines = [];\n  for (const headline of adCampaign.headlines) {\n    if (headline.length > 30)\n      continue;\n    headlines.push(headline);\n  }\n  const descriptions = [];\n  for (const description of adCampaign.descriptions) {\n    if (description.length > 90)\n      continue;\n    descriptions.push(description);\n  }\n  if (descriptions.length === 0 && headlines.length === 0) {\n    const again = [list[0]];\n    return { context: again };\n  }\n  adCampaign.descriptions = descriptions;\n  adCampaign.headlines = headlines;\n  return { item: { adCampaign } };\n}",
                   "name": "fn_6",
                   "raw": true
                 },
                 "metadata": {
-                  "title": "Campaign Extractor"
+                  "title": "Discard Ads That Don't Fit"
                 }
               },
               {
                 "id": "structuredWorker-5",
                 "type": "structuredWorker",
                 "configuration": {
-                  "instruction": "Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document.",
+                  "instruction": "Given the customer critique, update the ad campaign. Make sure to conform to the requirements in the Search Engine Marketing document. The headlines must be very short to fit into 30 character limit, and descriptions must fit into 90 characters. Pack the punch few words. Follow the best practices for Google Ads.",
                   "schema": {
                     "type": "object",
                     "properties": {
@@ -162,14 +369,14 @@
                             "type": "array",
                             "items": {
                               "type": "string",
-                              "description": "an ad headline (30 character limit, up to 15 headlines)"
+                              "description": "an ad headline (each must fit into 30 characters, up to 10  headlines)"
                             }
                           },
                           "descriptions": {
                             "type": "array",
                             "items": {
                               "type": "string",
-                              "description": "the  description (90 character limit, up to 4 descriptions)"
+                              "description": "the  description (each must fit into 90 characters, up to 10 descriptions)"
                             }
                           }
                         }
@@ -179,6 +386,41 @@
                 },
                 "metadata": {
                   "title": "Ad Editor"
+                }
+              },
+              {
+                "id": "structuredWorker-3",
+                "type": "structuredWorker",
+                "configuration": {
+                  "instruction": "You are a professional Google Ads writer. Write an ad campaign of 10 headlines and 10 descriptions that transforms the search engine marketing overview into a compelling, engaging set of ads. The headlines must be very short to fit into 30 character limit, and descriptions must fit into 90 characters. Pack the punch few words. Follow the best practices for Google Ads.",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "adCampaign": {
+                        "type": "object",
+                        "description": "the ad campaign",
+                        "properties": {
+                          "headlines": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "an ad headline (each must fit into 30 characters, up to 10  headlines)"
+                            }
+                          },
+                          "descriptions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "description": "the  description (each must fit into 90 characters, up to 10 descriptions)"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "metadata": {
+                  "title": "Ad Writer"
                 }
               },
               {
@@ -247,60 +489,19 @@
                     ]
                   }
                 }
-              },
-              {
-                "id": "structuredWorker-3",
-                "type": "structuredWorker",
-                "configuration": {
-                  "instruction": "Write an ad campaign (up to 15 headlines and and 4 descriptions) and that transforms the search engine marketing overview into a compelling, engaging ad.",
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "adCampaign": {
-                        "type": "object",
-                        "description": "the ad campaign",
-                        "properties": {
-                          "headlines": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "description": "an ad headline (30 character limit, up to 15 headlines)"
-                            }
-                          },
-                          "descriptions": {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "description": "the  description (90 character limit, up to 4 descriptions)"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                "metadata": {
-                  "title": "Ad Writer"
-                }
               }
             ],
             "graphs": {}
           }
-        },
-        "$id": "promptSupplier"
+        }
       }
     },
     {
-      "id": "fn-4",
-      "type": "runJavascript",
-      "configuration": {
-        "n": 3,
-        "code": "function fn_4({ n }) {\n  return { list: [...Array(n).keys()] };\n}",
-        "name": "fn_4",
-        "raw": true
-      },
+      "id": "map-8",
+      "type": "map",
+      "configuration": {},
       "metadata": {
-        "title": "Worker Allocator"
+        "title": "Delegate to 3 writing sub-teams"
       }
     },
     {
@@ -316,53 +517,16 @@
       }
     },
     {
-      "id": "input-1",
-      "type": "input",
+      "id": "fn-4",
+      "type": "runJavascript",
       "configuration": {
-        "schema": {
-          "type": "object",
-          "properties": {
-            "context": {
-              "title": "Ad specs",
-              "type": "array",
-              "items": {
-                "type": "object",
-                "behavior": [
-                  "llm-content"
-                ]
-              },
-              "default": "[]",
-              "examples": [
-                "\n# Search Engine Marketing Document\n\nWrite an ad for Breadboard. The ad must incorporate the following key messages: \n- Breadboard for Developers\n- Play and experiment with AI Patterns\n- Prototype quickly\n- Use with Gemini APIs \n- Integrate AI Into Your Project\n- Create graphs with prompts\n- Accessible AI for Developers"
-              ],
-              "format": "multiline"
-            }
-          },
-          "required": [
-            "context"
-          ]
-        }
-      }
-    },
-    {
-      "id": "structuredWorker-3",
-      "type": "structuredWorker",
-      "configuration": {
-        "instruction": "Using the audience information in the search engine marketing overview, create a prompt for a bot who will pretend to be the target audience for the ad. The prompt needs to incorporate the sense of skepticism and weariness of ads, yet willingness to provide constructive feedback. The prompt needs to be in the form of:\n    \n    \"You are [persona]. You are [list of traits].\"",
-        "schema": {
-          "type": "object",
-          "properties": {
-            "prompt": {
-              "type": "string",
-              "description": "the prompt for the bot"
-            }
-          }
-        }
+        "n": 3,
+        "code": "function fn_4({ n }) {\n  return { list: [...Array(n).keys()] };\n}",
+        "name": "fn_4",
+        "raw": true
       },
       "metadata": {
-        "title": "Customer Prompt Maker",
-        "description": "Conjuring up a persona to represent a customer",
-        "logLevel": "info"
+        "title": "Worker Allocator"
       }
     }
   ],

@@ -274,7 +274,7 @@ export default await board(({ context }) => {
       logLevel: "info",
     },
     instruction: templates.promptTemplate({
-      $metadata: { title: "Create Headline Ranker Template", logLevel: "info" },
+      $metadata: { title: "Create Headline Ranker Template" },
       template: `The following ad headlines were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}`,
       headlines: rankingListMaker.headlines,
     }).prompt,

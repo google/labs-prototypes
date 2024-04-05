@@ -201,8 +201,7 @@
         "template": "The following ad headlines were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}"
       },
       "metadata": {
-        "title": "Create Headline Ranker Template",
-        "logLevel": "info"
+        "title": "Create Headline Ranker Template"
       }
     },
     {

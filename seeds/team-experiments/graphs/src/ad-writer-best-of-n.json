@@ -5,14 +5,20 @@
   "version": "0.0.2",
   "edges": [
     {
-      "from": "structuredWorker-11",
+      "from": "fn-14",
       "to": "output-2",
+      "out": "text",
+      "in": "text"
+    },
+    {
+      "from": "structuredWorker-11",
+      "to": "fn-14",
       "out": "json",
       "in": "headlines"
     },
     {
       "from": "structuredWorker-13",
-      "to": "output-2",
+      "to": "fn-14",
       "out": "json",
       "in": "descriptions"
     },
@@ -61,7 +67,7 @@
     {
       "from": "fn-9",
       "to": "promptTemplate-12",
-      "out": "headlines",
+      "out": "descriptions",
       "in": "headlines"
     },
     {
@@ -103,18 +109,25 @@
         "schema": {
           "type": "object",
           "properties": {
-            "headlines": {
-              "title": "json",
-              "description": "The validated JSON.",
-              "type": "string"
-            },
-            "descriptions": {
-              "title": "json",
-              "description": "The validated JSON.",
-              "type": "string"
+            "text": {
+              "type": "string",
+              "format": "markdown",
+              "title": "text"
             }
           }
         }
+      }
+    },
+    {
+      "id": "fn-14",
+      "type": "runJavascript",
+      "configuration": {
+        "code": "function fn_14({ headlines, descriptions }) {\n  const formatItems = (ranked) => {\n    const items = ranked.ranked;\n    return items.map((item) => `- ${item.item}`).join(\"\\n\");\n  };\n  const h = formatItems(headlines);\n  const d = formatItems(descriptions);\n  const text = `# Headlines\n${h}\n\n# Descriptions\n${d}`;\n  return { text };\n}",
+        "name": "fn_14",
+        "raw": true
+      },
+      "metadata": {
+        "title": "Format Output"
       }
     },
     {

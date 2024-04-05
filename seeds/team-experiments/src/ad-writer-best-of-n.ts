@@ -156,6 +156,19 @@ const arrangeForRanking = code(({ list }) => {
   return { headlines, descriptions };
 });
 
+const formatOutput = code(({ headlines, descriptions }) => {
+  type Item = { item: string };
+  type Ranked = { ranked: Item[] };
+  const formatItems = (ranked: unknown) => {
+    const items = (ranked as Ranked).ranked;
+    return items.map((item) => `- ${item.item}`).join("\n");
+  };
+  const h = formatItems(headlines);
+  const d = formatItems(descriptions);
+  const text = `# Headlines\n${h}\n\n# Descriptions\n${d}`;
+  return { text };
+});
+
 export default await board(({ context }) => {
   context.title("Ad specs").format("multiline").examples(adExample);
 
@@ -260,16 +273,19 @@ export default await board(({ context }) => {
     instruction: templates.promptTemplate({
       $metadata: { title: "Create Descriptions Ranker Template" },
       template: `The following ad descriptions were written for the provided Search Engine marketing document. Order these passages based on how well they follow the guidelines in the document\n\n{{headlines}}`,
-      headlines: rankingListMaker.headlines,
+      headlines: rankingListMaker.descriptions,
     }).prompt,
     context,
     schema: rankerSchema,
   });
 
-  return {
+  const outputFormatter = formatOutput({
+    $metadata: { title: "Format Output" },
     headlines: headlinesRanker.json,
     descriptions: descriptionsRanker.json,
-  };
+  });
+
+  return { text: outputFormatter.text.isString().format("markdown") };
 }).serialize({
   title: "Ad Writer (Best of N)",
   description: "An example of a team of workers writing an ad",

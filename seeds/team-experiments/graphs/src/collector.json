@@ -55,7 +55,7 @@
       "id": "fn-5",
       "type": "runJavascript",
       "configuration": {
-        "code": "function fn_5({ context }) {\n  const c = context;\n  const last = c[c.length - 1];\n  if (last.parts.text.includes(\"~EXIT~\")) {\n    return { exit: context };\n  }\n  return { context };\n}",
+        "code": "const fn_5 = ({ context }) => {\n  const c = context;\n  const last = c[c.length - 1];\n  if (last.parts.text.includes(\"~EXIT~\")) {\n    return { exit: context };\n  }\n  return { context };\n};",
         "name": "fn_5",
         "raw": true
       },

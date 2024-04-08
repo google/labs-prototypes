@@ -99,7 +99,7 @@
           "id": "fn-3",
           "type": "runJavascript",
           "configuration": {
-            "code": "function fn_3({ text }) {\n  return { hello: `HELLO, ${text}` };\n}",
+            "code": "const fn_3 = ({ text }) => {\n  return { hello: `HELLO, ${text}` };\n};",
             "name": "fn_3",
             "raw": true
           },

@@ -122,7 +122,7 @@
       "id": "fn-14",
       "type": "runJavascript",
       "configuration": {
-        "code": "function fn_14({ headlines, descriptions }) {\n  const formatItems = (ranked) => {\n    const items = ranked.ranked;\n    return items.map((item) => `- ${item.item}`).join(\"\\n\");\n  };\n  const h = formatItems(headlines);\n  const d = formatItems(descriptions);\n  const text = `# Headlines\n${h}\n\n# Descriptions\n${d}`;\n  return { text };\n}",
+        "code": "const fn_14 = ({ headlines, descriptions }) => {\n  const formatItems = (ranked) => {\n    const items = ranked.ranked;\n    return items.map((item) => `- ${item.item}`).join(\"\\n\");\n  };\n  const h = formatItems(headlines);\n  const d = formatItems(descriptions);\n  const text = `# Headlines\n${h}\n\n# Descriptions\n${d}`;\n  return { text };\n};",
         "name": "fn_14",
         "raw": true
       },
@@ -247,7 +247,7 @@
       "id": "fn-9",
       "type": "runJavascript",
       "configuration": {
-        "code": "function fn_9({ list }) {\n  const campaigns = list;\n  const headlines = [];\n  const descriptions = [];\n  for (const campaign of campaigns) {\n    const c = campaign.item.adCampaign;\n    headlines.push(...c.headlines);\n    descriptions.push(...c.descriptions);\n  }\n  return { headlines, descriptions };\n}",
+        "code": "const fn_9 = ({ list }) => {\n  const campaigns = list;\n  const headlines = [];\n  const descriptions = [];\n  for (const campaign of campaigns) {\n    const c = campaign.item.adCampaign;\n    headlines.push(...c.headlines);\n    descriptions.push(...c.descriptions);\n  }\n  return { headlines, descriptions };\n};",
         "name": "fn_9",
         "raw": true
       },
@@ -349,7 +349,7 @@
                 "id": "fn-6",
                 "type": "runJavascript",
                 "configuration": {
-                  "code": "function fn_6({ context }) {\n  const list = context || [];\n  const last = list[list.length - 1];\n  const json2 = JSON.parse(last.parts.text);\n  const { adCampaign } = json2;\n  const headlines = [];\n  for (const headline of adCampaign.headlines) {\n    if (headline.length > 30)\n      continue;\n    headlines.push(headline);\n  }\n  const descriptions = [];\n  for (const description of adCampaign.descriptions) {\n    if (description.length > 90)\n      continue;\n    descriptions.push(description);\n  }\n  if (descriptions.length === 0 && headlines.length === 0) {\n    const again = [list[0]];\n    return { context: again };\n  }\n  adCampaign.descriptions = descriptions;\n  adCampaign.headlines = headlines;\n  return { item: { adCampaign } };\n}",
+                  "code": "const fn_6 = ({ context }) => {\n  const list = context || [];\n  const last = list[list.length - 1];\n  const json2 = JSON.parse(last.parts.text);\n  const { adCampaign } = json2;\n  const headlines = [];\n  for (const headline of adCampaign.headlines) {\n    if (headline.length > 30)\n      continue;\n    headlines.push(headline);\n  }\n  const descriptions = [];\n  for (const description of adCampaign.descriptions) {\n    if (description.length > 90)\n      continue;\n    descriptions.push(description);\n  }\n  if (descriptions.length === 0 && headlines.length === 0) {\n    const again = [list[0]];\n    return { context: again };\n  }\n  adCampaign.descriptions = descriptions;\n  adCampaign.headlines = headlines;\n  return { item: { adCampaign } };\n};",
                   "name": "fn_6",
                   "raw": true
                 },
@@ -520,7 +520,7 @@
       "id": "fn-5",
       "type": "runJavascript",
       "configuration": {
-        "code": "function fn_5({ json: json2 }) {\n  const { prompt } = json2;\n  return { prompt };\n}",
+        "code": "const fn_5 = ({ json: json2 }) => {\n  const { prompt } = json2;\n  return { prompt };\n};",
         "name": "fn_5",
         "raw": true
       },
@@ -533,7 +533,7 @@
       "type": "runJavascript",
       "configuration": {
         "n": 3,
-        "code": "function fn_4({ n }) {\n  return { list: [...Array(n).keys()] };\n}",
+        "code": "const fn_4 = ({ n }) => {\n  return { list: [...Array(n).keys()] };\n};",
         "name": "fn_4",
         "raw": true
       },

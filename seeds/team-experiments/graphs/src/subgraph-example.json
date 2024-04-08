@@ -1,0 +1,132 @@
+{
+  "title": "Subgraph Example",
+  "description": "An example of using subgraphs within a board",
+  "$schema": "https://raw.githubusercontent.com/breadboard-ai/breadboard/@google-labs/breadboard-schema@1.4.0/packages/schema/breadboard.schema.json",
+  "version": "0.0.1",
+  "edges": [
+    {
+      "from": "invoke-3",
+      "to": "output-2",
+      "out": "hello",
+      "in": "hello"
+    },
+    {
+      "from": "input-1",
+      "to": "invoke-3",
+      "out": "text",
+      "in": "text"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "output-2",
+      "type": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "hello": {
+              "type": "string",
+              "title": "hello"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "invoke-3",
+      "type": "invoke",
+      "configuration": {
+        "$board": "#mySubgraph"
+      },
+      "metadata": {
+        "title": "Subgraph Invoker"
+      }
+    },
+    {
+      "id": "input-1",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text"
+            }
+          },
+          "required": [
+            "text"
+          ]
+        }
+      }
+    }
+  ],
+  "kits": [],
+  "graphs": {
+    "mySubgraph": {
+      "edges": [
+        {
+          "from": "fn-3",
+          "to": "output-2",
+          "out": "hello",
+          "in": "hello"
+        },
+        {
+          "from": "input-1",
+          "to": "fn-3",
+          "out": "text",
+          "in": "text"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "output-2",
+          "type": "output",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hello": {
+                  "type": "string",
+                  "title": "hello"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "fn-3",
+          "type": "runJavascript",
+          "configuration": {
+            "code": "function fn_3({ text }) {\n  return { hello: `HELLO, ${text}` };\n}",
+            "name": "fn_3",
+            "raw": true
+          },
+          "metadata": {
+            "title": "Hello Maker"
+          }
+        },
+        {
+          "id": "input-1",
+          "type": "input",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "title": "text"
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      ],
+      "graphs": {}
+    }
+  }
+}

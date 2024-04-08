@@ -1,0 +1,137 @@
+{
+  "title": "Subgraph Example with Map",
+  "description": "An example of using subgraphs within a board using `core.map`.",
+  "$schema": "https://raw.githubusercontent.com/breadboard-ai/breadboard/@google-labs/breadboard-schema@1.4.0/packages/schema/breadboard.schema.json",
+  "version": "0.0.1",
+  "edges": [
+    {
+      "from": "map-3",
+      "to": "output-2",
+      "out": "list",
+      "in": "hello"
+    },
+    {
+      "from": "input-1",
+      "to": "map-3",
+      "out": "names",
+      "in": "list"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "output-2",
+      "type": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "hello": {
+              "title": "List",
+              "type": "array",
+              "description": "The list of outputs from the board."
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "map-3",
+      "type": "map",
+      "configuration": {
+        "board": "#mySubgraph"
+      },
+      "metadata": {
+        "title": "Greeter"
+      }
+    },
+    {
+      "id": "input-1",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "names": {
+              "title": "Names of people to greet",
+              "type": "array",
+              "description": "The list to iterate over.",
+              "examples": [
+                "[\"Paul\",\"Joe\",\"Al\",\"Kevin\",\"Croissant\"]"
+              ]
+            }
+          },
+          "required": [
+            "names"
+          ]
+        }
+      }
+    }
+  ],
+  "kits": [],
+  "graphs": {
+    "mySubgraph": {
+      "edges": [
+        {
+          "from": "fn-3",
+          "to": "output-2",
+          "out": "hello",
+          "in": "item"
+        },
+        {
+          "from": "input-1",
+          "to": "fn-3",
+          "out": "item",
+          "in": "text"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "output-2",
+          "type": "output",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "string",
+                  "title": "item"
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "fn-3",
+          "type": "runJavascript",
+          "configuration": {
+            "code": "function fn_3({ text }) {\n  return { hello: `HELLO, ${text}` };\n}",
+            "name": "fn_3",
+            "raw": true
+          },
+          "metadata": {
+            "title": "Hello Maker"
+          }
+        },
+        {
+          "id": "input-1",
+          "type": "input",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "item": {
+                  "type": "string",
+                  "title": "item"
+                }
+              },
+              "required": [
+                "item"
+              ]
+            }
+          }
+        }
+      ],
+      "graphs": {}
+    }
+  }
+}

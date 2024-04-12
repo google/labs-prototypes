@@ -1,0 +1,142 @@
+{
+  "title": "JSON Schema Wizard",
+  "description": "A wizard that creates a JSON schema from a passage of text.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "passage": {
+              "type": "string",
+              "title": "Passage",
+              "examples": [
+                "An ad campaign that contains 5 headlines and 3 descriptions. Each headlines must be up to 30 characters long, and each description must be up to 90 characters long."
+              ],
+              "format": "multiline",
+              "description": "G"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -293,
+          "y": 20
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text",
+              "examples": [],
+              "format": "markdown"
+            },
+            "json": {
+              "type": "object",
+              "title": "Schema",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 661,
+          "y": -23
+        }
+      }
+    },
+    {
+      "id": "promptTemplate-a5b7ddbf",
+      "type": "promptTemplate",
+      "metadata": {
+        "visual": {
+          "x": -67,
+          "y": -59
+        },
+        "title": "Template",
+        "logLevel": "debug",
+        "description": "Creating a template for the wizard"
+      },
+      "configuration": {
+        "template": "You are a JSON Schema expert who can generate a valid JSON Schema from any passage. To do that, you take the PASSAGE and follow the plan with the following steps:\n\n1. Extract the important fields that will need to be present and assign their types. Show your work under the heading of FIELDS.\n2. Create a JSON Schema containing these fields. Show your work under the heading of SCHEMA. All fields must have descriptions, because these will be used by consumers of your output.\n\n# PASSAGE\n\n{{passage}}\n"
+      }
+    },
+    {
+      "id": "text-67c1bd86",
+      "type": "text",
+      "metadata": {
+        "visual": {
+          "x": 139,
+          "y": -128
+        },
+        "title": "Generator",
+        "description": "Generating JSON Schema",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "validateJson-fd7ec089",
+      "type": "validateJson",
+      "metadata": {
+        "visual": {
+          "x": 385,
+          "y": -188
+        },
+        "title": "Validator",
+        "description": "Validating JSON Schema",
+        "logLevel": "debug"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "promptTemplate-a5b7ddbf",
+      "to": "text-67c1bd86",
+      "out": "prompt",
+      "in": "text",
+      "constant": false
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-a5b7ddbf",
+      "out": "passage",
+      "in": "passage",
+      "constant": false
+    },
+    {
+      "from": "text-67c1bd86",
+      "to": "output",
+      "out": "text",
+      "in": "text",
+      "constant": false
+    },
+    {
+      "from": "text-67c1bd86",
+      "to": "validateJson-fd7ec089",
+      "out": "text",
+      "in": "json",
+      "constant": false
+    },
+    {
+      "from": "validateJson-fd7ec089",
+      "to": "output",
+      "out": "json",
+      "in": "json",
+      "constant": false
+    }
+  ]
+}

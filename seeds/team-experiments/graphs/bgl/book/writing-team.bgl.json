@@ -31,6 +31,13 @@
               "examples": [
                 "space opera"
               ]
+            },
+            "pagetarget": {
+              "type": "string",
+              "title": "Target Number of Pages",
+              "examples": [
+                "400"
+              ]
             }
           },
           "required": []
@@ -38,8 +45,8 @@
       },
       "metadata": {
         "visual": {
-          "x": -509,
-          "y": 163
+          "x": -336,
+          "y": 154
         }
       }
     },
@@ -61,6 +68,12 @@
               "title": "Critique",
               "examples": [],
               "format": "markdown"
+            },
+            "revised": {
+              "type": "string",
+              "title": "Revised Outline",
+              "examples": [],
+              "format": "markdown"
             }
           },
           "required": []
@@ -68,8 +81,8 @@
       },
       "metadata": {
         "visual": {
-          "x": 709,
-          "y": 147
+          "x": 1194.9999999999998,
+          "y": 185
         }
       }
     },
@@ -78,8 +91,8 @@
       "type": "invoke",
       "metadata": {
         "visual": {
-          "x": -204,
-          "y": -39
+          "x": -55,
+          "y": -197
         },
         "title": "Conjure Outline Writer",
         "logLevel": "debug"
@@ -91,7 +104,6 @@
         },
         "bookdescription": "This book will be about breadboards and how awesome they are",
         "chaptertarget": "10",
-        "pagetarget": "400",
         "setting": "the planet where there are no breadboards",
         "tonality": "futuristic struggle, but optimistic"
       }
@@ -103,8 +115,8 @@
         "title": "Conjure Critic",
         "logLevel": "debug",
         "visual": {
-          "x": 260,
-          "y": -4
+          "x": 314,
+          "y": -79
         }
       },
       "configuration": {
@@ -121,8 +133,8 @@
         "title": "Outline Writer",
         "logLevel": "debug",
         "visual": {
-          "x": 10,
-          "y": 143.00000000000006
+          "x": 61,
+          "y": 142
         }
       },
       "configuration": {
@@ -135,9 +147,54 @@
       "metadata": {
         "visual": {
           "x": 465,
-          "y": 130
+          "y": 103
         },
         "title": "Critique",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "invoke-f76ec6ef",
+      "type": "invoke",
+      "metadata": {
+        "visual": {
+          "x": 785,
+          "y": -90
+        },
+        "title": "Conjure Editor",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "$board": {
+          "kind": "board",
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-editor.bgl.json"
+        }
+      }
+    },
+    {
+      "id": "promptTemplate-6dbad5cc",
+      "type": "promptTemplate",
+      "metadata": {
+        "visual": {
+          "x": 727,
+          "y": -272
+        },
+        "title": "Author",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "template": "You are a famous author in the {{fictiongenre}} genre.  You are writing a novel.\n"
+      }
+    },
+    {
+      "id": "worker-518baba9",
+      "type": "worker",
+      "metadata": {
+        "visual": {
+          "x": 885,
+          "y": 133
+        },
+        "title": "Editor",
         "logLevel": "debug"
       }
     }
@@ -196,6 +253,60 @@
       "to": "output",
       "out": "text",
       "in": "outline"
+    },
+    {
+      "from": "input",
+      "to": "invoke-f76ec6ef",
+      "out": "title",
+      "in": "workingtitle"
+    },
+    {
+      "from": "input",
+      "to": "invoke-f76ec6ef",
+      "out": "storyarc",
+      "in": "storyarc"
+    },
+    {
+      "from": "input",
+      "to": "invoke-6b39cf69",
+      "out": "pagetarget",
+      "in": "pagetarget"
+    },
+    {
+      "from": "input",
+      "to": "invoke-f76ec6ef",
+      "out": "pagetarget",
+      "in": "pagetarget"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-6dbad5cc",
+      "out": "fictiongenre",
+      "in": "fictiongenre"
+    },
+    {
+      "from": "promptTemplate-6dbad5cc",
+      "to": "invoke-f76ec6ef",
+      "out": "prompt",
+      "in": "author"
+    },
+    {
+      "from": "invoke-f76ec6ef",
+      "to": "worker-518baba9",
+      "out": "text",
+      "in": "instruction"
+    },
+    {
+      "from": "worker-f65da79a",
+      "to": "worker-518baba9",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "worker-518baba9",
+      "to": "output",
+      "out": "text",
+      "in": "revised"
     }
   ]
 }

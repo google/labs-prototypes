@@ -1,0 +1,113 @@
+{
+  "title": "Outline Editor",
+  "description": "Conjures up the Outline Editor persona",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "author": {
+              "type": "string",
+              "title": "Author",
+              "examples": []
+            },
+            "pagetarget": {
+              "type": "string",
+              "title": "Target number of pages",
+              "examples": []
+            },
+            "storyarc": {
+              "type": "string",
+              "title": "Story Arc",
+              "examples": []
+            },
+            "workingtitle": {
+              "type": "string",
+              "title": "The working title",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 0,
+          "y": 11
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 476,
+          "y": 33
+        }
+      }
+    },
+    {
+      "id": "promptTemplate-12efa891",
+      "type": "promptTemplate",
+      "metadata": {
+        "visual": {
+          "x": 210,
+          "y": 0
+        },
+        "title": "Create Template",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "template": "{{author}}\n\nYour first step was to write a detailed outline for the novel.  You are shooting for around {{pagetarget}} pages for the finished novel.\n\nThe key themes of the novel are: \n{{storyarc}}\n\nYou have written a first draft of your outline, and then asked an outstanding book editor and publisher to give you suggestions.  Based on their suggestions you are going to rewrite and improve your outline.\n\nThis is great feedback and you want to try to incorporate some of it, while still staying true to your original vision for the novel.  Please write an improved outline for your novel, by taking the feedback into account.  \n\nREVISED OUTLINE FOR {{workingtitle}}:\n"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "promptTemplate-12efa891",
+      "to": "output",
+      "out": "prompt",
+      "in": "text"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-12efa891",
+      "out": "author",
+      "in": "author"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-12efa891",
+      "out": "pagetarget",
+      "in": "pagetarget"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-12efa891",
+      "out": "storyarc",
+      "in": "storyarc"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-12efa891",
+      "out": "workingtitle",
+      "in": "workingtitle"
+    }
+  ]
+}

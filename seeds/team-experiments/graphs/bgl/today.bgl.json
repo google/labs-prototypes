@@ -1,0 +1,82 @@
+{
+  "title": "Today",
+  "description": "Returns today's date.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "title": "date",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 196,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": "runJavascript-1a44bd49",
+      "type": "runJavascript",
+      "metadata": {
+        "visual": {
+          "x": -101,
+          "y": -52
+        }
+      },
+      "configuration": {
+        "name": "run",
+        "code": "const run = () => new Date().toDateString();"
+      }
+    },
+    {
+      "id": "input-32145e88",
+      "type": "input",
+      "metadata": {
+        "visual": {
+          "x": -401,
+          "y": -2
+        }
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "question": {
+              "type": "string",
+              "title": "Question",
+              "examples": [],
+              "description": "The question must be \"what is today?\""
+            }
+          },
+          "type": "object",
+          "required": []
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "runJavascript-1a44bd49",
+      "to": "output",
+      "out": "result",
+      "in": "date"
+    },
+    {
+      "from": "input-32145e88",
+      "to": "runJavascript-1a44bd49",
+      "out": "question",
+      "in": "question"
+    }
+  ]
+}

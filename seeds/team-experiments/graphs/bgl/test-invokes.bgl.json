@@ -1,0 +1,83 @@
+{
+  "title": "Test Invokes",
+  "description": "Testing various ways of invoking things",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text",
+              "examples": [],
+              "format": "multiline"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -227,
+          "y": 50
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 329,
+          "y": 18
+        }
+      }
+    },
+    {
+      "id": "invoke-5e1d840c",
+      "type": "invoke",
+      "metadata": {
+        "title": "Nice Title",
+        "visual": {
+          "x": 36,
+          "y": -187
+        }
+      },
+      "configuration": {
+        "$board": {
+          "kind": "board",
+          "path": "https://breadboard-ai.web.app/graphs/ad-writer-2.json"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "out": "text",
+      "to": "invoke-5e1d840c",
+      "in": "context"
+    },
+    {
+      "from": "invoke-5e1d840c",
+      "to": "output",
+      "out": "json",
+      "in": "text"
+    }
+  ]
+}

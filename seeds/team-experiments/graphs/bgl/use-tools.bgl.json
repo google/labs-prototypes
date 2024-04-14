@@ -1,0 +1,82 @@
+{
+  "title": "Use Tools",
+  "description": "An example for using tools",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -180,
+          "y": 104
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 253,
+          "y": 42
+        }
+      }
+    },
+    {
+      "id": "toolWorker-09264f9f",
+      "type": "toolWorker",
+      "metadata": {
+        "visual": {
+          "x": -1,
+          "y": -91
+        }
+      },
+      "configuration": {
+        "instruction": "You are a friendly assistant who helps answering user's question using tools. When the question does not require a tool, just answer it without calling a tool.",
+        "tools": [
+          {
+            "kind": "board",
+            "path": "file://fsapi~bgl/today.bgl.json"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "out": "text",
+      "to": "toolWorker-09264f9f",
+      "in": "context"
+    },
+    {
+      "from": "toolWorker-09264f9f",
+      "to": "output",
+      "out": "text",
+      "in": "text"
+    }
+  ]
+}

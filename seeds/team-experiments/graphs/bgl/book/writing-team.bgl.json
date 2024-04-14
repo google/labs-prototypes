@@ -1,0 +1,201 @@
+{
+  "title": "Book Writing Team",
+  "description": "A team of workers that writes a book",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Working Title",
+              "examples": [
+                "Aurora"
+              ]
+            },
+            "storyarc": {
+              "type": "string",
+              "title": "Story Arc",
+              "examples": [
+                "A girl named Aurora invents a breadboard on the planet where breadboards are strictly forbidden. Through struggles and determination, and with the help of trusted friends, Aurora overcomes many challenges and changes the whole planet for the better. "
+              ],
+              "format": "multiline"
+            },
+            "fictiongenre": {
+              "type": "string",
+              "title": "Fiction Genre",
+              "examples": [
+                "space opera"
+              ]
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -509,
+          "y": 163
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "outline": {
+              "type": "string",
+              "title": "Outline",
+              "examples": [],
+              "format": "markdown"
+            },
+            "critique": {
+              "type": "string",
+              "title": "Critique",
+              "examples": [],
+              "format": "markdown"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 709,
+          "y": 147
+        }
+      }
+    },
+    {
+      "id": "invoke-6b39cf69",
+      "type": "invoke",
+      "metadata": {
+        "visual": {
+          "x": -204,
+          "y": -39
+        },
+        "title": "Conjure Outline Writer",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "$board": {
+          "kind": "board",
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-writer.bgl.json"
+        },
+        "bookdescription": "This book will be about breadboards and how awesome they are",
+        "chaptertarget": "10",
+        "pagetarget": "400",
+        "setting": "the planet where there are no breadboards",
+        "tonality": "futuristic struggle, but optimistic"
+      }
+    },
+    {
+      "id": "invoke-2c8934df",
+      "type": "invoke",
+      "metadata": {
+        "title": "Conjure Critic",
+        "logLevel": "debug",
+        "visual": {
+          "x": 260,
+          "y": -4
+        }
+      },
+      "configuration": {
+        "$board": {
+          "kind": "board",
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-critic.json"
+        }
+      }
+    },
+    {
+      "id": "worker-ed3c620f",
+      "type": "worker",
+      "metadata": {
+        "title": "Outline Writer",
+        "logLevel": "debug",
+        "visual": {
+          "x": 10,
+          "y": 143.00000000000006
+        }
+      },
+      "configuration": {
+        "context": []
+      }
+    },
+    {
+      "id": "worker-f65da79a",
+      "type": "worker",
+      "metadata": {
+        "visual": {
+          "x": 465,
+          "y": 130
+        },
+        "title": "Critique",
+        "logLevel": "debug"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "invoke-6b39cf69",
+      "out": "title",
+      "in": "workingtitle"
+    },
+    {
+      "from": "input",
+      "to": "invoke-6b39cf69",
+      "out": "storyarc",
+      "in": "storyarc"
+    },
+    {
+      "from": "input",
+      "to": "invoke-6b39cf69",
+      "out": "fictiongenre",
+      "in": "fictiongenre"
+    },
+    {
+      "from": "input",
+      "to": "invoke-2c8934df",
+      "out": "fictiongenre",
+      "in": "fictiongenre"
+    },
+    {
+      "from": "worker-ed3c620f",
+      "to": "worker-f65da79a",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "invoke-2c8934df",
+      "to": "worker-f65da79a",
+      "out": "prompt",
+      "in": "instruction"
+    },
+    {
+      "from": "worker-f65da79a",
+      "to": "output",
+      "out": "text",
+      "in": "critique"
+    },
+    {
+      "from": "invoke-6b39cf69",
+      "to": "worker-ed3c620f",
+      "out": "text",
+      "in": "instruction"
+    },
+    {
+      "from": "worker-ed3c620f",
+      "to": "output",
+      "out": "text",
+      "in": "outline"
+    }
+  ]
+}

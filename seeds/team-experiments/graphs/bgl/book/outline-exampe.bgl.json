@@ -65,8 +65,8 @@
       "type": "invoke",
       "metadata": {
         "visual": {
-          "x": -53,
-          "y": -89
+          "x": -69,
+          "y": -106
         },
         "title": "Outline Writer",
         "logLevel": "debug"
@@ -74,7 +74,7 @@
       "configuration": {
         "$board": {
           "kind": "board",
-          "path": "https://gist.githubusercontent.com/dglazkov/82d8d644b6ca5f8f0f8fc3158abb2d0f/raw/0a8f0025f6af6802448dd3fb9bd1b9ddfdd8cfa2/outline.bgl.json"
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-critic.json"
         },
         "bookdescription": "This book will be about breadboards and how awesome they are",
         "chaptertarget": "10",
@@ -111,15 +111,15 @@
       "in": "storyarc"
     },
     {
-      "from": "invoke-6b39cf69",
-      "to": "text-07813280",
+      "from": "text-07813280",
+      "to": "output",
       "out": "text",
       "in": "text"
     },
     {
-      "from": "text-07813280",
-      "to": "output",
-      "out": "text",
+      "from": "invoke-6b39cf69",
+      "to": "text-07813280",
+      "out": "prompt",
       "in": "text"
     }
   ]

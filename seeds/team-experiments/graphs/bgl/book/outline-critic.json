@@ -1,0 +1,103 @@
+{
+  "title": "Outline Critic",
+  "description": "A prompt to conjure up the book outline critic",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "fictiongenre": {
+              "type": "string",
+              "title": "Fiction Genre",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 0,
+          "y": 11
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "title": "prompt",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 784,
+          "y": 0
+        }
+      }
+    },
+    {
+      "id": "promptTemplate-355784ad",
+      "type": "promptTemplate",
+      "metadata": {
+        "title": "Book Critic Persona",
+        "logLevel": "debug",
+        "visual": {
+          "x": 238,
+          "y": 0
+        }
+      },
+      "configuration": {
+        "template": "You are an accomplished book editor and publisher, specializing in the {{fiction_genre}} genre.  Your specialty is being able to recognize what story elements and characters will make a great novel.  You are great at giving insightful feedback to authors to help them make their novels better.\n"
+      }
+    },
+    {
+      "id": "promptTemplate-b043199d",
+      "type": "promptTemplate",
+      "metadata": {
+        "visual": {
+          "x": 522,
+          "y": 0
+        },
+        "title": "Critique Outline",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "template": "{{bookcritic}}\n\nYour friend, an accomplished author, has written an outline for a new book and has asked you for insightful feedback.  \n\nReview the outline that the author submitted.  Please read it very carefully.  Then, provide feedback for the author.  Give the author up to five specific suggestions to make the novel more compelling and have more chance to be a bestseller!\n\nYour feedback and suggestions:\n"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "promptTemplate-355784ad",
+      "out": "fictiongenre",
+      "in": "fiction_genre"
+    },
+    {
+      "from": "promptTemplate-355784ad",
+      "to": "promptTemplate-b043199d",
+      "out": "prompt",
+      "in": "bookcritic"
+    },
+    {
+      "from": "promptTemplate-b043199d",
+      "to": "output",
+      "out": "prompt",
+      "in": "prompt"
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "title": "Outline Writer Example",
+  "description": "Invoke the Outline Writer board to create a prompt and then use Gemini to build.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "title": "Working Title",
+              "examples": [
+                "Aurora"
+              ]
+            },
+            "storyarc": {
+              "type": "string",
+              "title": "Story Arc",
+              "examples": [
+                "A girl named Aurora invents a breadboard on the planet where breadboards are strictly forbidden. Through struggles and determination, and with the help of trusted friends, Aurora overcomes many challenges and changes the whole planet for the better. "
+              ],
+              "format": "multiline"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -292,
+          "y": -19
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text",
+              "examples": [],
+              "format": "markdown"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 433,
+          "y": -29
+        }
+      }
+    },
+    {
+      "id": "invoke-6b39cf69",
+      "type": "invoke",
+      "metadata": {
+        "visual": {
+          "x": -53,
+          "y": -89
+        },
+        "title": "Outline Writer",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "$board": {
+          "kind": "board",
+          "path": "https://gist.githubusercontent.com/dglazkov/82d8d644b6ca5f8f0f8fc3158abb2d0f/raw/0a8f0025f6af6802448dd3fb9bd1b9ddfdd8cfa2/outline.bgl.json"
+        },
+        "bookdescription": "This book will be about breadboards and how awesome they are",
+        "chaptertarget": "10",
+        "fictiongenre": "young adult space opera",
+        "pagetarget": "400",
+        "setting": "the planet where there are no breadboards",
+        "tonality": "futuristic struggle, but optimistic"
+      }
+    },
+    {
+      "id": "text-07813280",
+      "type": "text",
+      "metadata": {
+        "visual": {
+          "x": 177,
+          "y": -104
+        },
+        "title": "Generate Outline",
+        "logLevel": "debug"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "invoke-6b39cf69",
+      "out": "title",
+      "in": "workingtitle"
+    },
+    {
+      "from": "input",
+      "to": "invoke-6b39cf69",
+      "out": "storyarc",
+      "in": "storyarc"
+    },
+    {
+      "from": "invoke-6b39cf69",
+      "to": "text-07813280",
+      "out": "text",
+      "in": "text"
+    },
+    {
+      "from": "text-07813280",
+      "to": "output",
+      "out": "text",
+      "in": "text"
+    }
+  ]
+}

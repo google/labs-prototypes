@@ -1,0 +1,208 @@
+{
+  "title": "Outline Writer",
+  "description": "A prompt to generate a high-level outline for a book",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "fictiongenre": {
+              "type": "string",
+              "title": "Fiction Genre",
+              "examples": [],
+              "description": "The genre, like science fiction, space opera, noir, etc."
+            },
+            "bookdescription": {
+              "type": "string",
+              "title": "Overall Book Description",
+              "examples": [],
+              "description": "The overall description of the book"
+            },
+            "setting": {
+              "type": "string",
+              "title": "Setting",
+              "examples": [],
+              "description": "The setting in which the book happens",
+              "format": "multiline"
+            },
+            "tonality": {
+              "type": "string",
+              "title": "Tonality",
+              "examples": []
+            },
+            "storyarc": {
+              "type": "string",
+              "title": "Story Arc",
+              "examples": [],
+              "format": "multiline"
+            },
+            "workingtitle": {
+              "type": "string",
+              "title": "Working Title",
+              "examples": []
+            },
+            "pagetarget": {
+              "type": "string",
+              "title": "Target Number of Pages",
+              "examples": [
+                "400"
+              ]
+            },
+            "chaptertarget": {
+              "type": "string",
+              "title": "Target Number of Chapters",
+              "examples": [
+                "20"
+              ]
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -375.99999999999994,
+          "y": -47.999999999999986
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 482.0000000000001,
+          "y": -34
+        }
+      }
+    },
+    {
+      "id": "promptTemplate-47940a03",
+      "type": "promptTemplate",
+      "metadata": {
+        "visual": {
+          "x": -32.99999999999994,
+          "y": -145.99999999999997
+        },
+        "title": "author",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "template": "You are a famous author in the {{fictiongenre}} genre.  You are writing a novel."
+      }
+    },
+    {
+      "id": "promptTemplate-ae08e629",
+      "type": "promptTemplate",
+      "metadata": {
+        "visual": {
+          "x": -118.99999999999994,
+          "y": -340
+        },
+        "title": "book_description",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "template": "Here is a description of the book:\nThe novel can be described as {{overall_book_description}}.\nThe novel’s tonality: {{tonality}} \nThe novel’s setting: {{setting}}"
+      }
+    },
+    {
+      "id": "promptTemplate-5fd06855",
+      "type": "promptTemplate",
+      "metadata": {
+        "visual": {
+          "x": 241,
+          "y": -198
+        },
+        "title": "writefirstoutline",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "template": "{{author}}\n\n{{book_description}}\n\nThe key themes of the novel are: \n{{story_arc}}\n\nYour first step is to write a detailed outline for the novel.  You are shooting for around {{page_target}} pages for the finished novel, so your outline should contain key bullets and story arc for about {{chapter_target}} chapters. Create a part of the outline for each chapter.\n\nOk, let's get started.  Please start by writing your bulleted outline.  Again, you want to cover at least @chapter_target chapters, and you want to be very creative.\n\nOutline for \"{{working_title}}\":\n"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "promptTemplate-47940a03",
+      "to": "promptTemplate-5fd06855",
+      "out": "prompt",
+      "in": "author"
+    },
+    {
+      "from": "promptTemplate-ae08e629",
+      "to": "promptTemplate-5fd06855",
+      "out": "prompt",
+      "in": "book_description"
+    },
+    {
+      "from": "promptTemplate-5fd06855",
+      "to": "output",
+      "out": "prompt",
+      "in": "text"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-47940a03",
+      "out": "fictiongenre",
+      "in": "fictiongenre"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-ae08e629",
+      "out": "bookdescription",
+      "in": "overall_book_description"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-ae08e629",
+      "out": "setting",
+      "in": "setting"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-ae08e629",
+      "out": "tonality",
+      "in": "tonality"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-5fd06855",
+      "out": "storyarc",
+      "in": "story_arc"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-5fd06855",
+      "out": "workingtitle",
+      "in": "working_title"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-5fd06855",
+      "out": "pagetarget",
+      "in": "page_target"
+    },
+    {
+      "from": "input",
+      "to": "promptTemplate-5fd06855",
+      "out": "chaptertarget",
+      "in": "chapter_target"
+    }
+  ]
+}

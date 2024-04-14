@@ -60,82 +60,74 @@
       }
     },
     {
-      "id": "promptTemplate-a5b7ddbf",
-      "type": "promptTemplate",
+      "id": "worker-5288aa40",
+      "type": "worker",
+      "configuration": {
+        "instruction": "You are a JSON Schema expert who helps others construct great JSON Schemas. You do this by reading the passages below and creating a guide for creating a useful JSON Schema. You know that a useful JSON Schema\n\n- contains descriptions for the fields, because they can be very handy for understanding the meaning of the fields\n- uses the absolute minimum number of JSON Schema features to get the job done. Unless required, don't use them. For example, only specify required fields when they are actually required. Leave them to be optional otherwise.\n- has property names that are descriptive and clear.\n- clearly conveys the structure and the hierarchy of the data. The root element is always of object type and contains a property with the name describing the overall data structure.\n\nYou also know that a useful guide for creating a JSON schema is a list of property descriptions with the title of \"Schema guide for [infer title from the passage]\"\n\n- the root object contains the property named [name of the property describing the overall structure]\n- this property is of type [type], with description of [description] and contains the following properties (if the property is of type \"object\").\n- [list any other constraints or limits of the property]\n- [description of next property]\n- ...\n\nPASSAGES:"
+      },
       "metadata": {
         "visual": {
-          "x": -67,
-          "y": -59
-        },
-        "title": "Template",
-        "logLevel": "debug",
-        "description": "Creating a template for the wizard"
+          "x": -116,
+          "y": -151
+        }
+      }
+    },
+    {
+      "id": "structuredWorker-6c243b4b",
+      "type": "structuredWorker",
+      "configuration": {
+        "instruction": "Generate a useful JSON schema based on the guide. Follow the guide precisely. You know that a useful JSON Schema\n\n- contains descriptions for the fields, because they can be very handy for understanding the meaning of the fields\n- uses the absolute minimum number of JSON Schema features to get the job done. Unless required, don't use them. For example, only specify required fields when they are actually required. Leave them to be optional otherwise.\n- has property names that are descriptive and clear.\n- clearly conveys the structure and the hierarchy of the data. The root element is always of object type and contains a property with the name describing the overall data structure."
+      },
+      "metadata": {
+        "visual": {
+          "x": 148,
+          "y": -206
+        }
+      }
+    },
+    {
+      "id": "runJavascript-42565a61",
+      "type": "runJavascript",
+      "metadata": {
+        "visual": {
+          "x": 510,
+          "y": -209
+        }
       },
       "configuration": {
-        "template": "You are a JSON Schema expert who can generate a valid JSON Schema from any passage. To do that, you take the PASSAGE and follow the plan with the following steps:\n\n1. Extract the important fields that will need to be present and assign their types. Show your work under the heading of FIELDS.\n2. Create a JSON Schema containing these fields. Show your work under the heading of SCHEMA. All fields must have descriptions, because these will be used by consumers of your output.\n\n# PASSAGE\n\n{{passage}}\n"
-      }
-    },
-    {
-      "id": "text-67c1bd86",
-      "type": "text",
-      "metadata": {
-        "visual": {
-          "x": 139,
-          "y": -128
-        },
-        "title": "Generator",
-        "description": "Generating JSON Schema",
-        "logLevel": "debug"
-      }
-    },
-    {
-      "id": "validateJson-fd7ec089",
-      "type": "validateJson",
-      "metadata": {
-        "visual": {
-          "x": 385,
-          "y": -188
-        },
-        "title": "Validator",
-        "description": "Validating JSON Schema",
-        "logLevel": "debug"
+        "name": "run",
+        "code": "const run = ({ json }) => ({json});",
+        "raw": "on"
       }
     }
   ],
   "edges": [
     {
-      "from": "promptTemplate-a5b7ddbf",
-      "to": "text-67c1bd86",
-      "out": "prompt",
-      "in": "text",
-      "constant": false
-    },
-    {
       "from": "input",
-      "to": "promptTemplate-a5b7ddbf",
+      "to": "worker-5288aa40",
       "out": "passage",
-      "in": "passage",
+      "in": "context",
       "constant": false
     },
     {
-      "from": "text-67c1bd86",
-      "to": "output",
-      "out": "text",
-      "in": "text",
+      "from": "worker-5288aa40",
+      "to": "structuredWorker-6c243b4b",
+      "out": "context",
+      "in": "context",
       "constant": false
     },
     {
-      "from": "text-67c1bd86",
-      "to": "validateJson-fd7ec089",
-      "out": "text",
-      "in": "json",
-      "constant": false
-    },
-    {
-      "from": "validateJson-fd7ec089",
+      "from": "structuredWorker-6c243b4b",
       "to": "output",
       "out": "json",
       "in": "json",
+      "constant": false
+    },
+    {
+      "from": "worker-5288aa40",
+      "to": "output",
+      "out": "text",
+      "in": "text",
       "constant": false
     }
   ]

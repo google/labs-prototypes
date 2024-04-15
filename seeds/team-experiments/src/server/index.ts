@@ -17,6 +17,26 @@ const vite = await createViteServer({
   appType: "custom",
 });
 
+const serveApi = async (
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+  next: () => void
+) => {
+  const url = req.url;
+  if (!url) {
+    return;
+  }
+
+  // TODO: Implement actual APIs here.
+  if (url === "/api/test") {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end("API!");
+    return;
+  }
+
+  next();
+};
+
 const serveIndex = async (
   req: http.IncomingMessage,
   res: http.ServerResponse
@@ -34,7 +54,7 @@ const serveIndex = async (
   }
 
   const index = await readFile(
-    path.resolve(__dirname, "../index.html"),
+    path.resolve(__dirname, "../../index.html"),
     "utf-8"
   );
   const transformed = await vite.transformIndexHtml("/index.html", index, url);
@@ -44,9 +64,12 @@ const serveIndex = async (
 
 const server = http.createServer(async (req, res) => {
   vite.middlewares(req, res, async () => {
-    await serveIndex(req, res);
+    serveApi(req, res, async () => {
+      await serveIndex(req, res);
+    });
   });
 });
 
-console.info("Serving from port 3000...");
-server.listen(3000);
+server.listen(3000, () => {
+  console.info("Serving from port 3000...");
+});

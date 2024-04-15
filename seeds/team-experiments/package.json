@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev:board": "breadboard debug src/boards --watch -o graphs",
-    "dev": "vite"
+    "dev": "tsx src/server/index.ts"
   },
   "keywords": [],
   "author": "Your Name Here",

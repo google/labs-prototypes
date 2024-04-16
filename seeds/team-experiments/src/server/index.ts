@@ -7,8 +7,8 @@
 import { IncomingMessage, ServerResponse, createServer } from "http";
 import { createServer as createViteServer } from "vite";
 import { serveIndex } from "./static";
-import { getPageContent } from "./browse";
 import { serverError } from "./errors";
+import { api, browseApi } from "./api";
 
 const PORT = 3000;
 const HOST = "localhost";
@@ -28,24 +28,15 @@ const serveApi = async (
   if (!url) {
     return;
   }
-
-  if (url && url.startsWith("/api/browse")) {
-    if (!URL.canParse(url, HOSTNAME)) {
-      serverError(res, `Invalid URL: ${url}`);
-      return;
-    }
-    const resolvedUrl = new URL(url, HOSTNAME);
-    const urlParam = resolvedUrl.searchParams.get("url");
-    if (!urlParam) {
-      serverError(res, `URL parameter not supplied`);
-      return;
-    }
-    const content = await getPageContent(urlParam);
-    res.writeHead(200, { "Content-Type": "application/json" });
-    const response = { url: urlParam, content };
-    res.end(JSON.stringify(response));
+  const resolvedURL = URL.canParse(url, HOSTNAME)
+    ? new URL(url, HOSTNAME)
+    : null;
+  if (!resolvedURL) {
+    serverError(res, `Invalid URL: ${url}`);
     return;
   }
+
+  if (await api(resolvedURL, res, "/api/browse", browseApi)) return;
 
   next();
 };

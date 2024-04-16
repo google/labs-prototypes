@@ -14,6 +14,7 @@ import "./elements/elements.js";
 import { conversationItems } from "../mock/conversation.js";
 import { assetItems, jobDescription } from "../mock/assets.js";
 import { activityItems } from "../mock/activity.js";
+import { run } from "@google-labs/breadboard/harness";
 
 BreadboardUI.register();
 
@@ -45,6 +46,16 @@ export class Main extends LitElement {
       font-weight: normal;
     }
   `;
+
+  #run: ReturnType<typeof run>;
+
+  constructor() {
+    super();
+    this.#run = run({
+      url: "/bgl/insta/mock-conversation.bgl.json",
+      kits: [],
+    });
+  }
 
   render() {
     return html`<header><h1>${this.teamName}</h1></header>

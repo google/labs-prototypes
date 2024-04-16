@@ -8,7 +8,7 @@ import { customElement, property } from "lit/decorators.js";
 import {
   AssetItem,
   ConversationData,
-  ConversationItemFormat,
+  ItemFormat,
 } from "../../../types/types.js";
 import { map } from "lit/directives/map.js";
 import { markdown } from "../../directives/markdown";
@@ -120,7 +120,7 @@ export class AssetsList extends LitElement {
     if (this.jobDescription) {
       let content: TemplateResult | symbol = nothing;
       if (Array.isArray(this.jobDescription.message)) {
-        if (this.jobDescription.format === ConversationItemFormat.MARKDOWN) {
+        if (this.jobDescription.format === ItemFormat.MARKDOWN) {
           content = html`${markdown(this.jobDescription.message.join("\n"))}`;
         } else {
           content = html`${map(
@@ -129,7 +129,7 @@ export class AssetsList extends LitElement {
           )}`;
         }
       } else {
-        if (this.jobDescription.format === ConversationItemFormat.MARKDOWN) {
+        if (this.jobDescription.format === ItemFormat.MARKDOWN) {
           content = html`${markdown(this.jobDescription.message)}`;
         }
 

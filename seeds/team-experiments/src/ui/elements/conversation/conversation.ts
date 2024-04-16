@@ -7,8 +7,8 @@ import { LitElement, html, css, nothing, TemplateResult } from "lit";
 import { customElement, property } from "lit/decorators.js";
 import {
   ConversationItem,
-  ConversationItemFormat,
-  ConversationItemType,
+  ItemFormat,
+  ItemType,
   Participant,
 } from "../../../types/types";
 import { map } from "lit/directives/map.js";
@@ -209,12 +209,12 @@ export class Conversation extends LitElement {
 
     const tmpl = html`${map(this.items, (item) => {
         switch (item.type) {
-          case ConversationItemType.DATA:
-          case ConversationItemType.TEXT_CONVERSATION: {
+          case ItemType.DATA:
+          case ItemType.TEXT_CONVERSATION: {
             let content: TemplateResult | symbol = nothing;
 
             if (Array.isArray(item.message)) {
-              if (item.format === ConversationItemFormat.MARKDOWN) {
+              if (item.format === ItemFormat.MARKDOWN) {
                 content = html`${markdown(item.message.join("\n"))}`;
               } else {
                 content = html`${map(
@@ -223,7 +223,7 @@ export class Conversation extends LitElement {
                 )}`;
               }
             } else {
-              if (item.format === ConversationItemFormat.MARKDOWN) {
+              if (item.format === ItemFormat.MARKDOWN) {
                 content = html`${markdown(item.message)}`;
               }
 
@@ -258,7 +258,7 @@ export class Conversation extends LitElement {
             </section>`;
           }
 
-          case ConversationItemType.INPUT: {
+          case ItemType.INPUT: {
             return html`Input`;
           }
         }

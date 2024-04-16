@@ -8,8 +8,8 @@ import { MINUTE } from "../constants/constants.js";
 import {
   AssetItem,
   ConversationItem,
-  ConversationItemFormat,
-  ConversationItemType,
+  ItemFormat,
+  ItemType,
   Participant,
 } from "../types/types.js";
 
@@ -17,8 +17,8 @@ export const jobDescription: ConversationItem = {
   datetime: new Date(Date.now() - MINUTE * 2),
   who: Participant.TEAM_MEMBER,
   role: "Team Lead",
-  type: ConversationItemType.DATA,
-  format: ConversationItemFormat.MARKDOWN,
+  type: ItemType.DATA,
+  format: ItemFormat.MARKDOWN,
   message: [
     `# Job Description`,
     `Create an Instagram campaign to promote soccer club Fremont FC.`,

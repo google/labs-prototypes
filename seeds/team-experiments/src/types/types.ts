@@ -9,16 +9,16 @@ export enum Participant {
   TEAM_MEMBER = "team-member",
 }
 
-export enum ConversationItemType {
-  TEXT_CONVERSATION = "text-conversation",
-  DATA = "data",
-  INPUT = "input",
-}
-
-export enum ConversationItemFormat {
+export enum ItemFormat {
   TEXT,
   MARKDOWN,
   MULTIPART,
+}
+
+export enum ItemType {
+  TEXT_CONVERSATION = "text-conversation",
+  DATA = "data",
+  INPUT = "input",
 }
 
 export type ConversationInputPart =
@@ -27,27 +27,27 @@ export type ConversationInputPart =
 
 export interface ConversationText {
   datetime: Date;
-  type: ConversationItemType.TEXT_CONVERSATION;
+  type: ItemType.TEXT_CONVERSATION;
   who: Participant;
   role?: string;
-  format: ConversationItemFormat;
+  format: ItemFormat;
   message: string | string[];
 }
 
 export interface ConversationData {
   datetime: Date;
-  type: ConversationItemType.DATA;
+  type: ItemType.DATA;
   who: Participant;
   role?: string;
-  format: ConversationItemFormat;
+  format: ItemFormat;
   message: string | string[];
 }
 
 export interface ConversationInput {
   datetime: Date;
-  type: ConversationItemType.INPUT;
+  type: ItemType.INPUT;
   role?: string;
-  format: ConversationItemFormat;
+  format: ItemFormat;
   parts: ConversationInputPart[];
 }
 
@@ -61,7 +61,10 @@ export interface ActivityItem {
   who: Participant;
   role?: string;
   headline: string;
-  subItems: ActivityItem[];
+  content?: string | string[];
+  subItems?: ActivityItem[];
+  active: boolean;
+  format?: ItemFormat;
 }
 
 export interface AssetItem {

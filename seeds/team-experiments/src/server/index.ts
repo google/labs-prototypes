@@ -4,13 +4,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { readFile } from "fs/promises";
-import http from "http";
-import path from "path";
-import { fileURLToPath } from "url";
+import { IncomingMessage, ServerResponse, createServer } from "http";
 import { createServer as createViteServer } from "vite";
+import { serveIndex } from "./static";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PORT = 3000;
+const HOST = "localhost";
 
 const vite = await createViteServer({
   server: { middlewareMode: true },
@@ -18,8 +17,8 @@ const vite = await createViteServer({
 });
 
 const serveApi = async (
-  req: http.IncomingMessage,
-  res: http.ServerResponse,
+  req: IncomingMessage,
+  res: ServerResponse,
   next: () => void
 ) => {
   const url = req.url;
@@ -37,39 +36,16 @@ const serveApi = async (
   next();
 };
 
-const serveIndex = async (
-  req: http.IncomingMessage,
-  res: http.ServerResponse
-) => {
-  const url = req.url;
-  if (!url) {
-    // Don't know how to serve this, let's bail.
-    return;
-  }
-
-  if (url !== "/" && url !== "/index.html") {
-    res.writeHead(404, "Page not found");
-    res.end("Page Not Found. Are you looking for '/index.html' maybe?");
-    return;
-  }
-
-  const index = await readFile(
-    path.resolve(__dirname, "../../index.html"),
-    "utf-8"
-  );
-  const transformed = await vite.transformIndexHtml("/index.html", index, url);
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end(transformed);
-};
-
-const server = http.createServer(async (req, res) => {
+const server = createServer(async (req, res) => {
   vite.middlewares(req, res, async () => {
     serveApi(req, res, async () => {
-      await serveIndex(req, res);
+      await serveIndex(req, res, async (contents: string) => {
+        return await vite.transformIndexHtml("/index.html", contents);
+      });
     });
   });
 });
 
-server.listen(3000, () => {
-  console.info("Serving from port 3000...");
+server.listen(PORT, HOST, () => {
+  console.info(`Running on "http://${HOST}:${PORT}"...`);
 });

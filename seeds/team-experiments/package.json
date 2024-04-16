@@ -5,7 +5,18 @@
   "type": "module",
   "scripts": {
     "dev:board": "breadboard debug src/boards --watch -o graphs",
-    "dev": "tsx src/server/index.ts"
+    "dev:server": "wireit",
+    "dev": "npm run dev:server --watch"
+  },
+  "wireit": {
+    "dev:server": {
+      "command": "tsx src/server/index.ts",
+      "service": true,
+      "files": [
+        "src/server/**/*.ts",
+        "tsconfig.json"
+      ]
+    }
   },
   "keywords": [],
   "author": "Your Name Here",
@@ -25,7 +36,8 @@
     "@google-labs/json-kit": "^0.1.5",
     "@google-labs/palm-kit": "^0.0.10",
     "@google-labs/template-kit": "^0.2.5",
-    "lit": "^3.1.2"
+    "lit": "^3.1.2",
+    "puppeteer": "^22.6.5"
   },
   "private": true
 }

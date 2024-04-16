@@ -8,6 +8,7 @@ import { readFile } from "fs/promises";
 import { dirname, extname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { IncomingMessage, ServerResponse } from "http";
+import { notFound } from "./errors";
 
 const CONTENT_TYPE = new Map([
   [".html", "text/html"],
@@ -34,8 +35,7 @@ export const serveFile = async (
     res.writeHead(200, { "Content-Type": contentType });
     res.end(contents);
   } catch {
-    res.writeHead(404, "Page not found");
-    res.end("Static file not found");
+    notFound(res, "Static file not found");
   }
 };
 
@@ -50,11 +50,10 @@ export const serveIndex = async (
     return;
   }
 
-  if (url !== "/" && url !== "/index.html") {
-    res.writeHead(404, "Page not found");
-    res.end("Page Not Found. Are you looking for '/index.html' maybe?");
+  if (url === "/" || url === "/index.html") {
+    serveFile(res, "index.html", transformer);
     return;
   }
 
-  serveFile(res, "index.html", transformer);
+  notFound(res, "Page Not Found. Are you looking for '/index.html' maybe?");
 };

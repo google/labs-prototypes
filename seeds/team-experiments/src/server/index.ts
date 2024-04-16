@@ -7,9 +7,12 @@
 import { IncomingMessage, ServerResponse, createServer } from "http";
 import { createServer as createViteServer } from "vite";
 import { serveIndex } from "./static";
+import { getPageContent } from "./browse";
+import { serverError } from "./errors";
 
 const PORT = 3000;
 const HOST = "localhost";
+const HOSTNAME = `http://${HOST}:${PORT}`;
 
 const vite = await createViteServer({
   server: { middlewareMode: true },
@@ -26,10 +29,21 @@ const serveApi = async (
     return;
   }
 
-  // TODO: Implement actual APIs here.
-  if (url === "/api/test") {
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.end("API!");
+  if (url && url.startsWith("/api/browse")) {
+    if (!URL.canParse(url, HOSTNAME)) {
+      serverError(res, `Invalid URL: ${url}`);
+      return;
+    }
+    const resolvedUrl = new URL(url, HOSTNAME);
+    const urlParam = resolvedUrl.searchParams.get("url");
+    if (!urlParam) {
+      serverError(res, `URL parameter not supplied`);
+      return;
+    }
+    const content = await getPageContent(urlParam);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    const response = { url: urlParam, content };
+    res.end(JSON.stringify(response));
     return;
   }
 

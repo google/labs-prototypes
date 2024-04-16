@@ -57,3 +57,24 @@ export const serveIndex = async (
 
   notFound(res, "Page Not Found. Are you looking for '/index.html' maybe?");
 };
+
+export const serveDir = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  dir: string,
+  path: string,
+  next: () => Promise<void>
+) => {
+  const url = req.url;
+  if (!url) {
+    return next();
+  }
+  if (!url.startsWith(path)) {
+    return next();
+  }
+
+  const resolvedPath = url.slice(path.length + 1);
+
+  const resolvedDir = resolve(ROOT_PATH, dir, resolvedPath);
+  serveFile(res, resolvedDir);
+};

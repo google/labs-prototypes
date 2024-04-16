@@ -7,11 +7,11 @@
 import { LitElement, css, html } from "lit";
 import * as BreadboardUI from "@google-labs/breadboard-ui";
 import { customElement, property } from "lit/decorators.js";
+import { ConversationItemCreateEvent } from "../events/events.js";
 import "./elements/elements.js";
 
 // Mock data - to replace.
 import { conversationItems } from "../mock/conversation.js";
-import { ConversationItemCreateEvent } from "../events/events.js";
 import { assetItems, jobDescription } from "../mock/assets.js";
 import { activityItems } from "../mock/activity.js";
 

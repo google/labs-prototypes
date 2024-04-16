@@ -122,3 +122,4 @@ dist
 *.local.md
 
 .wireit
+settings.json

@@ -1,0 +1,172 @@
+/**
+ * @license
+ * Copyright 2023 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+:root {
+  --grid-size: 4px;
+  --grid-size-2: calc(var(--grid-size) * 2);
+  --grid-size-3: calc(var(--grid-size) * 3);
+  --grid-size-4: calc(var(--grid-size) * 4);
+  --grid-size-5: calc(var(--grid-size) * 5);
+  --grid-size-6: calc(var(--grid-size) * 6);
+  --grid-size-7: calc(var(--grid-size) * 7);
+  --grid-size-8: calc(var(--grid-size) * 8);
+  --grid-size-9: calc(var(--grid-size) * 9);
+  --grid-size-10: calc(var(--grid-size) * 10);
+  --grid-size-11: calc(var(--grid-size) * 11);
+  --grid-size-12: calc(var(--grid-size) * 12);
+
+  --font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --easing: cubic-bezier(0, 0, 0.3, 1);
+  --easing-duration-in: 0.15s;
+  --easing-duration-out: 0.3s;
+
+  --icon-access-request: url(/third_party/icons/access-request.svg);
+  --icon-add-circle: url(/third_party/icons/add-circle.svg);
+  --icon-add-note: url(/third_party/icons/add-note.svg);
+  --icon-add-photo: url(/third_party/icons/add-photo.svg);
+  --icon-add: url(/third_party/icons/add.svg);
+  --icon-arrow-back: url(/third_party/icons/arrow-back.svg);
+  --icon-before: url(/third_party/icons/before.svg);
+  --icon-close: url(/third_party/icons/close.svg);
+  --icon-collapse: url(/third_party/icons/collapse.svg);
+  --icon-copy-to-clipboard: url(/third_party/icons/copy-to-clipboard.svg);
+  --icon-delete: url(/third_party/icons/delete.svg);
+  --icon-download: url(/third_party/icons/download.svg);
+  --icon-edit: url(/third_party/icons/edit.svg);
+  --icon-error: url(/third_party/icons/error.svg);
+  --icon-expand: url(/third_party/icons/expand.svg);
+  --icon-history: url(/third_party/icons/history.svg);
+  --icon-info: url(/third_party/icons/info.svg);
+  --icon-menu: url(/third_party/icons/menu.svg);
+  --icon-next: url(/third_party/icons/next.svg);
+  --icon-preview: url(/third_party/icons/preview.svg);
+  --icon-quick-jump: url(/third_party/icons/quick-jump.svg);
+  --icon-refresh: url(/third_party/icons/refresh.svg);
+  --icon-reset-alt: url(/third_party/icons/reset-alt.svg);
+  --icon-reset-image: url(/third_party/icons/reset-image.svg);
+  --icon-reset: url(/third_party/icons/reset.svg);
+  --icon-resume-blue: url(/third_party/icons/resume-blue.svg);
+  --icon-save: url(/third_party/icons/save.svg);
+  --icon-search: url(/third_party/icons/search.svg);
+  --icon-send-blue: url(/third_party/icons/send-blue.svg);
+  --icon-settings: url(/third_party/icons/settings.svg);
+  --icon-start: url(/third_party/icons/start.svg);
+  --icon-warning: url(/third_party/icons/warning.svg);
+
+  --role-team-lead: url(/third_party/icons/roles/team-lead.svg);
+
+  --asset-image-png: url(/third_party/icons/assets/image-png.svg);
+  --asset-application-pdf: url(/third_party/icons/assets/application-pdf.svg);
+
+  --inputs-50: #eaf7e7;
+  --inputs-100: #bbe7b0;
+  --inputs-200: #9adc8a;
+  --inputs-300: #6ccb55;
+  --inputs-400: #4fc134;
+  --inputs-500: #24b202;
+  --inputs-600: #20a202;
+  --inputs-700: #1a7e01;
+  --inputs-800: #136202;
+  --inputs-900: #0f4b00;
+
+  --nodes-50: #fff9e6;
+  --nodes-100: #ffebb0;
+  --nodes-200: #ffe28b;
+  --nodes-300: #ffd454;
+  --nodes-400: #ffcc33;
+  --nodes-500: #ffbf00;
+  --nodes-600: #e8af02;
+  --nodes-700: #b68902;
+  --nodes-800: #8c6900;
+  --nodes-900: #6b5000;
+
+  --boards-50: #fff4eb;
+  --boards-100: #ffdfc0;
+  --boards-200: #ffcea1;
+  --boards-300: #feb876;
+  --boards-400: #feab5c;
+  --boards-500: #fe9533;
+  --boards-600: #e7882e;
+  --boards-700: #b46b24;
+  --boards-800: #8c521b;
+  --boards-900: #6b3f15;
+
+  --output-50: #ecf5ff;
+  --output-100: #c0dfff;
+  --output-200: #a1d0ff;
+  --output-300: #77bbff;
+  --output-400: #5cadff;
+  --output-500: #3399ff;
+  --output-600: #2e8be8;
+  --output-700: #246db5;
+  --output-800: #1b548c;
+  --output-900: #1b548c;
+
+  --neutral-white: #ffffff;
+  --neutral-10: #fafafa;
+  --neutral-50: #f6f6f6;
+  --neutral-100: #ededed;
+  --neutral-200: #e3e3e3;
+  --neutral-300: #d9d9d9;
+  --neutral-400: #c2c2c2;
+  --neutral-500: #9c9c9c;
+  --neutral-600: #7a7a7a;
+  --neutral-700: #595959;
+  --neutral-800: #333333;
+  --neutral-900: #1a1a1a;
+
+  --title-large: 22px;
+  --title-line-height-large: 28px;
+
+  --title-medium: 16px;
+  --title-line-height-medium: 24px;
+
+  --title-small: 14px;
+  --title-line-height-small: 20px;
+
+  --label-large: 14px;
+  --label-line-height-large: 20px;
+
+  --label-medium: 12px;
+  --label-line-height-medium: 16px;
+
+  --label-small: 11px;
+  --label-line-height-small: 16px;
+
+  --body-large: 16px;
+  --body-line-height-large: 24px;
+
+  --body-medium: 14px;
+  --body-line-height-medium: 20px;
+
+  --body-small: 12px;
+  --body-line-height-small: 16px;
+
+  --body-x-small: 10px;
+  --body-line-height-x-small: 13px;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+  font-family: var(--font-family);
+  color: var(--neutral-900);
+  margin: 0;
+  padding: 0;
+  display: block;
+  background: var(--neutral-50);
+  width: 100vw;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+at-main {
+  flex: 1;
+  overflow: auto;
+  height: 100%;
+}

@@ -5,19 +5,16 @@
  */
 
 import { readFile } from "fs/promises";
-import { dirname, extname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { extname, resolve } from "path";
 import { IncomingMessage, ServerResponse } from "http";
-import { notFound } from "./errors";
+import { notFound } from "./errors.js";
+import { root } from "./common.js";
 
 const CONTENT_TYPE = new Map([
   [".html", "text/html"],
   [".json", "application/json"],
 ]);
 const DEFAULT_CONTENT_TYPE = "text/plain";
-
-const MODULE_PATH = dirname(fileURLToPath(import.meta.url));
-const ROOT_PATH = resolve(MODULE_PATH, "../../");
 
 /**
  * Serve a static file
@@ -29,7 +26,7 @@ export const serveFile = async (
 ) => {
   const contentType = CONTENT_TYPE.get(extname(path)) || DEFAULT_CONTENT_TYPE;
   try {
-    const resolvedPath = resolve(ROOT_PATH, path);
+    const resolvedPath = resolve(root(), path);
     let contents = await readFile(resolvedPath, "utf-8");
     if (transformer) contents = await transformer(contents);
     res.writeHead(200, { "Content-Type": contentType });
@@ -80,6 +77,6 @@ export const serveDir = async (
 
   const resolvedPath = url.slice(path.length + 1);
 
-  const resolvedDir = resolve(ROOT_PATH, dir, resolvedPath);
+  const resolvedDir = resolve(root(), dir, resolvedPath);
   serveFile(res, resolvedDir);
 };

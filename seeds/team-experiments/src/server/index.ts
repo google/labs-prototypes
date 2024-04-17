@@ -6,9 +6,10 @@
 
 import { IncomingMessage, ServerResponse, createServer } from "http";
 import { createServer as createViteServer } from "vite";
-import { serveDir, serveIndex } from "./static";
-import { serverError } from "./errors";
-import { api, browseApi } from "./api";
+import { serveDir, serveIndex } from "./static.js";
+import { serverError } from "./errors.js";
+import { api, browseApi } from "./api.js";
+import { secretsAPI } from "./apis/secrets.js";
 
 const PORT = 3000;
 const HOST = "localhost";
@@ -17,6 +18,7 @@ const HOSTNAME = `http://${HOST}:${PORT}`;
 const vite = await createViteServer({
   server: { middlewareMode: true },
   appType: "custom",
+  optimizeDeps: { esbuildOptions: { target: "esnext" } },
 });
 
 const serveApi = async (
@@ -37,6 +39,7 @@ const serveApi = async (
   }
 
   if (await api(resolvedURL, res, "/api/browse", browseApi)) return;
+  if (await api(resolvedURL, res, "/api/secrets", secretsAPI)) return;
 
   next();
 };

@@ -61,6 +61,7 @@ export class Main extends LitElement {
     super();
   }
 
+  // This is kind of gross. I only need it to shuttle sample input over.
   #inputValue = "";
   #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null = null;
 
@@ -74,13 +75,24 @@ export class Main extends LitElement {
     this.requestUpdate();
     return new Promise((resolve) => {
       this.#pendingInput = async (data: InputResolveRequest) => {
-        reply(data);
+        await reply(data);
         this.#pendingInput = null;
         this.#inputValue = "";
+        this.#addConversationItem({
+          datetime: new Date(Date.now()),
+          who: Participant.USER,
+          type: ItemType.TEXT_CONVERSATION,
+          format: ItemFormat.TEXT,
+          message: data.inputs.text as string,
+        });
         this.requestUpdate();
         resolve();
       };
     });
+  }
+
+  #addConversationItem(item: ConversationItem) {
+    this.conversation = [...this.conversation, item];
   }
 
   async #startRun() {
@@ -97,32 +109,27 @@ export class Main extends LitElement {
         }
         case "output": {
           const { outputs, timestamp } = data;
-          let format;
-          let type;
-          let message;
+          const role = "Team Lead";
           if (outputs.text) {
-            format = ItemFormat.TEXT;
-            type = ItemType.TEXT_CONVERSATION;
-            message = outputs.text as string;
-          } else if (outputs.data) {
-            format = ItemFormat.MARKDOWN;
-            type = ItemType.DATA;
-            message = outputs.data as string;
-          } else {
-            // Unknown output, skip.
-            break;
-          }
-          this.conversation = [
-            ...this.conversation,
-            {
-              datetime: new Date(timestamp),
+            this.#addConversationItem({
+              datetime: new Date(performance.timeOrigin + timestamp),
               who: Participant.TEAM_MEMBER,
-              role: "Team Lead",
-              type,
-              format,
-              message,
-            } as ConversationItem,
-          ];
+              role,
+              type: ItemType.TEXT_CONVERSATION,
+              format: ItemFormat.TEXT,
+              message: outputs.text as string,
+            });
+          }
+          if (outputs.data) {
+            this.#addConversationItem({
+              datetime: new Date(performance.timeOrigin + timestamp),
+              who: Participant.TEAM_MEMBER,
+              role,
+              type: ItemType.DATA,
+              format: ItemFormat.MARKDOWN,
+              message: outputs.data as string,
+            });
+          }
           break;
         }
       }

@@ -120,14 +120,14 @@
   },
   "homepage": "https://github.com/google/labs-prototypes/seeds/palm-lite#readme",
   "devDependencies": {
-    "@ava/typescript": "^4.0.0",
-    "@google-labs/discovery-types": "*",
-    "@google-labs/tsconfig": "*",
-    "@types/node": "^18.16.3",
-    "@typescript-eslint/eslint-plugin": "^5.56.0",
-    "@typescript-eslint/parser": "^5.56.0",
-    "ava": "^5.2.0",
-    "typedoc": "^0.25.1",
-    "typescript": "^5.0.4"
+    "@ava/typescript": "^4.1.0",
+    "@google-labs/discovery-types": "^0.0.1",
+    "@google-labs/tsconfig": "^0.0.1",
+    "@types/node": "^18.19.31",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "ava": "^5.3.1",
+    "typedoc": "^0.25.13",
+    "typescript": "^5.4.5"
   }
 }

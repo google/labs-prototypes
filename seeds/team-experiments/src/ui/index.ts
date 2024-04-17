@@ -33,6 +33,10 @@ export class Main extends LitElement {
   @state()
   conversation: ConversationItem[] = [];
 
+  // This is kind of gross. I only need it to shuttle sample input over.
+  @state()
+  inputValue = "";
+
   static styles = css`
     :host {
       display: grid;
@@ -61,8 +65,6 @@ export class Main extends LitElement {
     super();
   }
 
-  // This is kind of gross. I only need it to shuttle sample input over.
-  #inputValue = "";
   #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null = null;
 
   async #waitForInput(
@@ -70,14 +72,17 @@ export class Main extends LitElement {
     reply: (chunk: InputResolveRequest) => Promise<void>
   ): Promise<void> {
     // Nasty stuff. Should I use like, inspector API here?
+    // Note, this diving into schema and the whole
+    // this.inputValue is only needed to grab sample
+    // input text, so that I can just click "Enter" without
+    // typing anything in.
     const schema = data.inputArguments.schema;
-    this.#inputValue = schema?.properties?.text.examples?.[0] || "";
-    this.requestUpdate();
+    this.inputValue = schema?.properties?.text.examples?.[0] || "";
     return new Promise((resolve) => {
       this.#pendingInput = async (data: InputResolveRequest) => {
         await reply(data);
         this.#pendingInput = null;
-        this.#inputValue = "";
+        this.inputValue = "";
         this.#addConversationItem({
           datetime: new Date(Date.now()),
           who: Participant.USER,
@@ -85,7 +90,6 @@ export class Main extends LitElement {
           format: ItemFormat.TEXT,
           message: data.inputs.text as string,
         });
-        this.requestUpdate();
         resolve();
       };
     });
@@ -127,7 +131,7 @@ export class Main extends LitElement {
               role,
               type: ItemType.DATA,
               format: ItemFormat.MARKDOWN,
-              message: outputs.data as string,
+              message: (outputs.data as string).split("\n"),
             });
           }
           break;
@@ -153,7 +157,7 @@ export class Main extends LitElement {
             // TODO: Send this to the server.
             this.#pendingInput?.({ inputs: { text: evt.message } });
           }}
-          .inputValue=${this.#inputValue}
+          .inputValue=${this.inputValue}
         ></at-conversation>
         <team-activity
           slot="slot-1"

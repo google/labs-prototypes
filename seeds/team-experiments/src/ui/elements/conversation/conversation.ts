@@ -17,6 +17,7 @@ import { markdown } from "../../directives/markdown.js";
 import { toRelativeTime } from "../../utils/toRelativeTime.js";
 import { cache } from "lit/directives/cache.js";
 import { ConversationItemCreateEvent } from "../../../events/events";
+import { Ref, createRef, ref } from "lit/directives/ref.js";
 
 @customElement("at-conversation")
 export class Conversation extends LitElement {
@@ -48,6 +49,10 @@ export class Conversation extends LitElement {
     ul {
       margin: 0.5em 0;
       padding: var(--grid-size-2) var(--grid-size-6);
+    }
+
+    .conversation-items {
+      flex: 1;
     }
 
     .conversation-item {
@@ -195,6 +200,9 @@ export class Conversation extends LitElement {
     }
   `;
 
+  #conversationItemsRef: Ref<HTMLDivElement> = createRef();
+  #itemCount = 0;
+
   #onConversationSubmit(evt: Event) {
     evt.preventDefault();
 
@@ -211,67 +219,88 @@ export class Conversation extends LitElement {
     this.dispatchEvent(new ConversationItemCreateEvent(message));
   }
 
+  protected updated(): void {
+    if (
+      this.items &&
+      this.#conversationItemsRef.value &&
+      this.#itemCount !== this.items.length
+    ) {
+      // Attempt to scroll to the newest.
+      const lastItem = this.#conversationItemsRef.value.querySelector(
+        ".conversation-item:last-of-type"
+      );
+      if (lastItem) {
+        lastItem.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }
+
   render() {
     if (!this.items) {
       return nothing;
     }
 
-    const tmpl = html`${map(this.items, (item) => {
-        switch (item.type) {
-          case ItemType.DATA:
-          case ItemType.TEXT_CONVERSATION: {
-            let content: TemplateResult | symbol = nothing;
+    const tmpl = html`<div
+        class="conversation-items"
+        ${ref(this.#conversationItemsRef)}
+      >
+        ${map(this.items, (item) => {
+          switch (item.type) {
+            case ItemType.DATA:
+            case ItemType.TEXT_CONVERSATION: {
+              let content: TemplateResult | symbol = nothing;
 
-            if (Array.isArray(item.message)) {
-              if (item.format === ItemFormat.MARKDOWN) {
-                content = html`${markdown(item.message.join("\n"))}`;
+              if (Array.isArray(item.message)) {
+                if (item.format === ItemFormat.MARKDOWN) {
+                  content = html`${markdown(item.message.join("\n"))}`;
+                } else {
+                  content = html`${map(
+                    item.message,
+                    (section) => html`<p>${section}</p>`
+                  )}`;
+                }
               } else {
-                content = html`${map(
-                  item.message,
-                  (section) => html`<p>${section}</p>`
-                )}`;
-              }
-            } else {
-              if (item.format === ItemFormat.MARKDOWN) {
-                content = html`${markdown(item.message)}`;
+                if (item.format === ItemFormat.MARKDOWN) {
+                  content = html`${markdown(item.message)}`;
+                }
+
+                content = html`<p>${item.message}</p>`;
               }
 
-              content = html`<p>${item.message}</p>`;
+              let sender: TemplateResult | symbol = nothing;
+              switch (item.who) {
+                case Participant.TEAM_MEMBER: {
+                  const senderClass = (item.role || "Team Member")
+                    .toLocaleLowerCase()
+                    .replace(/\s/g, "-");
+                  sender = html`<h1
+                    class="${classMap({ sender: true, [senderClass]: true })}"
+                  >
+                    ${item.role || "Team Member"}
+                    <span class="when">${toRelativeTime(item.datetime)}</span>
+                  </h1>`;
+                  break;
+                }
+              }
+
+              return html`<section
+                class=${classMap({
+                  "conversation-item": true,
+                  [item.type]: true,
+                  [item.who]: true,
+                })}
+              >
+                ${sender ? html`${sender}` : nothing}
+                <div class="content">${content}</div>
+              </section>`;
             }
 
-            let sender: TemplateResult | symbol = nothing;
-            switch (item.who) {
-              case Participant.TEAM_MEMBER: {
-                const senderClass = (item.role || "Team Member")
-                  .toLocaleLowerCase()
-                  .replace(/\s/g, "-");
-                sender = html`<h1
-                  class="${classMap({ sender: true, [senderClass]: true })}"
-                >
-                  ${item.role || "Team Member"}
-                  <span class="when">${toRelativeTime(item.datetime)}</span>
-                </h1>`;
-                break;
-              }
+            case ItemType.INPUT: {
+              return html`Input`;
             }
-
-            return html`<section
-              class=${classMap({
-                "conversation-item": true,
-                [item.type]: true,
-                [item.who]: true,
-              })}
-            >
-              ${sender ? html`${sender}` : nothing}
-              <div class="content">${content}</div>
-            </section>`;
           }
-
-          case ItemType.INPUT: {
-            return html`Input`;
-          }
-        }
-      })}
+        })}
+      </div>
 
       <form id="user-input" @submit=${this.#onConversationSubmit}>
         <fieldset>

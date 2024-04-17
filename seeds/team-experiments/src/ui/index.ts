@@ -61,6 +61,7 @@ export class Main extends LitElement {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin: 0;
     }
 
     #back {

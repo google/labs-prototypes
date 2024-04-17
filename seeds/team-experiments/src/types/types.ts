@@ -11,6 +11,7 @@ export enum SECTION {
 
 export interface State {
   teamId: string | null;
+  teamSection: number | null;
   section: SECTION | null;
 }
 

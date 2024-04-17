@@ -47,14 +47,31 @@ export class Main extends LitElement {
     }
   `;
 
-  #run: ReturnType<typeof run>;
-
   constructor() {
     super();
-    this.#run = run({
+  }
+
+  async #startRun() {
+    for await (const result of run({
       url: "/bgl/insta/mock-conversation.bgl.json",
       kits: [],
-    });
+    })) {
+      const { type, data } = result;
+      switch (type) {
+        case "input": {
+          console.log("input", data);
+          break;
+        }
+        case "output": {
+          console.log("output", data);
+        }
+      }
+    }
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.#startRun();
   }
 
   render() {

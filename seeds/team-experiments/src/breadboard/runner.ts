@@ -7,7 +7,7 @@
 import { InputValues } from "@google-labs/breadboard";
 import { RunConfig, run } from "@google-labs/breadboard/harness";
 import { InputResolveRequest } from "@google-labs/breadboard/remote";
-import { RunInputRequestEvent, RunOutputProvideEvent } from "../events/events";
+import { RunInputEvent, RunOutputEvent } from "./events.js";
 
 // TODO: Decide if this interaction model is better.
 export class Runner extends EventTarget {
@@ -18,10 +18,6 @@ export class Runner extends EventTarget {
     this.#run = run(config);
     this.#pendingInput = null;
     this.resume();
-  }
-
-  finished() {
-    return !this.#run;
   }
 
   waitingForInputs() {
@@ -51,11 +47,11 @@ export class Runner extends EventTarget {
       switch (type) {
         case "input": {
           this.#pendingInput = reply;
-          this.dispatchEvent(new RunInputRequestEvent(data));
+          this.dispatchEvent(new RunInputEvent(data));
           return true;
         }
         case "output": {
-          this.dispatchEvent(new RunOutputProvideEvent(data));
+          this.dispatchEvent(new RunOutputEvent(data));
           break;
         }
       }

@@ -8,8 +8,6 @@ import { LitElement, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
   ConversationItemCreateEvent,
-  RunInputRequestEvent,
-  RunOutputProvideEvent,
   TeamSectionSelectEvent,
 } from "../../../events/events.js";
 
@@ -26,6 +24,7 @@ import {
 import { clamp } from "../../utils/clamp.js";
 import { Switcher } from "../elements.js";
 import { Runner } from "../../../breadboard/runner.js";
+import { RunInputEvent, RunOutputEvent } from "../../../breadboard/events.js";
 
 @customElement("at-team-job")
 export class TeamJob extends LitElement {
@@ -61,8 +60,8 @@ export class TeamJob extends LitElement {
 
   async #startRun() {
     this.#run = new Runner();
-    this.#run.addEventListener(RunOutputProvideEvent.eventName, (evt) => {
-      const e = evt as RunOutputProvideEvent;
+    this.#run.addEventListener(RunOutputEvent.eventName, (evt) => {
+      const e = evt as RunOutputEvent;
       const { outputs, timestamp } = e.data;
       const role = "Team Lead";
       if (outputs.text) {
@@ -86,8 +85,8 @@ export class TeamJob extends LitElement {
         });
       }
     });
-    this.#run.addEventListener(RunInputRequestEvent.eventName, (evt) => {
-      const e = evt as RunInputRequestEvent;
+    this.#run.addEventListener(RunInputEvent.eventName, (evt) => {
+      const e = evt as RunInputEvent;
       // Nasty stuff. Should I use like, inspector API here?
       // Note, this diving into schema and the whole
       // this.inputValue is only needed to grab sample
@@ -136,7 +135,6 @@ export class TeamJob extends LitElement {
 
           if (!this.#run) return;
 
-          if (this.#run.finished()) return;
           if (!this.#run.waitingForInputs()) return;
 
           this.#run.provideInputs({ text: evt.message });

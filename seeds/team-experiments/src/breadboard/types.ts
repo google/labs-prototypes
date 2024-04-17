@@ -5,10 +5,13 @@
  */
 
 import { InputResponse, OutputResponse } from "@google-labs/breadboard";
+import { SecretResult } from "@google-labs/breadboard/harness";
+import { InputResolveRequest } from "@google-labs/breadboard/remote";
 
 type RunEventMap = {
   input: RunInputEvent;
   output: RunOutputEvent;
+  secret: RunSecretEvent;
 };
 
 export type RunInputEvent = Event & {
@@ -17,6 +20,11 @@ export type RunInputEvent = Event & {
 
 export type RunOutputEvent = Event & {
   data: OutputResponse;
+};
+
+export type RunSecretEvent = Event & {
+  data: SecretResult["data"];
+  reply: (data: InputResolveRequest) => Promise<void>;
 };
 
 export type TypedEventTarget<EventMap extends object> = {

@@ -15,6 +15,6 @@ export const secretsAPI = async (_url: URL, res: ServerResponse) => {
     res.end(JSON.stringify({ error: "Could not retrieve secrets" }));
     return true;
   }
-  res.end(JSON.stringify(parsed));
+  res.end(JSON.stringify({ parsed }));
   return true;
 };

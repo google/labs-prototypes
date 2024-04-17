@@ -24,6 +24,13 @@ import {
 import { clamp } from "../../utils/clamp.js";
 import { Switcher } from "../elements.js";
 import { Runner } from "../../../breadboard/index.js";
+import { asRuntimeKit } from "@google-labs/breadboard";
+import Core from "@google-labs/core-kit";
+import JSONKit from "@google-labs/json-kit";
+import TemplateKit from "@google-labs/template-kit";
+import GeminiKit from "@google-labs/gemini-kit";
+import AgentKit from "@google-labs/agent-kit";
+import { SecretsManager } from "../../secrets.js";
 
 @customElement("at-team-job")
 export class TeamJob extends LitElement {
@@ -52,24 +59,30 @@ export class TeamJob extends LitElement {
   `;
 
   #run: Runner | null = null;
+  #secrets = new SecretsManager();
 
   #addConversationItem(item: ConversationItem) {
     this.conversation = [...this.conversation, item];
   }
 
   async #startRun() {
+    if (!(await this.#secrets.load("/api/secrets"))) {
+      console.warn(
+        "Please add `.env` file to the root of this package and place secrets there."
+      );
+    }
     this.#run = new Runner();
     this.#run.addEventListener("output", (e) => {
       const { outputs, timestamp } = e.data;
       const role = "Team Lead";
-      if (outputs.text) {
+      if (outputs.output) {
         this.#addConversationItem({
           datetime: new Date(performance.timeOrigin + timestamp),
           who: Participant.TEAM_MEMBER,
           role,
           type: ItemType.TEXT_CONVERSATION,
           format: ItemFormat.TEXT,
-          message: outputs.text as string,
+          message: outputs.output as string,
         });
       }
       if (outputs.data) {
@@ -92,9 +105,24 @@ export class TeamJob extends LitElement {
       const schema = e.data.inputArguments.schema;
       this.inputValue = schema?.properties?.text.examples?.[0] || "";
     });
+    this.#run.addEventListener("secret", (e) => {
+      e.reply({
+        inputs: Object.fromEntries(
+          e.data.keys.map((key) => {
+            return [key, this.#secrets.get(key)];
+          })
+        ),
+      });
+    });
     this.#run.start({
-      url: "/bgl/insta/mock-conversation.bgl.json",
-      kits: [],
+      url: "/bgl/insta/simple-chat.bgl.json",
+      kits: [
+        asRuntimeKit(Core),
+        asRuntimeKit(JSONKit),
+        asRuntimeKit(TemplateKit),
+        asRuntimeKit(GeminiKit),
+        asRuntimeKit(AgentKit),
+      ],
     });
   }
 

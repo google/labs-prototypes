@@ -148,6 +148,7 @@ export class Conversation extends LitElement {
       height: calc(var(--grid-size) * 17);
       border: none;
       margin: 0;
+      width: 100%;
       padding: 0;
     }
 
@@ -159,11 +160,15 @@ export class Conversation extends LitElement {
       display: block;
       box-sizing: border-box;
       width: 100%;
-      field-sizing: content;
       max-height: 300px;
       border-radius: 100px;
-      padding: var(--grid-size-3);
+      padding: var(--grid-size-3) var(--grid-size-10) var(--grid-size-3)
+        var(--grid-size-3);
       border: 1px solid var(--output-600);
+    }
+
+    #user-input textarea {
+      field-sizing: content;
     }
 
     #user-input input[type="submit"] {
@@ -172,6 +177,7 @@ export class Conversation extends LitElement {
       width: 24px;
       height: 24px;
       background: var(--icon-send-blue) center center / 20px 20px no-repeat;
+      border-radius: 50%;
       font-size: 0;
       border: none;
     }

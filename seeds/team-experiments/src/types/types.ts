@@ -4,6 +4,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export enum SECTION {
+  TEAM_LIST = "team-list",
+  TEAM_JOB = "team-job",
+}
+
+export interface State {
+  teamId: string | null;
+  section: SECTION | null;
+}
+
 export enum Participant {
   USER = "user",
   TEAM_MEMBER = "team-member",
@@ -19,6 +29,12 @@ export enum ItemType {
   TEXT_CONVERSATION = "text-conversation",
   DATA = "data",
   INPUT = "input",
+}
+
+export enum ItemStatus {
+  INERT = "inert",
+  ACTIVE = "active",
+  COMPLETE = "complete",
 }
 
 export type ConversationInputPart =
@@ -74,4 +90,15 @@ export interface AssetItem {
   name: string;
   mime_type: string;
   url: string;
+}
+
+export interface TeamListItem {
+  datetime: Date;
+  teamName: string;
+  description?: string | string[];
+  format?: ItemFormat;
+  status: ItemStatus;
+  statusDescription?: string;
+  who: Participant;
+  role?: string;
 }

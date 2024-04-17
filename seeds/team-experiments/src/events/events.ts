@@ -5,13 +5,21 @@
  */
 
 import { InputResponse, OutputResponse } from "@google-labs/breadboard";
-import { ConversationInputPart } from "../types/types.js";
+import type { ConversationInputPart, State } from "../types/types.js";
 
 const opts = {
   composed: true,
   bubbles: true,
   cancelable: true,
 };
+
+export class StateChangeEvent extends Event {
+  static readonly eventName = "statechange";
+
+  constructor(public state: State) {
+    super(StateChangeEvent.eventName, { ...opts });
+  }
+}
 
 export class ConversationItemCreateEvent extends Event {
   static readonly eventName = "conversationitemcreate";
@@ -21,18 +29,26 @@ export class ConversationItemCreateEvent extends Event {
   }
 }
 
-export class RunInputRequest extends Event {
+export class RunInputRequestEvent extends Event {
   static readonly eventName = "runinputrequest";
 
   constructor(public data: InputResponse) {
-    super(RunInputRequest.eventName, { ...opts });
+    super(RunInputRequestEvent.eventName, { ...opts });
   }
 }
 
-export class RunOutputProvide extends Event {
+export class RunOutputProvideEvent extends Event {
   static readonly eventName = "runoutputprovide";
 
   constructor(public data: OutputResponse) {
-    super(RunOutputProvide.eventName, { ...opts });
+    super(RunOutputProvideEvent.eventName, { ...opts });
+  }
+}
+
+export class TeamSelectEvent extends Event {
+  static readonly eventName = "teamselect";
+
+  constructor(public id: string) {
+    super(TeamSelectEvent.eventName, { ...opts });
   }
 }

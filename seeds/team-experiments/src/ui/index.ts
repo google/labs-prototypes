@@ -4,96 +4,27 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LitElement, css, html } from "lit";
+import { LitElement, TemplateResult, css, html, nothing } from "lit";
 import * as BreadboardUI from "@google-labs/breadboard-ui";
 import { customElement, property, state } from "lit/decorators.js";
-import {
-  ConversationItemCreateEvent,
-  RunInputRequest,
-  RunOutputProvide,
-} from "../events/events.js";
 import "./elements/elements.js";
 
-// Mock data - to replace.
-import { assetItems, jobDescription } from "../mock/assets.js";
-import { activityItems } from "../mock/activity.js";
-import { RunConfig, run } from "@google-labs/breadboard/harness";
-import {
-  ConversationItem,
-  ItemFormat,
-  ItemType,
-  Participant,
-} from "../types/types.js";
-import { InputValues } from "@google-labs/breadboard";
-import { InputResolveRequest } from "@google-labs/breadboard/remote";
+import { teamListItems } from "../mock/team-list.js";
+import { StateChangeEvent, TeamSelectEvent } from "../events/events.js";
+import { SECTION, TeamListItem } from "../types/types.js";
+import { Router } from "../router/router.js";
 
 BreadboardUI.register();
-
-// TODO: Decide if this interaction model is better.
-class Run extends EventTarget {
-  #run: ReturnType<typeof run> | null;
-  #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null;
-
-  constructor(config: RunConfig) {
-    super();
-    this.#run = run(config);
-    this.#pendingInput = null;
-  }
-
-  finished() {
-    return !this.#run;
-  }
-
-  waitingForInputs() {
-    return !!this.#pendingInput;
-  }
-
-  provideInputs(inputs: InputValues) {
-    if (!this.#pendingInput) {
-      return false;
-    }
-    this.#pendingInput({ inputs });
-    this.#pendingInput = null;
-    this.resume();
-  }
-
-  async resume(): Promise<boolean> {
-    if (!this.#run) return false;
-    if (this.waitingForInputs()) return true;
-
-    for (;;) {
-      const result = await this.#run.next();
-      if (result.done) {
-        this.#run = null;
-        return false;
-      }
-      const { type, data, reply } = result.value;
-      switch (type) {
-        case "input": {
-          this.#pendingInput = reply;
-          this.dispatchEvent(new RunInputRequest(data));
-          return true;
-        }
-        case "output": {
-          this.dispatchEvent(new RunOutputProvide(data));
-          break;
-        }
-      }
-    }
-  }
-}
 
 @customElement("at-main")
 export class Main extends LitElement {
   @property()
-  teamName = "Team Name";
+  team: TeamListItem | null = null;
 
   @state()
-  conversation: ConversationItem[] = [];
+  section = SECTION.TEAM_LIST;
 
-  // This is kind of gross. I only need it to shuttle sample input over.
-  @state()
-  inputValue = "";
+  #router = Router.instance();
 
   static styles = css`
     :host {
@@ -110,111 +41,99 @@ export class Main extends LitElement {
       display: flex;
       align-items: center;
       padding: 0 var(--grid-size-3);
+      overflow: auto;
     }
 
     header h1 {
       color: var(--neutral-white);
       font-size: var(--title-large);
       font-weight: normal;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #back {
+      display: block;
+      width: 24px;
+      height: 24px;
+      font-size: 0;
+      border: none;
+      background: var(--icon-arrow-back-white) center center / 20px 20px
+        no-repeat;
+      flex: 0 0 auto;
+      margin-right: var(--grid-size-2);
+      cursor: pointer;
     }
   `;
 
   constructor() {
     super();
-  }
 
-  #run: Run | null = null;
-
-  #addConversationItem(item: ConversationItem) {
-    this.conversation = [...this.conversation, item];
-  }
-
-  async #startRun() {
-    this.#run = new Run({
-      url: "/bgl/insta/mock-conversation.bgl.json",
-      kits: [],
-    });
-    this.#run.addEventListener(RunOutputProvide.eventName, (evt) => {
-      const e = evt as RunOutputProvide;
-      const { outputs, timestamp } = e.data;
-      const role = "Team Lead";
-      if (outputs.text) {
-        this.#addConversationItem({
-          datetime: new Date(performance.timeOrigin + timestamp),
-          who: Participant.TEAM_MEMBER,
-          role,
-          type: ItemType.TEXT_CONVERSATION,
-          format: ItemFormat.TEXT,
-          message: outputs.text as string,
-        });
+    this.#router.addEventListener("statechange", (evt: Event) => {
+      const stateEvent = evt as StateChangeEvent;
+      const { state } = stateEvent;
+      if (state.section) {
+        this.section = state.section;
       }
-      if (outputs.data) {
-        this.#addConversationItem({
-          datetime: new Date(performance.timeOrigin + timestamp),
-          who: Participant.TEAM_MEMBER,
-          role,
-          type: ItemType.DATA,
-          format: ItemFormat.MARKDOWN,
-          message: (outputs.data as string).split("\n"),
-        });
+
+      if (state.teamId) {
+        this.team = teamListItems.get(state.teamId) || null;
+      } else {
+        this.team = null;
       }
     });
-    this.#run.addEventListener(RunInputRequest.eventName, (evt) => {
-      const e = evt as RunInputRequest;
-      // Nasty stuff. Should I use like, inspector API here?
-      // Note, this diving into schema and the whole
-      // this.inputValue is only needed to grab sample
-      // input text, so that I can just click "Enter" without
-      // typing anything in.
-      const schema = e.data.inputArguments.schema;
-      this.inputValue = schema?.properties?.text.examples?.[0] || "";
-    });
-    this.#run.resume();
-  }
 
-  connectedCallback(): void {
-    super.connectedCallback();
-    // Is this the right place to start the run?
-    this.#startRun();
+    this.#router.emitState();
   }
 
   render() {
-    return html`<header><h1>${this.teamName}</h1></header>
-      <at-switcher slots="3" .selected=${0}>
-        <at-conversation
-          slot="slot-0"
-          name="Chat"
-          .items=${this.conversation}
-          @conversationitemcreate=${(evt: ConversationItemCreateEvent) => {
-            this.inputValue = "";
-            this.#addConversationItem({
-              datetime: new Date(Date.now()),
-              who: Participant.USER,
-              type: ItemType.TEXT_CONVERSATION,
-              format: ItemFormat.TEXT,
-              message: evt.message as string,
+    let tmpl: TemplateResult | symbol = nothing;
+    switch (this.section) {
+      case SECTION.TEAM_LIST: {
+        tmpl = html`<at-team-list
+          @teamselect=${(evt: TeamSelectEvent) => {
+            this.#router.set({
+              teamId: evt.id,
+              section: SECTION.TEAM_JOB,
             });
-
-            if (!this.#run) return;
-
-            if (this.#run.finished()) return;
-            if (!this.#run.waitingForInputs()) return;
-
-            this.#run.provideInputs({ text: evt.message });
           }}
-          .inputValue=${this.inputValue}
-        ></at-conversation>
-        <team-activity
-          slot="slot-1"
-          name="Timeline"
-          .items=${activityItems}
-        ></team-activity>
-        <assets-list
-          slot="slot-2"
-          name="Assets"
-          .jobDescription=${jobDescription}
-          .items=${assetItems}
-        ></assets-list>
-      </at-switcher>`;
+          .items=${teamListItems}
+        ></at-team-list>`;
+        break;
+      }
+
+      case SECTION.TEAM_JOB: {
+        tmpl = html`<at-team-job .team=${this.team}></at-team-job>`;
+        break;
+      }
+
+      default: {
+        tmpl = html`404 - Section not found`;
+        break;
+      }
+    }
+
+    return html`<header>
+        <h1>
+          ${this.team
+            ? html`<button
+                  id="back"
+                  @click=${() => {
+                    this.#router.set({
+                      teamId: null,
+                      section: SECTION.TEAM_LIST,
+                    });
+                  }}
+                >
+                  Back</button
+                >${this.team.teamName}`
+            : "Your Teams"}
+        </h1>
+      </header>
+      ${tmpl}`;
   }
 }

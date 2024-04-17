@@ -50,7 +50,12 @@ export const serveIndex = async (
     return;
   }
 
-  if (url === "/" || url === "/index.html") {
+  // We parse the URL here because we may have search params included in the
+  // URL, and that prevents us from finding a match to `/`. With a parsed URL we
+  // can just look at the pathname property and go from there.
+  const fullUrl = new URL(url, `http://${req.headers.host}`);
+  const { pathname } = fullUrl;
+  if (pathname === "/" || pathname === "/index.html") {
     serveFile(res, "index.html", transformer);
     return;
   }

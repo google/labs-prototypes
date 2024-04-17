@@ -10,7 +10,11 @@ import { customElement, property, state } from "lit/decorators.js";
 import "./elements/elements.js";
 
 import { teamListItems } from "../mock/team-list.js";
-import { StateChangeEvent, TeamSelectEvent } from "../events/events.js";
+import {
+  StateChangeEvent,
+  TeamSectionSelectEvent,
+  TeamSelectEvent,
+} from "../events/events.js";
 import { SECTION, TeamListItem } from "../types/types.js";
 import { Router } from "../router/router.js";
 
@@ -20,6 +24,9 @@ BreadboardUI.register();
 export class Main extends LitElement {
   @property()
   team: TeamListItem | null = null;
+
+  @property()
+  teamSection = 0;
 
   @state()
   section = SECTION.TEAM_LIST;
@@ -85,6 +92,8 @@ export class Main extends LitElement {
       } else {
         this.team = null;
       }
+
+      this.teamSection = state.teamSection || 0;
     });
 
     this.#router.emitState();
@@ -107,7 +116,15 @@ export class Main extends LitElement {
       }
 
       case SECTION.TEAM_JOB: {
-        tmpl = html`<at-team-job .team=${this.team}></at-team-job>`;
+        tmpl = html`<at-team-job
+          @teamsectionselect=${(evt: TeamSectionSelectEvent) => {
+            this.#router.set({
+              teamSection: evt.id,
+            });
+          }}
+          .team=${this.team}
+          .teamSection=${this.teamSection}
+        ></at-team-job>`;
         break;
       }
 

@@ -36,10 +36,10 @@ export class Conversation extends LitElement {
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
-      overflow-x: hidden;
-      overflow-y: scroll;
-      height: 100%;
+      overflow: auto;
+      height: calc(100svh - calc(var(--grid-size) * 25));
       position: relative;
+      padding-bottom: calc(var(--grid-size) * 20);
     }
 
     p {
@@ -52,7 +52,11 @@ export class Conversation extends LitElement {
     }
 
     .conversation-items {
-      flex: 1;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
     }
 
     .conversation-item {
@@ -139,9 +143,10 @@ export class Conversation extends LitElement {
     }
 
     #user-input {
-      position: sticky;
+      position: fixed;
       bottom: 0;
       width: 100%;
+      max-width: var(--max-width);
       padding: var(--grid-size-12) var(--grid-size-6) 0;
     }
 

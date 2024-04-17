@@ -38,7 +38,7 @@ export class Main extends LitElement {
       display: grid;
       grid-template-rows: var(--grid-size-12) auto;
       width: 100%;
-      max-width: 480px;
+      max-width: var(--max-width);
       margin: 0 auto;
       background: var(--neutral-white);
     }

@@ -37,6 +37,7 @@ export class Switcher extends LitElement {
       justify-content: space-around;
       height: 100%;
       border-bottom: 1px solid #d9d9d9;
+      z-index: 1;
     }
 
     #buttons button {

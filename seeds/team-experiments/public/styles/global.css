@@ -18,6 +18,8 @@
   --grid-size-11: calc(var(--grid-size) * 11);
   --grid-size-12: calc(var(--grid-size) * 12);
 
+  --max-width: 480px;
+
   --font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   --easing: cubic-bezier(0, 0, 0.3, 1);

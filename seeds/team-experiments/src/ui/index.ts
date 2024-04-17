@@ -7,23 +7,81 @@
 import { LitElement, css, html } from "lit";
 import * as BreadboardUI from "@google-labs/breadboard-ui";
 import { customElement, property, state } from "lit/decorators.js";
-import { ConversationItemCreateEvent } from "../events/events.js";
+import {
+  ConversationItemCreateEvent,
+  RunInputRequest,
+  RunOutputProvide,
+} from "../events/events.js";
 import "./elements/elements.js";
 
 // Mock data - to replace.
 import { assetItems, jobDescription } from "../mock/assets.js";
 import { activityItems } from "../mock/activity.js";
-import { run } from "@google-labs/breadboard/harness";
+import { RunConfig, run } from "@google-labs/breadboard/harness";
 import {
   ConversationItem,
   ItemFormat,
   ItemType,
   Participant,
 } from "../types/types.js";
-import { InputResponse } from "@google-labs/breadboard";
+import { InputValues } from "@google-labs/breadboard";
 import { InputResolveRequest } from "@google-labs/breadboard/remote";
 
 BreadboardUI.register();
+
+// TODO: Decide if this interaction model is better.
+class Run extends EventTarget {
+  #run: ReturnType<typeof run> | null;
+  #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null;
+
+  constructor(config: RunConfig) {
+    super();
+    this.#run = run(config);
+    this.#pendingInput = null;
+  }
+
+  finished() {
+    return !this.#run;
+  }
+
+  waitingForInputs() {
+    return !!this.#pendingInput;
+  }
+
+  provideInputs(inputs: InputValues) {
+    if (!this.#pendingInput) {
+      return false;
+    }
+    this.#pendingInput({ inputs });
+    this.#pendingInput = null;
+    this.resume();
+  }
+
+  async resume(): Promise<boolean> {
+    if (!this.#run) return false;
+    if (this.waitingForInputs()) return true;
+
+    for (;;) {
+      const result = await this.#run.next();
+      if (result.done) {
+        this.#run = null;
+        return false;
+      }
+      const { type, data, reply } = result.value;
+      switch (type) {
+        case "input": {
+          this.#pendingInput = reply;
+          this.dispatchEvent(new RunInputRequest(data));
+          return true;
+        }
+        case "output": {
+          this.dispatchEvent(new RunOutputProvide(data));
+          break;
+        }
+      }
+    }
+  }
+}
 
 @customElement("at-main")
 export class Main extends LitElement {
@@ -65,79 +123,53 @@ export class Main extends LitElement {
     super();
   }
 
-  #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null = null;
-
-  async #waitForInput(
-    data: InputResponse,
-    reply: (chunk: InputResolveRequest) => Promise<void>
-  ): Promise<void> {
-    // Nasty stuff. Should I use like, inspector API here?
-    // Note, this diving into schema and the whole
-    // this.inputValue is only needed to grab sample
-    // input text, so that I can just click "Enter" without
-    // typing anything in.
-    const schema = data.inputArguments.schema;
-    this.inputValue = schema?.properties?.text.examples?.[0] || "";
-    return new Promise((resolve) => {
-      this.#pendingInput = async (data: InputResolveRequest) => {
-        await reply(data);
-        this.#pendingInput = null;
-        this.inputValue = "";
-        this.#addConversationItem({
-          datetime: new Date(Date.now()),
-          who: Participant.USER,
-          type: ItemType.TEXT_CONVERSATION,
-          format: ItemFormat.TEXT,
-          message: data.inputs.text as string,
-        });
-        resolve();
-      };
-    });
-  }
+  #run: Run | null = null;
 
   #addConversationItem(item: ConversationItem) {
     this.conversation = [...this.conversation, item];
   }
 
   async #startRun() {
-    const runner = run({
+    this.#run = new Run({
       url: "/bgl/insta/mock-conversation.bgl.json",
       kits: [],
     });
-    for await (const result of runner) {
-      const { type, data, reply } = result;
-      switch (type) {
-        case "input": {
-          await this.#waitForInput(data, reply);
-          break;
-        }
-        case "output": {
-          const { outputs, timestamp } = data;
-          const role = "Team Lead";
-          if (outputs.text) {
-            this.#addConversationItem({
-              datetime: new Date(performance.timeOrigin + timestamp),
-              who: Participant.TEAM_MEMBER,
-              role,
-              type: ItemType.TEXT_CONVERSATION,
-              format: ItemFormat.TEXT,
-              message: outputs.text as string,
-            });
-          }
-          if (outputs.data) {
-            this.#addConversationItem({
-              datetime: new Date(performance.timeOrigin + timestamp),
-              who: Participant.TEAM_MEMBER,
-              role,
-              type: ItemType.DATA,
-              format: ItemFormat.MARKDOWN,
-              message: (outputs.data as string).split("\n"),
-            });
-          }
-          break;
-        }
+    this.#run.addEventListener(RunOutputProvide.eventName, (evt) => {
+      const e = evt as RunOutputProvide;
+      const { outputs, timestamp } = e.data;
+      const role = "Team Lead";
+      if (outputs.text) {
+        this.#addConversationItem({
+          datetime: new Date(performance.timeOrigin + timestamp),
+          who: Participant.TEAM_MEMBER,
+          role,
+          type: ItemType.TEXT_CONVERSATION,
+          format: ItemFormat.TEXT,
+          message: outputs.text as string,
+        });
       }
-    }
+      if (outputs.data) {
+        this.#addConversationItem({
+          datetime: new Date(performance.timeOrigin + timestamp),
+          who: Participant.TEAM_MEMBER,
+          role,
+          type: ItemType.DATA,
+          format: ItemFormat.MARKDOWN,
+          message: (outputs.data as string).split("\n"),
+        });
+      }
+    });
+    this.#run.addEventListener(RunInputRequest.eventName, (evt) => {
+      const e = evt as RunInputRequest;
+      // Nasty stuff. Should I use like, inspector API here?
+      // Note, this diving into schema and the whole
+      // this.inputValue is only needed to grab sample
+      // input text, so that I can just click "Enter" without
+      // typing anything in.
+      const schema = e.data.inputArguments.schema;
+      this.inputValue = schema?.properties?.text.examples?.[0] || "";
+    });
+    this.#run.resume();
   }
 
   connectedCallback(): void {
@@ -154,8 +186,21 @@ export class Main extends LitElement {
           name="Chat"
           .items=${this.conversation}
           @conversationitemcreate=${(evt: ConversationItemCreateEvent) => {
-            // TODO: Send this to the server.
-            this.#pendingInput?.({ inputs: { text: evt.message } });
+            this.inputValue = "";
+            this.#addConversationItem({
+              datetime: new Date(Date.now()),
+              who: Participant.USER,
+              type: ItemType.TEXT_CONVERSATION,
+              format: ItemFormat.TEXT,
+              message: evt.message as string,
+            });
+
+            if (!this.#run) return;
+
+            if (this.#run.finished()) return;
+            if (!this.#run.waitingForInputs()) return;
+
+            this.#run.provideInputs({ text: evt.message });
           }}
           .inputValue=${this.inputValue}
         ></at-conversation>

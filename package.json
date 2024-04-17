@@ -50,14 +50,14 @@
   "author": "Google Labs Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/node": "^18.15.5",
-    "@typescript-eslint/eslint-plugin": "^5.56.0",
-    "@typescript-eslint/parser": "^5.56.0",
-    "ava": "^5.2.0",
-    "eslint": "^8.36.0",
+    "@types/node": "^18.19.31",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "ava": "^5.3.1",
+    "eslint": "^8.57.0",
     "npm-ci": "^0.0.2",
-    "rimraf": "^5.0.1",
-    "typescript": "^5.0.4",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.4.5",
     "wireit": "^0.14.4"
   },
   "workspaces": [

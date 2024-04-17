@@ -5,6 +5,7 @@
  */
 
 import { InputResponse, OutputResponse } from "@google-labs/breadboard";
+import { RunInputEvent, RunOutputEvent } from "./types.js";
 
 const opts = {
   composed: true,
@@ -12,18 +13,18 @@ const opts = {
   cancelable: true,
 };
 
-export class RunInputEvent extends Event {
+export class InputEvent extends Event implements RunInputEvent {
   static readonly eventName = "input";
 
   constructor(public data: InputResponse) {
-    super(RunInputEvent.eventName, { ...opts });
+    super(InputEvent.eventName, { ...opts });
   }
 }
 
-export class RunOutputEvent extends Event {
+export class OutputEvent extends Event implements RunOutputEvent {
   static readonly eventName = "output";
 
   constructor(public data: OutputResponse) {
-    super(RunOutputEvent.eventName, { ...opts });
+    super(OutputEvent.eventName, { ...opts });
   }
 }

@@ -7,10 +7,11 @@
 import { InputValues } from "@google-labs/breadboard";
 import { RunConfig, run } from "@google-labs/breadboard/harness";
 import { InputResolveRequest } from "@google-labs/breadboard/remote";
-import { RunInputEvent, RunOutputEvent } from "./events.js";
+import { InputEvent, OutputEvent } from "./events.js";
+import { RunEventTarget } from "./types.js";
 
 // TODO: Decide if this interaction model is better.
-export class Runner extends EventTarget {
+export class Runner extends (EventTarget as RunEventTarget) implements Runner {
   #run: ReturnType<typeof run> | null = null;
   #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null = null;
 
@@ -47,11 +48,11 @@ export class Runner extends EventTarget {
       switch (type) {
         case "input": {
           this.#pendingInput = reply;
-          this.dispatchEvent(new RunInputEvent(data));
+          this.dispatchEvent(new InputEvent(data));
           return true;
         }
         case "output": {
-          this.dispatchEvent(new RunOutputEvent(data));
+          this.dispatchEvent(new OutputEvent(data));
           break;
         }
       }

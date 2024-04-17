@@ -23,8 +23,7 @@ import {
 } from "../../../types/types.js";
 import { clamp } from "../../utils/clamp.js";
 import { Switcher } from "../elements.js";
-import { Runner } from "../../../breadboard/runner.js";
-import { RunInputEvent, RunOutputEvent } from "../../../breadboard/events.js";
+import { Runner } from "../../../breadboard/index.js";
 
 @customElement("at-team-job")
 export class TeamJob extends LitElement {
@@ -60,8 +59,7 @@ export class TeamJob extends LitElement {
 
   async #startRun() {
     this.#run = new Runner();
-    this.#run.addEventListener(RunOutputEvent.eventName, (evt) => {
-      const e = evt as RunOutputEvent;
+    this.#run.addEventListener("output", (e) => {
       const { outputs, timestamp } = e.data;
       const role = "Team Lead";
       if (outputs.text) {
@@ -85,8 +83,7 @@ export class TeamJob extends LitElement {
         });
       }
     });
-    this.#run.addEventListener(RunInputEvent.eventName, (evt) => {
-      const e = evt as RunInputEvent;
+    this.#run.addEventListener("input", (e) => {
       // Nasty stuff. Should I use like, inspector API here?
       // Note, this diving into schema and the whole
       // this.inputValue is only needed to grab sample

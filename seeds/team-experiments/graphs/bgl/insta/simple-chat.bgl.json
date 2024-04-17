@@ -8,8 +8,8 @@
       "type": "curry",
       "metadata": {
         "visual": {
-          "x": -233,
-          "y": 166
+          "x": -291,
+          "y": 165
         }
       },
       "configuration": {
@@ -85,8 +85,8 @@
           },
           "metadata": {
             "visual": {
-              "x": 413,
-              "y": -4
+              "x": 457,
+              "y": -29
             }
           }
         },
@@ -98,19 +98,6 @@
               "x": -77,
               "y": -108
             }
-          }
-        },
-        {
-          "id": "worker-2668005a",
-          "type": "worker",
-          "metadata": {
-            "visual": {
-              "x": 164,
-              "y": -39
-            }
-          },
-          "configuration": {
-            "instruction": "You are a helpful chat bot who answers every question to the best of their abilities and happily makes up the answers if necessary."
           }
         },
         {
@@ -126,15 +113,28 @@
               "y": 120
             }
           }
+        },
+        {
+          "id": "toolWorker-7793ced3",
+          "type": "toolWorker",
+          "metadata": {
+            "visual": {
+              "x": 184,
+              "y": -216
+            }
+          },
+          "configuration": {
+            "instruction": "You are a super-helpful chat bot who uses tools to help users. In cases where the tool is not applicable, you improvise and try to answer the question anyway. In situations when the user just wants to have a conversation, just have a conversation.",
+            "tools": [
+              {
+                "kind": "board",
+                "path": "#546708aa-d1c8-4f3a-9c27-45f54f1a7e24"
+              }
+            ]
+          }
         }
       ],
       "edges": [
-        {
-          "from": "human-48580446",
-          "to": "worker-2668005a",
-          "out": "context",
-          "in": "context"
-        },
         {
           "from": "input",
           "to": "human-48580446",
@@ -142,19 +142,101 @@
           "in": "context"
         },
         {
-          "from": "worker-2668005a",
+          "from": "human-48580446",
+          "to": "toolWorker-7793ced3",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "toolWorker-7793ced3",
           "to": "output",
           "out": "context",
           "in": "context"
         },
         {
           "from": "jsonata-0e5b6fa8",
-          "to": "worker-2668005a",
+          "to": "toolWorker-7793ced3",
           "out": "model",
           "in": "model"
         }
       ],
       "url": "file://fsapi~insta/simple-chat.bgl.json#940f7c71-f50a-4cd5-ad9b-0c9d07702ab5"
+    },
+    "546708aa-d1c8-4f3a-9c27-45f54f1a7e24": {
+      "title": "Get Web Page",
+      "description": "Given a URL, replies with the text contents of the Web page.",
+      "version": "0.0.1",
+      "nodes": [
+        {
+          "type": "input",
+          "id": "input",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "title": "text"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "visual": {
+              "x": -218,
+              "y": 71
+            }
+          }
+        },
+        {
+          "type": "output",
+          "id": "output",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "title": "text"
+                }
+              }
+            }
+          },
+          "metadata": {
+            "visual": {
+              "x": 357,
+              "y": 24
+            }
+          }
+        },
+        {
+          "id": "promptTemplate-edab9017",
+          "type": "promptTemplate",
+          "metadata": {
+            "visual": {
+              "x": 17,
+              "y": -21
+            }
+          },
+          "configuration": {
+            "template": "{\"url\":\"{{url}}\",\"content\":\"Show docs\\nBREADBOARD\\nA GENERATIVE AI PROTOTYPE FRAMEWORK\\nGET STARTED →\\nMake Anything\\n\\nBreadboard lets you design sophisticated Generative AI experiences. Build complex workflows visually, free from API wrangling.\\n\\nDebug On the Fly\\n\\nStart making boards and see them visualized in real time.\\n\\nFlexible Kits\\n\\nNo need to reinvent the wheel. From AI to webcam capture, we’ve got you covered.\\n\\nOpen Source\\n\\nWant to contribute? Feel free! Breadboard is completely open source on GitHub.\\n\\nThe Happy Path\\n\\nIf you're eager to start making boards with Breadboard as quickly as possible, here's a yellow brick road that will take you there. It's not quite a tutorial, but more like a step-by-step onboarding guide with some of the best practices baked in.\\n\\nGET GOING →\\nGenerate Web Apps\\n\\nMade something awesome? Share it with others and let them play with it immediately!\\n\\nCopyright 2024 Google LLC. Code licensed under Apache License 2.0\"}"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "from": "input",
+          "out": "text",
+          "to": "promptTemplate-edab9017",
+          "in": "url"
+        },
+        {
+          "from": "promptTemplate-edab9017",
+          "to": "output",
+          "out": "prompt",
+          "in": "text"
+        }
+      ]
     }
   }
 }

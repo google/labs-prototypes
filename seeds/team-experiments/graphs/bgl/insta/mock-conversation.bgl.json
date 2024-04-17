@@ -1,0 +1,180 @@
+{
+  "title": "Mock Conversation",
+  "description": "Just to get things going, this is a mock conversation between an agent and a user.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text",
+              "examples": []
+            },
+            "data": {
+              "type": "string",
+              "title": "data",
+              "examples": [],
+              "format": "markdown"
+            }
+          },
+          "required": []
+        },
+        "text": "Here's the job description I have from your previous conversation.",
+        "data": "# Job Description\nCreate an Instagram campaign to promote soccer club Fremont FC.\n * Generate images for the campaign\n * Write campaign messages\n * Critique ad campaigns\n * Ask you for campaign preferences\n * Generate posts for each scheduled game"
+      },
+      "metadata": {
+        "visual": {
+          "x": -131,
+          "y": -202
+        },
+        "title": "Team Lead",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "output-6c183292",
+      "type": "output",
+      "metadata": {
+        "visual": {
+          "x": -377,
+          "y": -186
+        },
+        "title": "Team Lead",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "Text",
+              "examples": [],
+              "format": "multiline"
+            }
+          },
+          "required": [],
+          "type": "object"
+        },
+        "text": "I'm here to help you find an AI team that meets your needs.\nDescribe the task you need to complete."
+      }
+    },
+    {
+      "id": "input-629eee12",
+      "type": "input",
+      "metadata": {
+        "visual": {
+          "x": -320,
+          "y": 40
+        },
+        "title": "User",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "Text",
+              "examples": [
+                "I want to create an Instagram campaign to promote my soccer club called Fremont FC"
+              ]
+            }
+          },
+          "required": [],
+          "type": "object"
+        }
+      }
+    },
+    {
+      "id": "input-db12c688",
+      "type": "input",
+      "metadata": {
+        "visual": {
+          "x": -66,
+          "y": 75
+        },
+        "title": "User",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "Text",
+              "examples": [
+                "Yeah, but I want to use my team's logo and player photos to create multimedia posts promoting each new game"
+              ]
+            }
+          },
+          "required": [],
+          "type": "object"
+        }
+      }
+    },
+    {
+      "id": "output-4b7e6542",
+      "type": "output",
+      "metadata": {
+        "visual": {
+          "x": 140,
+          "y": -127
+        },
+        "title": "Team Lead",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text",
+              "examples": []
+            },
+            "data": {
+              "type": "string",
+              "title": "data",
+              "examples": [],
+              "format": "markdown"
+            }
+          },
+          "required": [],
+          "type": "object"
+        },
+        "text": "Sure, I've updated the job description",
+        "data": "# Job Description\nCreate an Instagram campaign to promote soccer club Fremont FC.\n * Use brand assets to create campaign schedule\n * Generate images for the campaign\n * Write campaign messages\n * Critique ad campaigns\n * Ask you for campaign preferences\n * Generate posts for each scheduled game"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "output-6c183292",
+      "to": "input-629eee12",
+      "out": "",
+      "in": ""
+    },
+    {
+      "from": "input-629eee12",
+      "to": "output",
+      "out": "",
+      "in": ""
+    },
+    {
+      "from": "output",
+      "to": "input-db12c688",
+      "out": "",
+      "in": ""
+    },
+    {
+      "from": "input-db12c688",
+      "to": "output-4b7e6542",
+      "out": "",
+      "in": ""
+    }
+  ]
+}

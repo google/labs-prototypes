@@ -44,10 +44,6 @@ export class TeamJob extends LitElement {
   @state()
   conversation: ConversationItem[] = [];
 
-  // This is kind of gross. I only need it to shuttle sample input over.
-  @state()
-  inputValue = "";
-
   static styles = css`
     :host {
       display: grid;
@@ -96,15 +92,6 @@ export class TeamJob extends LitElement {
         });
       }
     });
-    this.#run.addEventListener("input", (e) => {
-      // Nasty stuff. Should I use like, inspector API here?
-      // Note, this diving into schema and the whole
-      // this.inputValue is only needed to grab sample
-      // input text, so that I can just click "Enter" without
-      // typing anything in.
-      const schema = e.data.inputArguments.schema;
-      this.inputValue = schema?.properties?.text.examples?.[0] || "";
-    });
     this.#run.addEventListener("secret", (e) => {
       e.reply({
         inputs: Object.fromEntries(
@@ -149,7 +136,6 @@ export class TeamJob extends LitElement {
         name="Chat"
         .items=${this.conversation}
         @conversationitemcreate=${(evt: ConversationItemCreateEvent) => {
-          this.inputValue = "";
           this.#addConversationItem({
             datetime: new Date(Date.now()),
             who: Participant.USER,
@@ -164,7 +150,6 @@ export class TeamJob extends LitElement {
 
           this.#run.provideInputs({ text: evt.message });
         }}
-        .inputValue=${this.inputValue}
       ></at-conversation>
       <team-activity
         slot="slot-1"

@@ -24,9 +24,6 @@ export class Conversation extends LitElement {
   @property()
   items: ConversationItem[] | null = null;
 
-  @property()
-  inputValue = "";
-
   static styles = css`
     * {
       box-sizing: border-box;
@@ -314,7 +311,6 @@ export class Conversation extends LitElement {
             required
             name="message"
             id="message"
-            value=${this.inputValue}
             placeholder="Talk to the team"
           />
           <input type="submit" />

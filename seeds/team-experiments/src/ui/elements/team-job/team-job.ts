@@ -16,7 +16,6 @@ import {
 // Mock data - to replace.
 import { assetItems, jobDescription } from "../../../mock/assets.js";
 import { activityItems } from "../../../mock/activity.js";
-import { RunConfig, run } from "@google-labs/breadboard/harness";
 import {
   ConversationItem,
   ItemFormat,
@@ -24,64 +23,9 @@ import {
   Participant,
   TeamListItem,
 } from "../../../types/types.js";
-import { InputValues } from "@google-labs/breadboard";
-import { InputResolveRequest } from "@google-labs/breadboard/remote";
 import { clamp } from "../../utils/clamp.js";
 import { Switcher } from "../elements.js";
-
-// TODO: Decide if this interaction model is better.
-class Run extends EventTarget {
-  #run: ReturnType<typeof run> | null;
-  #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null;
-
-  constructor(config: RunConfig) {
-    super();
-    this.#run = run(config);
-    this.#pendingInput = null;
-  }
-
-  finished() {
-    return !this.#run;
-  }
-
-  waitingForInputs() {
-    return !!this.#pendingInput;
-  }
-
-  provideInputs(inputs: InputValues) {
-    if (!this.#pendingInput) {
-      return false;
-    }
-    this.#pendingInput({ inputs });
-    this.#pendingInput = null;
-    this.resume();
-  }
-
-  async resume(): Promise<boolean> {
-    if (!this.#run) return false;
-    if (this.waitingForInputs()) return true;
-
-    for (;;) {
-      const result = await this.#run.next();
-      if (result.done) {
-        this.#run = null;
-        return false;
-      }
-      const { type, data, reply } = result.value;
-      switch (type) {
-        case "input": {
-          this.#pendingInput = reply;
-          this.dispatchEvent(new RunInputRequestEvent(data));
-          return true;
-        }
-        case "output": {
-          this.dispatchEvent(new RunOutputProvideEvent(data));
-          break;
-        }
-      }
-    }
-  }
-}
+import { Runner } from "../../../breadboard/runner.js";
 
 @customElement("at-team-job")
 export class TeamJob extends LitElement {
@@ -109,17 +53,14 @@ export class TeamJob extends LitElement {
     }
   `;
 
-  #run: Run | null = null;
+  #run: Runner | null = null;
 
   #addConversationItem(item: ConversationItem) {
     this.conversation = [...this.conversation, item];
   }
 
   async #startRun() {
-    this.#run = new Run({
-      url: "/bgl/insta/mock-conversation.bgl.json",
-      kits: [],
-    });
+    this.#run = new Runner();
     this.#run.addEventListener(RunOutputProvideEvent.eventName, (evt) => {
       const e = evt as RunOutputProvideEvent;
       const { outputs, timestamp } = e.data;
@@ -155,7 +96,10 @@ export class TeamJob extends LitElement {
       const schema = e.data.inputArguments.schema;
       this.inputValue = schema?.properties?.text.examples?.[0] || "";
     });
-    this.#run.resume();
+    this.#run.start({
+      url: "/bgl/insta/mock-conversation.bgl.json",
+      kits: [],
+    });
   }
 
   connectedCallback(): void {

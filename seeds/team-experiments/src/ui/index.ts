@@ -6,15 +6,22 @@
 
 import { LitElement, css, html } from "lit";
 import * as BreadboardUI from "@google-labs/breadboard-ui";
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property, state } from "lit/decorators.js";
 import { ConversationItemCreateEvent } from "../events/events.js";
 import "./elements/elements.js";
 
 // Mock data - to replace.
-import { conversationItems } from "../mock/conversation.js";
 import { assetItems, jobDescription } from "../mock/assets.js";
 import { activityItems } from "../mock/activity.js";
 import { run } from "@google-labs/breadboard/harness";
+import {
+  ConversationItem,
+  ItemFormat,
+  ItemType,
+  Participant,
+} from "../types/types.js";
+import { InputResponse } from "@google-labs/breadboard";
+import { InputResolveRequest } from "@google-labs/breadboard/remote";
 
 BreadboardUI.register();
 
@@ -22,6 +29,9 @@ BreadboardUI.register();
 export class Main extends LitElement {
   @property()
   teamName = "Team Name";
+
+  @state()
+  conversation: ConversationItem[] = [];
 
   static styles = css`
     :host {
@@ -51,19 +61,69 @@ export class Main extends LitElement {
     super();
   }
 
+  #inputValue = "";
+  #pendingInput: ((data: InputResolveRequest) => Promise<void>) | null = null;
+
+  async #waitForInput(
+    data: InputResponse,
+    reply: (chunk: InputResolveRequest) => Promise<void>
+  ): Promise<void> {
+    // Nasty stuff. Should I use like, inspector API here?
+    const schema = data.inputArguments.schema;
+    this.#inputValue = schema?.properties?.text.examples?.[0] || "";
+    this.requestUpdate();
+    return new Promise((resolve) => {
+      this.#pendingInput = async (data: InputResolveRequest) => {
+        reply(data);
+        this.#pendingInput = null;
+        this.#inputValue = "";
+        this.requestUpdate();
+        resolve();
+      };
+    });
+  }
+
   async #startRun() {
-    for await (const result of run({
+    const runner = run({
       url: "/bgl/insta/mock-conversation.bgl.json",
       kits: [],
-    })) {
-      const { type, data } = result;
+    });
+    for await (const result of runner) {
+      const { type, data, reply } = result;
       switch (type) {
         case "input": {
-          console.log("input", data);
+          await this.#waitForInput(data, reply);
           break;
         }
         case "output": {
-          console.log("output", data);
+          const { outputs, timestamp } = data;
+          let format;
+          let type;
+          let message;
+          if (outputs.text) {
+            format = ItemFormat.TEXT;
+            type = ItemType.TEXT_CONVERSATION;
+            message = outputs.text as string;
+          } else if (outputs.data) {
+            format = ItemFormat.MARKDOWN;
+            type = ItemType.DATA;
+            message = outputs.data as string;
+          } else {
+            // Unknown output, skip.
+            break;
+          }
+          this.conversation = [
+            ...this.conversation,
+            {
+              datetime: new Date(timestamp),
+              who: Participant.TEAM_MEMBER,
+              role: "Team Lead",
+              type,
+              format,
+              message,
+            } as ConversationItem,
+          ];
+          break;
         }
       }
     }
@@ -71,20 +131,22 @@ export class Main extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
+    // Is this the right place to start the run?
     this.#startRun();
   }
 
   render() {
     return html`<header><h1>${this.teamName}</h1></header>
-      <at-switcher slots="3" .selected=${1}>
+      <at-switcher slots="3" .selected=${0}>
         <at-conversation
           slot="slot-0"
           name="Chat"
-          .items=${conversationItems}
+          .items=${this.conversation}
           @conversationitemcreate=${(evt: ConversationItemCreateEvent) => {
             // TODO: Send this to the server.
-            console.log(evt.message);
+            this.#pendingInput?.({ inputs: { text: evt.message } });
           }}
+          .inputValue=${this.#inputValue}
         ></at-conversation>
         <team-activity
           slot="slot-1"

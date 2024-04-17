@@ -29,8 +29,8 @@ import Core from "@google-labs/core-kit";
 import JSONKit from "@google-labs/json-kit";
 import TemplateKit from "@google-labs/template-kit";
 import GeminiKit from "@google-labs/gemini-kit";
-import AgentKit from "@google-labs/agent-kit";
 import { SecretsManager } from "../../secrets.js";
+import { load } from "@google-labs/breadboard/kits";
 
 @customElement("at-team-job")
 export class TeamJob extends LitElement {
@@ -108,7 +108,11 @@ export class TeamJob extends LitElement {
         asRuntimeKit(JSONKit),
         asRuntimeKit(TemplateKit),
         asRuntimeKit(GeminiKit),
-        asRuntimeKit(AgentKit),
+        await load(
+          new URL(
+            "https://raw.githubusercontent.com/breadboard-ai/breadboard/f9b210cd9f1770464154eb160b1127ef01a85d65/packages/agent-kit/agent.kit.json"
+          )
+        ),
       ],
     });
   }

@@ -10,6 +10,7 @@ import {
   ConversationItemCreateEvent,
   RunInputRequestEvent,
   RunOutputProvideEvent,
+  TeamSectionSelectEvent,
 } from "../../../events/events.js";
 
 // Mock data - to replace.
@@ -25,6 +26,8 @@ import {
 } from "../../../types/types.js";
 import { InputValues } from "@google-labs/breadboard";
 import { InputResolveRequest } from "@google-labs/breadboard/remote";
+import { clamp } from "../../utils/clamp.js";
+import { Switcher } from "../elements.js";
 
 // TODO: Decide if this interaction model is better.
 class Run extends EventTarget {
@@ -85,6 +88,9 @@ export class TeamJob extends LitElement {
   // TODO: Make use of this. Currently it's not used in the run.
   @property()
   team: TeamListItem | null = null;
+
+  @property()
+  teamSection = 0;
 
   @state()
   conversation: ConversationItem[] = [];
@@ -159,7 +165,17 @@ export class TeamJob extends LitElement {
   }
 
   render() {
-    return html` <at-switcher slots="3" .selected=${0}>
+    return html` <at-switcher
+      slots="3"
+      @click=${(evt: Event) => {
+        if (!(evt.target instanceof Switcher)) {
+          return;
+        }
+
+        this.dispatchEvent(new TeamSectionSelectEvent(evt.target.selected));
+      }}
+      .selected=${clamp(this.teamSection, 0, 2)}
+    >
       <at-conversation
         slot="slot-0"
         name="Chat"

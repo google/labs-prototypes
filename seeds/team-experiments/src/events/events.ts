@@ -52,3 +52,11 @@ export class TeamSelectEvent extends Event {
     super(TeamSelectEvent.eventName, { ...opts });
   }
 }
+
+export class TeamSectionSelectEvent extends Event {
+  static readonly eventName = "teamsectionselect";
+
+  constructor(public id: number) {
+    super(TeamSectionSelectEvent.eventName, { ...opts });
+  }
+}

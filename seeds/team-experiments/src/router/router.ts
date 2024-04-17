@@ -30,6 +30,7 @@ export class Router extends EventTarget {
 
   #state: State = {
     teamId: null,
+    teamSection: 0,
     section: SECTION.TEAM_LIST,
   };
 
@@ -37,6 +38,9 @@ export class Router extends EventTarget {
     const params = new URLSearchParams(window.location.search);
 
     this.#state.teamId = params.has("teamId") ? params.get("teamId") : null;
+    this.#state.teamSection = params.has("teamSection")
+      ? Number.parseInt(params.get("teamSection") as string, 10)
+      : null;
     this.#state.section = params.has("section")
       ? (params.get("section") as SECTION)
       : null;

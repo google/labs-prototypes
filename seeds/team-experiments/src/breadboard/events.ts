@@ -5,11 +5,13 @@
  */
 
 import { InputResponse, OutputResponse } from "@google-labs/breadboard";
-import { RunInputEvent, RunOutputEvent } from "./types.js";
+import { RunInputEvent, RunOutputEvent, RunSecretEvent } from "./types.js";
+import { SecretResult } from "@google-labs/breadboard/harness";
+import { InputResolveRequest } from "@google-labs/breadboard/remote";
 
 const opts = {
   composed: true,
-  bubbles: true,
+  bubbles: false,
   cancelable: true,
 };
 
@@ -26,5 +28,16 @@ export class OutputEvent extends Event implements RunOutputEvent {
 
   constructor(public data: OutputResponse) {
     super(OutputEvent.eventName, { ...opts });
+  }
+}
+
+export class SecretEvent extends Event implements RunSecretEvent {
+  static readonly eventName = "secret";
+
+  constructor(
+    public data: SecretResult["data"],
+    public reply: (data: InputResolveRequest) => Promise<void>
+  ) {
+    super(SecretEvent.eventName, { ...opts });
   }
 }

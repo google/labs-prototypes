@@ -7,7 +7,7 @@
 import { InputValues } from "@google-labs/breadboard";
 import { RunConfig, run } from "@google-labs/breadboard/harness";
 import { InputResolveRequest } from "@google-labs/breadboard/remote";
-import { InputEvent, OutputEvent } from "./events.js";
+import { InputEvent, OutputEvent, SecretEvent } from "./events.js";
 import { RunEventTarget } from "./types.js";
 
 // TODO: Decide if this interaction model is better.
@@ -54,6 +54,9 @@ export class Runner extends (EventTarget as RunEventTarget) implements Runner {
         case "output": {
           this.dispatchEvent(new OutputEvent(data));
           break;
+        }
+        case "secret": {
+          this.dispatchEvent(new SecretEvent(data, reply));
         }
       }
     }

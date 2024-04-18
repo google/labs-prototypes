@@ -1,0 +1,100 @@
+{
+  "title": "Internet",
+  "description": "Provides access to the Internet. Given a URL, returns back the text content of the web page.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "title": "URL",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -360,
+          "y": -56
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "contents": {
+              "type": "string",
+              "title": "Contents",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 403,
+          "y": -63
+        }
+      }
+    },
+    {
+      "id": "fetch-6a37cd89",
+      "type": "fetch",
+      "metadata": {
+        "visual": {
+          "x": 110,
+          "y": -193
+        },
+        "title": "Get Page Contents",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "urlTemplate-8d425f0c",
+      "type": "urlTemplate",
+      "metadata": {
+        "visual": {
+          "x": -159,
+          "y": -82
+        },
+        "title": "Make URL",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "template": "/api/browse?url={url}"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "urlTemplate-8d425f0c",
+      "to": "fetch-6a37cd89",
+      "out": "url",
+      "in": "url"
+    },
+    {
+      "from": "fetch-6a37cd89",
+      "to": "output",
+      "out": "response",
+      "in": "contents"
+    },
+    {
+      "from": "input",
+      "to": "urlTemplate-8d425f0c",
+      "out": "url",
+      "in": "url"
+    }
+  ]
+}

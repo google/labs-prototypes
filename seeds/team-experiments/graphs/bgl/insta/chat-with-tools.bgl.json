@@ -116,7 +116,7 @@
           "configuration": {
             "instruction": "You are a super-helpful chat bot who uses tools to help users. In cases where the tool is not applicable, you improvise and try to answer the question anyway. In situations when the user just wants to have a conversation, just have a conversation.",
             "tools": [
-              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/mock-get-page.json"
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/get-page.json"
             ]
           }
         },
@@ -124,9 +124,7 @@
           "id": "secrets-dbf8ee4c",
           "type": "secrets",
           "configuration": {
-            "keys": [
-              "model"
-            ]
+            "keys": ["model"]
           },
           "metadata": {
             "visual": {

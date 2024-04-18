@@ -85,9 +85,7 @@ export class Conversation extends LitElement {
     }
 
     .conversation-item.user {
-      --x: 10px;
       align-self: flex-end;
-      animation: slideIn 0.4s var(--easing) forwards;
     }
 
     .conversation-item.user .content {
@@ -364,7 +362,6 @@ export class Conversation extends LitElement {
                 }
               } else {
                 if (item.format === ItemFormat.MARKDOWN) {
-                  console.log(item.message);
                   content = html`${markdown(item.message)}`;
                 } else {
                   content = html`<p>${item.message}</p>`;

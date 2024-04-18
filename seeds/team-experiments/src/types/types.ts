@@ -21,9 +21,10 @@ export enum Participant {
 }
 
 export enum ItemFormat {
-  TEXT,
-  MARKDOWN,
-  MULTIPART,
+  TEXT = "text",
+  MARKDOWN = "markdown",
+  MULTIPART = "multipart",
+  ENUM = "enum",
 }
 
 export enum ItemType {
@@ -39,6 +40,8 @@ export enum ItemStatus {
   ACTIVE = "active",
   COMPLETE = "complete",
 }
+
+export type ConversationInputOption = string;
 
 export type ConversationInputPart =
   | string
@@ -73,29 +76,42 @@ export interface ConversationData {
   message: string | string[];
 }
 
-export interface ConversationInput {
-  datetime: Date;
-  type: ItemType.INPUT;
-  role?: string;
-  format: ItemFormat;
-  title: string;
-  parts: ConversationInputPart[];
-}
-
 export interface ConversationMultipart {
   datetime: Date;
   type: ItemType.MULTIPART;
   who: Participant;
+  format: ItemFormat;
   role?: string;
   parts: ConversationInputPart[];
+}
+
+export interface ConversationMultipartInput {
+  datetime: Date;
+  type: ItemType.INPUT;
+  who: Participant;
+  format: ItemFormat.MULTIPART;
+  role?: string;
+  title: string;
+  parts: ConversationInputPart[];
+}
+
+export interface ConversationEnumeratedInput {
+  datetime: Date;
+  type: ItemType.INPUT;
+  who: Participant;
+  format: ItemFormat.ENUM;
+  role?: string;
+  title: string;
+  options: ConversationInputOption[];
 }
 
 export type ConversationItem =
   | ConversationText
   | ConversationData
-  | ConversationInput
   | ConversationPending
-  | ConversationMultipart;
+  | ConversationMultipart
+  | ConversationMultipartInput
+  | ConversationEnumeratedInput;
 
 export interface ActivityItem {
   datetime: Date;

@@ -110,7 +110,7 @@ export class TeamJob extends LitElement {
         asRuntimeKit(GeminiKit),
         await load(
           new URL(
-            "https://raw.githubusercontent.com/breadboard-ai/breadboard/f9b210cd9f1770464154eb160b1127ef01a85d65/packages/agent-kit/agent.kit.json"
+            "https://raw.githubusercontent.com/breadboard-ai/breadboard/18b9f34b92398632928f4897c2b53b3a2ccac4c1/packages/agent-kit/agent.kit.json"
           )
         ),
       ],

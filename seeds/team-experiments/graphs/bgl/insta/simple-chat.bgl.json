@@ -114,17 +114,20 @@
           }
         },
         {
-          "id": "jsonata-0e5b6fa8",
-          "type": "jsonata",
-          "configuration": {
-            "raw": "on",
-            "expression": "{ \"model\": \"gemini-1.5-pro-latest\" }"
-          },
+          "id": "secrets-a601013f",
+          "type": "secrets",
           "metadata": {
             "visual": {
-              "x": -69,
-              "y": 120
-            }
+              "x": -75,
+              "y": 126
+            },
+            "title": "Get Model",
+            "logLevel": "debug"
+          },
+          "configuration": {
+            "keys": [
+              "model"
+            ]
           }
         }
       ],
@@ -148,7 +151,7 @@
           "in": "context"
         },
         {
-          "from": "jsonata-0e5b6fa8",
+          "from": "secrets-a601013f",
           "to": "worker-2668005a",
           "out": "model",
           "in": "model"

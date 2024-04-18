@@ -30,6 +30,7 @@ export enum ItemType {
   TEXT_CONVERSATION = "text-conversation",
   DATA = "data",
   INPUT = "input",
+  PENDING = "pending",
 }
 
 export enum ItemStatus {
@@ -41,6 +42,13 @@ export enum ItemStatus {
 export type ConversationInputPart =
   | string
   | { inline_data: string; mime_type: string };
+
+export interface ConversationPending {
+  datetime: Date;
+  type: ItemType.PENDING;
+  who: Participant;
+  role?: string;
+}
 
 export interface ConversationText {
   datetime: Date;
@@ -71,7 +79,8 @@ export interface ConversationInput {
 export type ConversationItem =
   | ConversationText
   | ConversationData
-  | ConversationInput;
+  | ConversationInput
+  | ConversationPending;
 
 export interface ActivityItem {
   datetime: Date;

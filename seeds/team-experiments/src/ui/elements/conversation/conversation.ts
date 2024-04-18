@@ -62,7 +62,6 @@ export class Conversation extends LitElement {
       font: var(--body-medium) / var(--body-line-height-medium)
         var(--font-family);
       width: 80%;
-      animation: slideIn 0.4s var(--easing) forwards;
     }
 
     .conversation-item .content {
@@ -88,6 +87,7 @@ export class Conversation extends LitElement {
     .conversation-item.user {
       --x: 10px;
       align-self: flex-end;
+      animation: slideIn 0.4s var(--easing) forwards;
     }
 
     .conversation-item.user .content {
@@ -137,6 +137,43 @@ export class Conversation extends LitElement {
 
     .conversation-item.data .sender {
       display: none;
+    }
+
+    .conversation-item.pending {
+      opacity: 0;
+      animation: slideIn 0.4s var(--easing) 0.3s forwards;
+    }
+
+    .conversation-item.pending .content {
+      min-height: var(--grid-size-10);
+      width: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .conversation-item.pending .content .dot {
+      display: block;
+      width: var(--grid-size-2);
+      height: var(--grid-size-2);
+      background: var(--neutral-500);
+      border-radius: 50%;
+      margin-right: var(--grid-size);
+      flex: 0 0 auto;
+      --delay: 0s;
+      animation: 1s linear var(--delay, 0s) forwards infinite bounce;
+    }
+
+    .conversation-item.pending .content .dot:last-of-type {
+      margin-right: var(--grid-size);
+    }
+
+    .conversation-item.pending .content .dot:nth-child(2) {
+      --delay: 0.05s;
+    }
+
+    .conversation-item.pending .content .dot:nth-child(3) {
+      --delay: 0.1s;
     }
 
     #user-input {
@@ -189,6 +226,43 @@ export class Conversation extends LitElement {
       border: none;
     }
 
+    @keyframes bounce {
+      0% {
+        translate: 0 0px;
+        opacity: 1;
+      }
+
+      17% {
+        translate: 0 -5px;
+        opacity: 0.7;
+      }
+
+      25% {
+        translate: 0 -6px;
+        opacity: 0.5;
+      }
+
+      42% {
+        translate: 0 -5px;
+        opacity: 0.7;
+      }
+
+      60% {
+        translate: 0 2px;
+        opacity: 1;
+      }
+
+      70% {
+        translate: 0 0;
+        opacity: 1;
+      }
+
+      100% {
+        translate: 0 0;
+        opacity: 1;
+      }
+    }
+
     @keyframes slideIn {
       from {
         translate: var(--x, 0) var(--y, 0);
@@ -216,6 +290,11 @@ export class Conversation extends LitElement {
     const message = data.get("message") as string;
     if (!message) {
       return;
+    }
+
+    const msg = evt.target.querySelector<HTMLInputElement>("#message");
+    if (msg) {
+      msg.value = "";
     }
 
     this.dispatchEvent(new ConversationItemCreateEvent(message));
@@ -247,6 +326,28 @@ export class Conversation extends LitElement {
         ${ref(this.#conversationItemsRef)}
       >
         ${map(this.items, (item) => {
+          let sender: TemplateResult | symbol = nothing;
+          if ("who" in item) {
+            switch (item.who) {
+              case Participant.TEAM_MEMBER: {
+                const senderClass = (item.role || "Team Member")
+                  .toLocaleLowerCase()
+                  .replace(/\s/g, "-");
+                sender = html`<h1
+                  class="${classMap({ sender: true, [senderClass]: true })}"
+                >
+                  ${item.role || "Team Member"}
+                  <span class="when"
+                    >${item.type === ItemType.PENDING
+                      ? nothing
+                      : toRelativeTime(item.datetime)}</span
+                  >
+                </h1>`;
+                break;
+              }
+            }
+          }
+
           switch (item.type) {
             case ItemType.DATA:
             case ItemType.TEXT_CONVERSATION: {
@@ -263,25 +364,10 @@ export class Conversation extends LitElement {
                 }
               } else {
                 if (item.format === ItemFormat.MARKDOWN) {
+                  console.log(item.message);
                   content = html`${markdown(item.message)}`;
-                }
-
-                content = html`<p>${item.message}</p>`;
-              }
-
-              let sender: TemplateResult | symbol = nothing;
-              switch (item.who) {
-                case Participant.TEAM_MEMBER: {
-                  const senderClass = (item.role || "Team Member")
-                    .toLocaleLowerCase()
-                    .replace(/\s/g, "-");
-                  sender = html`<h1
-                    class="${classMap({ sender: true, [senderClass]: true })}"
-                  >
-                    ${item.role || "Team Member"}
-                    <span class="when">${toRelativeTime(item.datetime)}</span>
-                  </h1>`;
-                  break;
+                } else {
+                  content = html`<p>${item.message}</p>`;
                 }
               }
 
@@ -294,6 +380,23 @@ export class Conversation extends LitElement {
               >
                 ${sender ? html`${sender}` : nothing}
                 <div class="content">${content}</div>
+              </section>`;
+            }
+
+            case ItemType.PENDING: {
+              return html`<section
+                class=${classMap({
+                  "conversation-item": true,
+                  [item.type]: true,
+                  [item.who]: true,
+                })}
+              >
+                ${sender ? html`${sender}` : nothing}
+                <div class="content">
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                  <span class="dot"></span>
+                </div>
               </section>`;
             }
 
@@ -312,6 +415,7 @@ export class Conversation extends LitElement {
             name="message"
             id="message"
             placeholder="Talk to the team"
+            autocomplete="off"
           />
           <input type="submit" />
         </fieldset>

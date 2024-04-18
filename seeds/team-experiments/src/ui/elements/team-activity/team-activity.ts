@@ -206,9 +206,9 @@ export class TeamActivity extends LitElement {
         } else {
           if (item.format === ItemFormat.MARKDOWN) {
             value = html`${markdown(item.content)}`;
+          } else {
+            value = html`<p>${item.content}</p>`;
           }
-
-          value = html`<p>${item.content}</p>`;
         }
 
         content = html`<div class="content">${value}</div>`;

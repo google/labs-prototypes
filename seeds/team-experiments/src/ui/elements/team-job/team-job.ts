@@ -58,6 +58,13 @@ export class TeamJob extends LitElement {
   #secrets = new SecretsManager();
 
   #addConversationItem(item: ConversationItem) {
+    const lastItemIsPending =
+      this.conversation.length &&
+      this.conversation[this.conversation.length - 1].type === ItemType.PENDING;
+    if (lastItemIsPending) {
+      this.conversation.pop();
+    }
+
     this.conversation = [...this.conversation, item];
   }
 
@@ -83,6 +90,16 @@ export class TeamJob extends LitElement {
       );
     }
     this.#run = new Runner();
+    this.#run.addEventListener("pending", (e) => {
+      const { timestamp } = e.data;
+      const role = "Team Lead";
+      this.#addConversationItem({
+        datetime: new Date(performance.timeOrigin + timestamp),
+        who: Participant.TEAM_MEMBER,
+        role,
+        type: ItemType.PENDING,
+      });
+    });
     this.#run.addEventListener("output", (e) => {
       const { outputs, timestamp } = e.data;
       const role = "Team Lead";
@@ -92,7 +109,7 @@ export class TeamJob extends LitElement {
           who: Participant.TEAM_MEMBER,
           role,
           type: ItemType.TEXT_CONVERSATION,
-          format: ItemFormat.TEXT,
+          format: ItemFormat.MARKDOWN,
           message: outputs.output as string,
         });
       }

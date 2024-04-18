@@ -7,7 +7,12 @@
 import { InputValues } from "@google-labs/breadboard";
 import { RunConfig, run } from "@google-labs/breadboard/harness";
 import { InputResolveRequest } from "@google-labs/breadboard/remote";
-import { InputEvent, OutputEvent, SecretEvent } from "./events.js";
+import {
+  InputEvent,
+  OutputEvent,
+  PendingEvent,
+  SecretEvent,
+} from "./events.js";
 import { RunEventTarget } from "./types.js";
 
 // TODO: Decide if this interaction model is better.
@@ -31,6 +36,7 @@ export class Runner extends (EventTarget as RunEventTarget) implements Runner {
     }
     this.#pendingInput({ inputs });
     this.#pendingInput = null;
+    this.dispatchEvent(new PendingEvent({ timestamp: 0 }));
     this.resume();
   }
 
@@ -57,6 +63,7 @@ export class Runner extends (EventTarget as RunEventTarget) implements Runner {
         }
         case "secret": {
           this.dispatchEvent(new SecretEvent(data, reply));
+          break;
         }
       }
     }

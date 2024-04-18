@@ -131,9 +131,9 @@ export class AssetsList extends LitElement {
       } else {
         if (this.jobDescription.format === ItemFormat.MARKDOWN) {
           content = html`${markdown(this.jobDescription.message)}`;
+        } else {
+          content = html`<p>${this.jobDescription.message}</p>`;
         }
-
-        content = html`<p>${this.jobDescription.message}</p>`;
       }
 
       jobDescriptionTmpl = html`<section

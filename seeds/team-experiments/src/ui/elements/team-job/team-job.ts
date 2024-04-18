@@ -62,11 +62,9 @@ export class TeamJob extends LitElement {
       const lastItem = this.conversation[this.conversation.length - 1];
 
       const lastItemIsPending = lastItem.type === ItemType.PENDING;
-      const lastItemIsMultipartInput =
-        lastItem.type === ItemType.INPUT &&
-        lastItem.format === ItemFormat.MULTIPART;
+      const lastItemIsInput = lastItem.type === ItemType.INPUT;
 
-      if (lastItemIsPending || lastItemIsMultipartInput) {
+      if (lastItemIsPending || lastItemIsInput) {
         this.conversation.pop();
       }
     }
@@ -184,6 +182,7 @@ export class TeamJob extends LitElement {
               who: Participant.USER,
               type: ItemType.MULTIPART,
               parts: evt.message,
+              format: ItemFormat.MULTIPART,
             });
           } else {
             this.#addConversationItem({

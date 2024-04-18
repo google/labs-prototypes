@@ -96,22 +96,29 @@ export class Conversation extends LitElement {
       border-radius: 10px 0 10px 10px;
     }
 
+    .conversation-item.enum,
     .conversation-item.multipart,
     .conversation-item.data {
       width: 100%;
       margin: var(--grid-size-2) 0 0 0;
     }
 
+    .conversation-item.enum,
     .conversation-item.multipart {
       margin: var(--grid-size-6) 0 0 0;
       padding: 0 var(--grid-size-6);
     }
 
+    .conversation-item.enum .content,
     .conversation-item.multipart .content,
     .conversation-item.data .content {
       background: var(--neutral-white);
       border: 1px solid var(--neutral-300);
       border-radius: var(--grid-size-2);
+    }
+
+    .conversation-item.enum .content {
+      padding-bottom: var(--grid-size-3);
     }
 
     .conversation-item .sender {
@@ -243,6 +250,30 @@ export class Conversation extends LitElement {
     .multipart-files li.application-pdf a:before {
       background: #fff var(--asset-application-pdf) center center / 20px 20px
         no-repeat;
+    }
+
+    .enumerated-option {
+      cursor: pointer;
+      height: var(--grid-size-8);
+      color: var(--output-700);
+      background: var(--output-100);
+      border-radius: var(--grid-size-12);
+      border: none;
+      font: normal var(--label-large) / var(--label-line-height-large)
+        var(--font-family);
+      display: inline-flex;
+      align-items: center;
+      padding: var(--grid-size) var(--grid-size-4);
+      margin: 0 var(--grid-size-2) var(--grid-size-2) 0;
+      opacity: 0.6;
+      transition: opacity var(--easing-duration-out) var(--easing);
+      user-select: none;
+    }
+
+    .enumerated-option:focus,
+    .enumerated-option:hover {
+      transition-duration: var(--easing-duration-in);
+      opacity: 1;
     }
 
     #user-input {
@@ -523,18 +554,44 @@ export class Conversation extends LitElement {
             }
 
             case ItemType.INPUT: {
-              if (item.format === ItemFormat.MULTIPART) {
-                return html`<at-multi-modal-input
-                  .inputTitle=${item.title}
-                  .parts=${item.parts}
-                  @multipartinput=${(evt: MultiPartInputEvent) => {
-                    this.dispatchEvent(
-                      new ConversationItemCreateEvent(evt.parts)
-                    );
-                  }}
-                ></at-multi-modal-input>`;
-              } else {
-                return html`Unsupported input type`;
+              switch (item.format) {
+                case ItemFormat.MULTIPART: {
+                  return html`<at-multi-modal-input
+                    .inputTitle=${item.title}
+                    .parts=${item.parts}
+                    @multipartinput=${(evt: MultiPartInputEvent) => {
+                      this.dispatchEvent(
+                        new ConversationItemCreateEvent(evt.parts)
+                      );
+                    }}
+                  ></at-multi-modal-input>`;
+                }
+
+                case ItemFormat.ENUM: {
+                  return html`<section
+                    class=${classMap({
+                      "conversation-item": true,
+                      [item.type]: true,
+                      [item.format]: true,
+                    })}
+                  >
+                    ${sender ? html`${sender}` : nothing}
+                    <div class="content">
+                      <h1>${item.title}</h1>
+                      ${map(item.options, (option) => {
+                        return html`<button @click=${() => {
+                          this.dispatchEvent(
+                            new ConversationItemCreateEvent(option)
+                          );
+                        }} class="enumerated-option">${option}</option>`;
+                      })}
+                    </div>
+                  </section>`;
+                }
+
+                default: {
+                  return html`Unsupported input type`;
+                }
               }
             }
           }

@@ -18,7 +18,7 @@ import { toRelativeTime } from "../../utils/toRelativeTime.js";
 import { cache } from "lit/directives/cache.js";
 import {
   ConversationItemCreateEvent,
-  MultiModalInputEvent,
+  MultiPartInputEvent,
 } from "../../../events/events.js";
 import { Ref, createRef, ref } from "lit/directives/ref.js";
 
@@ -526,7 +526,8 @@ export class Conversation extends LitElement {
               if (item.format === ItemFormat.MULTIPART) {
                 return html`<at-multi-modal-input
                   .inputTitle=${item.title}
-                  @multimodalinput=${(evt: MultiModalInputEvent) => {
+                  .parts=${item.parts}
+                  @multipartinput=${(evt: MultiPartInputEvent) => {
                     this.dispatchEvent(
                       new ConversationItemCreateEvent(evt.parts)
                     );

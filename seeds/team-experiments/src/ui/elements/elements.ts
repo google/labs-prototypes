@@ -6,7 +6,7 @@
 
 export { AssetsList } from "./assets-list/assets-list.js";
 export { Conversation } from "./conversation/conversation.js";
-export { MultiModalInput } from "./conversation/multi-modal-input.js";
+export { MultiPartInput } from "./conversation/multi-part-input.js";
 export { Switcher } from "./switcher/switcher.js";
 export { TeamActivity } from "./team-activity/team-activity.js";
 export { TeamJob } from "./team-job/team-job.js";

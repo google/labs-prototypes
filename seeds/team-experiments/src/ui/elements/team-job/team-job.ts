@@ -58,11 +58,17 @@ export class TeamJob extends LitElement {
   #secrets = new SecretsManager();
 
   #addConversationItem(item: ConversationItem) {
-    const lastItemIsPending =
-      this.conversation.length &&
-      this.conversation[this.conversation.length - 1].type === ItemType.PENDING;
-    if (lastItemIsPending) {
-      this.conversation.pop();
+    if (this.conversation.length) {
+      const lastItem = this.conversation[this.conversation.length - 1];
+
+      const lastItemIsPending = lastItem.type === ItemType.PENDING;
+      const lastItemIsMultipartInput =
+        lastItem.type === ItemType.INPUT &&
+        lastItem.format === ItemFormat.MULTIPART;
+
+      if (lastItemIsPending || lastItemIsMultipartInput) {
+        this.conversation.pop();
+      }
     }
 
     this.conversation = [...this.conversation, item];
@@ -172,13 +178,22 @@ export class TeamJob extends LitElement {
         name="Chat"
         .items=${this.conversation}
         @conversationitemcreate=${(evt: ConversationItemCreateEvent) => {
-          this.#addConversationItem({
-            datetime: new Date(Date.now()),
-            who: Participant.USER,
-            type: ItemType.TEXT_CONVERSATION,
-            format: ItemFormat.TEXT,
-            message: evt.message as string,
-          });
+          if (Array.isArray(evt.message)) {
+            this.#addConversationItem({
+              datetime: new Date(Date.now()),
+              who: Participant.USER,
+              type: ItemType.MULTIPART,
+              parts: evt.message,
+            });
+          } else {
+            this.#addConversationItem({
+              datetime: new Date(Date.now()),
+              who: Participant.USER,
+              type: ItemType.TEXT_CONVERSATION,
+              format: ItemFormat.TEXT,
+              message: evt.message as string,
+            });
+          }
 
           if (!this.#run) return;
 

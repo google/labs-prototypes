@@ -31,6 +31,7 @@ export enum ItemType {
   DATA = "data",
   INPUT = "input",
   PENDING = "pending",
+  MULTIPART = "multipart",
 }
 
 export enum ItemStatus {
@@ -41,7 +42,11 @@ export enum ItemStatus {
 
 export type ConversationInputPart =
   | string
-  | { inline_data: string; mime_type: string };
+  | {
+      inline_data: { mime_type: string; data: string };
+      url: string;
+      name: string;
+    };
 
 export interface ConversationPending {
   datetime: Date;
@@ -73,6 +78,15 @@ export interface ConversationInput {
   type: ItemType.INPUT;
   role?: string;
   format: ItemFormat;
+  title: string;
+  parts: ConversationInputPart[];
+}
+
+export interface ConversationMultipart {
+  datetime: Date;
+  type: ItemType.MULTIPART;
+  who: Participant;
+  role?: string;
   parts: ConversationInputPart[];
 }
 
@@ -80,7 +94,8 @@ export type ConversationItem =
   | ConversationText
   | ConversationData
   | ConversationInput
-  | ConversationPending;
+  | ConversationPending
+  | ConversationMultipart;
 
 export interface ActivityItem {
   datetime: Date;

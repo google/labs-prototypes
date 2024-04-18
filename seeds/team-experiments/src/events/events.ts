@@ -23,7 +23,7 @@ export class StateChangeEvent extends Event {
 export class ConversationItemCreateEvent extends Event {
   static readonly eventName = "conversationitemcreate";
 
-  constructor(public message: ConversationInputPart) {
+  constructor(public message: ConversationInputPart | ConversationInputPart[]) {
     super(ConversationItemCreateEvent.eventName, { ...opts });
   }
 }
@@ -41,5 +41,13 @@ export class TeamSectionSelectEvent extends Event {
 
   constructor(public id: number) {
     super(TeamSectionSelectEvent.eventName, { ...opts });
+  }
+}
+
+export class MultiModalInputEvent extends Event {
+  static readonly eventName = "multimodalinput";
+
+  constructor(public parts: ConversationInputPart[]) {
+    super(MultiModalInputEvent.eventName, { ...opts });
   }
 }

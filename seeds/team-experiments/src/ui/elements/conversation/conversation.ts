@@ -16,7 +16,10 @@ import { classMap } from "lit/directives/class-map.js";
 import { markdown } from "../../directives/markdown.js";
 import { toRelativeTime } from "../../utils/toRelativeTime.js";
 import { cache } from "lit/directives/cache.js";
-import { ConversationItemCreateEvent } from "../../../events/events";
+import {
+  ConversationItemCreateEvent,
+  MultiModalInputEvent,
+} from "../../../events/events.js";
 import { Ref, createRef, ref } from "lit/directives/ref.js";
 
 @customElement("at-conversation")
@@ -93,11 +96,18 @@ export class Conversation extends LitElement {
       border-radius: 10px 0 10px 10px;
     }
 
+    .conversation-item.multipart,
     .conversation-item.data {
       width: 100%;
       margin: var(--grid-size-2) 0 0 0;
     }
 
+    .conversation-item.multipart {
+      margin: var(--grid-size-6) 0 0 0;
+      padding: 0 var(--grid-size-6);
+    }
+
+    .conversation-item.multipart .content,
     .conversation-item.data .content {
       background: var(--neutral-white);
       border: 1px solid var(--neutral-300);
@@ -133,6 +143,7 @@ export class Conversation extends LitElement {
         20px 20px no-repeat;
     }
 
+    .conversation-item.multipart .sender,
     .conversation-item.data .sender {
       display: none;
     }
@@ -172,6 +183,66 @@ export class Conversation extends LitElement {
 
     .conversation-item.pending .content .dot:nth-child(3) {
       --delay: 0.1s;
+    }
+
+    .no-files,
+    .multipart-files {
+      display: block;
+      margin: 0;
+      padding: var(--grid-size-2) 0;
+      list-style: none;
+      width: 100%;
+      overflow: auto;
+    }
+
+    .multipart-files li {
+      display: block;
+      height: 24px;
+      margin-bottom: var(--grid-size-2);
+      width: 100%;
+      overflow: auto;
+      font: normal var(--body-medium) / var(--body-line-height-medium)
+        var(--font-family);
+    }
+
+    .multipart-files li:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .multipart-files li a {
+      display: block;
+      position: relative;
+      padding-left: var(--grid-size-7);
+      align-items: center;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+      line-height: 20px;
+      height: 20px;
+      color: var(--output-600);
+    }
+
+    .multipart-files li a:before {
+      content: "";
+      display: block;
+      background: #fff var(--asset-generic) center center / 20px 20px no-repeat;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      transform: translateY(-50%);
+    }
+
+    .multipart-files li.image-png a:before {
+      background: #fff var(--asset-image-png) center center / 20px 20px
+        no-repeat;
+    }
+
+    .multipart-files li.application-pdf a:before {
+      background: #fff var(--asset-application-pdf) center center / 20px 20px
+        no-repeat;
     }
 
     #user-input {
@@ -222,6 +293,15 @@ export class Conversation extends LitElement {
       border-radius: 50%;
       font-size: 0;
       border: none;
+    }
+
+    #user-input input[type="text"][disabled] {
+      border: 1px solid var(--neutral-400);
+      background: var(--neutral-50);
+    }
+
+    #user-input input[type="submit"][disabled] {
+      opacity: 0.5;
     }
 
     @keyframes bounce {
@@ -319,6 +399,14 @@ export class Conversation extends LitElement {
       return nothing;
     }
 
+    let newestItemIsInlineInput = false;
+    if (this.items.length) {
+      const newestItem = this.items[this.items.length - 1];
+      newestItemIsInlineInput =
+        newestItem.type === ItemType.INPUT &&
+        newestItem.format === ItemFormat.MULTIPART;
+    }
+
     const tmpl = html`<div
         class="conversation-items"
         ${ref(this.#conversationItemsRef)}
@@ -380,6 +468,43 @@ export class Conversation extends LitElement {
               </section>`;
             }
 
+            case ItemType.MULTIPART: {
+              return html`<section
+                class=${classMap({
+                  "conversation-item": true,
+                  [item.type]: true,
+                  [item.who]: true,
+                })}
+              >
+                ${sender ? html`${sender}` : nothing}
+                <div class="content">
+                  ${item.parts.length
+                    ? html`<ul class="multipart-files">
+                        ${map(item.parts, (file) => {
+                          if (typeof file === "string") {
+                            return html`${item}`;
+                          }
+
+                          const mimeTypeClass = file.inline_data.mime_type
+                            .toLocaleLowerCase()
+                            .replace(/\W/gi, "-");
+                          return html`<li
+                            class=${classMap({ [mimeTypeClass]: true })}
+                          >
+                            <a
+                              href="data:${file.inline_data
+                                .mime_type};base64,${file.inline_data.data}"
+                              download="${file.name}"
+                              >${file.name}</a
+                            >
+                          </li>`;
+                        })}
+                      </ul>`
+                    : html`<div class="no-files">No files provided</div>`}
+                </div>
+              </section>`;
+            }
+
             case ItemType.PENDING: {
               return html`<section
                 class=${classMap({
@@ -398,7 +523,18 @@ export class Conversation extends LitElement {
             }
 
             case ItemType.INPUT: {
-              return html`Input`;
+              if (item.format === ItemFormat.MULTIPART) {
+                return html`<at-multi-modal-input
+                  .inputTitle=${item.title}
+                  @multimodalinput=${(evt: MultiModalInputEvent) => {
+                    this.dispatchEvent(
+                      new ConversationItemCreateEvent(evt.parts)
+                    );
+                  }}
+                ></at-multi-modal-input>`;
+              } else {
+                return html`Unsupported input type`;
+              }
             }
           }
         })}
@@ -413,8 +549,9 @@ export class Conversation extends LitElement {
             id="message"
             placeholder="Talk to the team"
             autocomplete="off"
+            ?disabled=${newestItemIsInlineInput}
           />
-          <input type="submit" />
+          <input type="submit" ?disabled=${newestItemIsInlineInput} />
         </fieldset>
       </form>`;
 

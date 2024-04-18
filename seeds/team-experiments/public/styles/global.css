@@ -31,6 +31,7 @@
   --icon-add-note: url(/third_party/icons/add-note.svg);
   --icon-add-photo: url(/third_party/icons/add-photo.svg);
   --icon-add: url(/third_party/icons/add.svg);
+  --icon-add-blue: url(/third_party/icons/add-blue.svg);
   --icon-arrow-back-white: url(/third_party/icons/arrow-back-white.svg);
   --icon-arrow-back: url(/third_party/icons/arrow-back.svg);
   --icon-before: url(/third_party/icons/before.svg);
@@ -63,6 +64,7 @@
   --role-team-lead: url(/third_party/icons/roles/team-lead.svg);
   --role-historian: url(/third_party/icons/roles/historian.svg);
 
+  --asset-generic: url(/third_party/icons/assets/generic.svg);
   --asset-image-png: url(/third_party/icons/assets/image-png.svg);
   --asset-application-pdf: url(/third_party/icons/assets/application-pdf.svg);
 

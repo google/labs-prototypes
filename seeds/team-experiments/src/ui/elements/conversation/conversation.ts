@@ -323,7 +323,7 @@ export class Conversation extends LitElement {
         class="conversation-items"
         ${ref(this.#conversationItemsRef)}
       >
-        ${map(this.items, (item, idx) => {
+        ${map(this.items, (item) => {
           let sender: TemplateResult | symbol = nothing;
           if ("who" in item) {
             switch (item.who) {

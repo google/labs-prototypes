@@ -12,6 +12,11 @@ type RunEventMap = {
   input: RunInputEvent;
   output: RunOutputEvent;
   secret: RunSecretEvent;
+  pending: RunPendingEvent;
+};
+
+export type RunPendingEvent = Event & {
+  data: { timestamp: number };
 };
 
 export type RunInputEvent = Event & {

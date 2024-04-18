@@ -15,6 +15,14 @@ const opts = {
   cancelable: true,
 };
 
+export class PendingEvent extends Event {
+  static readonly eventName = "pending";
+
+  constructor(public data: { timestamp: number }) {
+    super(PendingEvent.eventName, { ...opts });
+  }
+}
+
 export class InputEvent extends Event implements RunInputEvent {
   static readonly eventName = "input";
 

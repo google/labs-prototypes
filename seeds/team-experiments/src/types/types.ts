@@ -102,4 +102,5 @@ export interface TeamListItem {
   statusDescription?: string;
   who: Participant;
   role?: string;
+  graph?: string;
 }

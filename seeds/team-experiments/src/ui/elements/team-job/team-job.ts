@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LitElement, css, html } from "lit";
+import { LitElement, PropertyValueMap, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
   ConversationItemCreateEvent,
@@ -61,7 +61,22 @@ export class TeamJob extends LitElement {
     this.conversation = [...this.conversation, item];
   }
 
+  protected willUpdate(
+    changedProperties:
+      | PropertyValueMap<{ team: TeamListItem }>
+      | Map<PropertyKey, unknown>
+  ) {
+    if (changedProperties.has("team")) {
+      this.#startRun();
+    }
+  }
+
   async #startRun() {
+    const url = this.team?.graph;
+    if (!url) {
+      console.warn("no graph, bailing");
+      return;
+    }
     if (!(await this.#secrets.load("/api/secrets"))) {
       console.warn(
         "Please add `.env` file to the root of this package and place secrets there."
@@ -102,7 +117,7 @@ export class TeamJob extends LitElement {
       });
     });
     this.#run.start({
-      url: "/bgl/insta/simple-chat.bgl.json",
+      url,
       kits: [
         asRuntimeKit(Core),
         asRuntimeKit(JSONKit),

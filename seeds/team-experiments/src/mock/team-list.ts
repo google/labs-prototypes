@@ -13,11 +13,12 @@ export const teamListItems: Map<string, TeamListItem> = new Map([
     {
       datetime: new Date(Date.now() - 20 * MINUTE),
       teamName: "Social Campaign",
-      description: "It's a social campaign",
+      description: "Uses simple chat (just makes up stuff)",
       status: ItemStatus.ACTIVE,
       statusDescription: "Brand input needed",
       who: Participant.TEAM_MEMBER,
       role: "Media Coordinator",
+      graph: "/bgl/insta/simple-chat.bgl.json",
     },
   ],
   [
@@ -26,10 +27,11 @@ export const teamListItems: Map<string, TeamListItem> = new Map([
       datetime: new Date(Date.now() - 20 * MINUTE),
       teamName: "Multimedia Campaign Manager Team",
       description:
-        "It's a super long title that needs to be truncated because it's so long and it contains more information than can be fit on a single line",
+        "Uses 'get page' tool: ask it about various URLs and it will scrape them and summarize them",
       status: ItemStatus.COMPLETE,
       who: Participant.TEAM_MEMBER,
       role: "Media Coordinator",
+      graph: "/bgl/insta/chat-with-tools.bgl.json",
     },
   ],
   [

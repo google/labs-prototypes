@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { LitElement, css, html } from "lit";
+import { LitElement, PropertyValueMap, css, html } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import {
   ConversationItemCreateEvent,
@@ -61,7 +61,22 @@ export class TeamJob extends LitElement {
     this.conversation = [...this.conversation, item];
   }
 
+  protected willUpdate(
+    changedProperties:
+      | PropertyValueMap<{ team: TeamListItem }>
+      | Map<PropertyKey, unknown>
+  ) {
+    if (changedProperties.has("team")) {
+      this.#startRun();
+    }
+  }
+
   async #startRun() {
+    const url = this.team?.graph;
+    if (!url) {
+      console.warn("no graph, bailing");
+      return;
+    }
     if (!(await this.#secrets.load("/api/secrets"))) {
       console.warn(
         "Please add `.env` file to the root of this package and place secrets there."
@@ -102,7 +117,7 @@ export class TeamJob extends LitElement {
       });
     });
     this.#run.start({
-      url: "/bgl/insta/simple-chat.bgl.json",
+      url,
       kits: [
         asRuntimeKit(Core),
         asRuntimeKit(JSONKit),
@@ -110,7 +125,7 @@ export class TeamJob extends LitElement {
         asRuntimeKit(GeminiKit),
         await load(
           new URL(
-            "https://raw.githubusercontent.com/breadboard-ai/breadboard/f9b210cd9f1770464154eb160b1127ef01a85d65/packages/agent-kit/agent.kit.json"
+            "https://raw.githubusercontent.com/breadboard-ai/breadboard/18b9f34b92398632928f4897c2b53b3a2ccac4c1/packages/agent-kit/agent.kit.json"
           )
         ),
       ],

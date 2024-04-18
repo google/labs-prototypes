@@ -9,10 +9,10 @@ import { ConversationInputPart } from "../../../types/types.js";
 import { map } from "lit/directives/map.js";
 import { classMap } from "lit/directives/class-map.js";
 import { asBase64 } from "../../utils/asBase64.js";
-import { MultiModalInputEvent } from "../../../events/events.js";
+import { MultiPartInputEvent } from "../../../events/events.js";
 
-@customElement("at-multi-modal-input")
-export class MultiModalInput extends LitElement {
+@customElement("at-multi-part-input")
+export class MultiPartInput extends LitElement {
   @property()
   inputTitle: string | null = null;
 
@@ -185,18 +185,14 @@ export class MultiModalInput extends LitElement {
 
   #items: ConversationInputPart[] = [];
 
-  set value(value: string) {
-    this.#items = JSON.parse(value);
-  }
-
-  get value() {
-    return JSON.stringify(this.#items);
+  set parts(parts: ConversationInputPart[]) {
+    this.#items = [...parts];
   }
 
   #onSubmit(evt: SubmitEvent) {
     evt.preventDefault();
 
-    this.dispatchEvent(new MultiModalInputEvent(this.#items));
+    this.dispatchEvent(new MultiPartInputEvent(this.#items));
   }
 
   render() {
@@ -279,7 +275,7 @@ export class MultiModalInput extends LitElement {
               type="button"
               id="skip"
               @click=${() => {
-                this.dispatchEvent(new MultiModalInputEvent([]));
+                this.dispatchEvent(new MultiPartInputEvent([]));
               }}
             >
               Skip

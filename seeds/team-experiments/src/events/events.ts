@@ -44,10 +44,10 @@ export class TeamSectionSelectEvent extends Event {
   }
 }
 
-export class MultiModalInputEvent extends Event {
-  static readonly eventName = "multimodalinput";
+export class MultiPartInputEvent extends Event {
+  static readonly eventName = "multipartinput";
 
   constructor(public parts: ConversationInputPart[]) {
-    super(MultiModalInputEvent.eventName, { ...opts });
+    super(MultiPartInputEvent.eventName, { ...opts });
   }
 }

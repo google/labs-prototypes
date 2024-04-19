@@ -4,40 +4,25 @@
   "version": "0.0.1",
   "nodes": [
     {
-      "id": "curry-dea06ed9",
-      "type": "curry",
-      "metadata": {
-        "visual": {
-          "x": -233,
-          "y": 166
-        }
-      },
-      "configuration": {
-        "$board": {
-          "kind": "board",
-          "path": "#940f7c71-f50a-4cd5-ad9b-0c9d07702ab5"
-        }
-      }
-    },
-    {
       "id": "repeater-b5a64681",
       "type": "repeater",
       "metadata": {
         "visual": {
-          "x": 60,
-          "y": 0
+          "x": -150,
+          "y": 29
+        },
+        "title": "Chat Loop",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "worker": {
+          "kind": "board",
+          "path": "#940f7c71-f50a-4cd5-ad9b-0c9d07702ab5"
         }
       }
     }
   ],
-  "edges": [
-    {
-      "from": "curry-dea06ed9",
-      "to": "repeater-b5a64681",
-      "out": "board",
-      "in": "worker"
-    }
-  ],
+  "edges": [],
   "graphs": {
     "940f7c71-f50a-4cd5-ad9b-0c9d07702ab5": {
       "title": "Single Turn",

@@ -46,7 +46,6 @@ export class Runner extends (EventTarget as RunEventTarget) implements Runner {
 
     for (;;) {
       const result = await this.#run.next();
-      console.log("🍊 result", result);
       if (result.done) {
         this.#run = null;
         return false;

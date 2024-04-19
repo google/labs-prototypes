@@ -1,0 +1,142 @@
+{
+  "title": "AI Teams Onboarder",
+  "description": "Find out basics about the client",
+  "version": "0.0.1",
+  "edges": [
+    {
+      "from": "repeater-7e200641",
+      "to": "output-0a357b6f",
+      "out": "*",
+      "in": ""
+    }
+  ],
+  "nodes": [
+    {
+      "id": "repeater-7e200641",
+      "type": "repeater",
+      "metadata": {
+        "visual": {
+          "x": 32.999999999999986,
+          "y": -498
+        },
+        "title": "Chat Bot",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "worker": {
+          "kind": "board",
+          "path": "#58849527-9663-4146-9531-91c1f0c986ab"
+        }
+      }
+    },
+    {
+      "id": "output-0a357b6f",
+      "type": "output",
+      "metadata": {
+        "visual": {
+          "x": 415,
+          "y": -465
+        }
+      }
+    }
+  ],
+  "graphs": {
+    "58849527-9663-4146-9531-91c1f0c986ab": {
+      "title": "single turn",
+      "description": "A blank board. Use it as a starting point for your creations.",
+      "version": "0.0.1",
+      "nodes": [
+        {
+          "type": "output",
+          "id": "output",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "context": {
+                  "type": "string",
+                  "title": "context",
+                  "examples": []
+                }
+              },
+              "required": []
+            }
+          },
+          "metadata": {
+            "visual": {
+              "x": 568,
+              "y": -595
+            }
+          }
+        },
+        {
+          "id": "human-e8cf008d",
+          "type": "human",
+          "metadata": {
+            "visual": {
+              "x": 129,
+              "y": -580
+            }
+          }
+        },
+        {
+          "id": "worker-3fec00f6",
+          "type": "worker",
+          "metadata": {
+            "visual": {
+              "x": 335,
+              "y": -577
+            }
+          },
+          "configuration": {
+            "instruction": "Your main goal is to find out what the client needs help with in terms of your general offerings: social media campaigns, marketing copy, or ads, or some combination of those. Then you should find out the business's name, description, location, industry, website, and instagram. Ask these in three turns, name and location, description which can include industry and other details, website and instagram. Once you have this basic information, you need to return the values for each of the categories you asked about. Return a json object like below with the values filled in, leaving unanswered values as empty strings. In addition, say: \"OK, I have what I need to set up your general profile. I'll be back with you in a moment.\""
+          }
+        },
+        {
+          "id": "input-6b16067b",
+          "type": "input",
+          "metadata": {
+            "visual": {
+              "x": -73,
+              "y": -578
+            }
+          },
+          "configuration": {
+            "schema": {
+              "properties": {
+                "context": {
+                  "type": "string",
+                  "title": "context",
+                  "examples": []
+                }
+              },
+              "required": [],
+              "type": "object"
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "from": "human-e8cf008d",
+          "to": "worker-3fec00f6",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "worker-3fec00f6",
+          "to": "output",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "input-6b16067b",
+          "to": "human-e8cf008d",
+          "out": "context",
+          "in": "context"
+        }
+      ],
+      "url": "idb://default/blank.json#58849527-9663-4146-9531-91c1f0c986ab"
+    }
+  }
+}

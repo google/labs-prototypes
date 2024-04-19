@@ -46,6 +46,7 @@ export class Runner extends (EventTarget as RunEventTarget) implements Runner {
 
     for (;;) {
       const result = await this.#run.next();
+      console.log("🍊 result", result);
       if (result.done) {
         this.#run = null;
         return false;
@@ -53,8 +54,11 @@ export class Runner extends (EventTarget as RunEventTarget) implements Runner {
       const { type, data, reply } = result.value;
       switch (type) {
         case "input": {
-          this.#pendingInput = reply;
-          this.dispatchEvent(new InputEvent(data));
+          if (!this.dispatchEvent(new InputEvent(data, reply))) {
+            break;
+          } else {
+            this.#pendingInput = reply;
+          }
           return true;
         }
         case "output": {

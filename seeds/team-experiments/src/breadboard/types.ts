@@ -21,6 +21,7 @@ export type RunPendingEvent = Event & {
 
 export type RunInputEvent = Event & {
   data: InputResponse;
+  reply: (data: InputResolveRequest) => Promise<void>;
 };
 
 export type RunOutputEvent = Event & {

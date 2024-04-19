@@ -26,7 +26,10 @@ export class PendingEvent extends Event {
 export class InputEvent extends Event implements RunInputEvent {
   static readonly eventName = "input";
 
-  constructor(public data: InputResponse) {
+  constructor(
+    public data: InputResponse,
+    public reply: (data: InputResolveRequest) => Promise<void>
+  ) {
     super(InputEvent.eventName, { ...opts });
   }
 }

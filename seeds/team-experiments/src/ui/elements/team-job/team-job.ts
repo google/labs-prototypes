@@ -104,6 +104,14 @@ export class TeamJob extends LitElement {
         type: ItemType.PENDING,
       });
     });
+    this.#run.addEventListener("input", (e) => {
+      const { data } = e;
+      const model = data.inputArguments.schema?.properties?.model;
+      if (model) {
+        e.reply({ inputs: { model: this.#secrets.get("model") } });
+        e.preventDefault();
+      }
+    });
     this.#run.addEventListener("output", (e) => {
       const { outputs, timestamp } = e.data;
       const role = "Team Lead";

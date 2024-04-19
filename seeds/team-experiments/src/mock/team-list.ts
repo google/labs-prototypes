@@ -12,6 +12,19 @@ export const teamListItems: Map<string, TeamListItem> = new Map([
     "team-1",
     {
       datetime: new Date(Date.now() - 20 * MINUTE),
+      teamName: "Onboarding to Social Campaign",
+      description: "Collect information to post to social media",
+      status: ItemStatus.ACTIVE,
+      statusDescription: "Not started",
+      who: Participant.TEAM_MEMBER,
+      role: "Media Coordinator",
+      graph: "/bgl/insta/onboard-for-social.json",
+    },
+  ],
+  [
+    "team-4",
+    {
+      datetime: new Date(Date.now() - 20 * MINUTE),
       teamName: "Social Campaign",
       description: "Uses simple chat (just makes up stuff)",
       status: ItemStatus.ACTIVE,

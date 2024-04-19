@@ -155,8 +155,6 @@ export class TeamJob extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    // Is this the right place to start the run?
-    this.#startRun();
   }
 
   render() {

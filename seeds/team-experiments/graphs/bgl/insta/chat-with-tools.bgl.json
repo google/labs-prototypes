@@ -97,21 +97,9 @@
             "visual": {
               "x": -77,
               "y": -108
-            }
-          }
-        },
-        {
-          "id": "jsonata-0e5b6fa8",
-          "type": "jsonata",
-          "configuration": {
-            "raw": "on",
-            "expression": "{ \"model\": \"gemini-1.5-pro-latest\" }"
-          },
-          "metadata": {
-            "visual": {
-              "x": -69,
-              "y": 120
-            }
+            },
+            "title": "Ask User",
+            "logLevel": "debug"
           }
         },
         {
@@ -121,13 +109,30 @@
             "visual": {
               "x": 184,
               "y": -216
-            }
+            },
+            "title": "Use a Tool",
+            "logLevel": "debug"
           },
           "configuration": {
             "instruction": "You are a super-helpful chat bot who uses tools to help users. In cases where the tool is not applicable, you improvise and try to answer the question anyway. In situations when the user just wants to have a conversation, just have a conversation.",
             "tools": [
-              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/mock-get-page.json"
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/get-page.json"
             ]
+          }
+        },
+        {
+          "id": "secrets-dbf8ee4c",
+          "type": "secrets",
+          "configuration": {
+            "keys": ["model"]
+          },
+          "metadata": {
+            "visual": {
+              "x": -59,
+              "y": 124
+            },
+            "title": "Get Model",
+            "logLevel": "debug"
           }
         }
       ],
@@ -151,7 +156,7 @@
           "in": "context"
         },
         {
-          "from": "jsonata-0e5b6fa8",
+          "from": "secrets-dbf8ee4c",
           "to": "toolWorker-7793ced3",
           "out": "model",
           "in": "model"

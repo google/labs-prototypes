@@ -14,6 +14,7 @@ Save keys. Create a file named `.env` in this directory. Add the following keys:
 
 ```bash
 GEMINI_KEY="your key goes here"
+model="gemini-1.5-pro-latest"
 ```
 
 ## Run

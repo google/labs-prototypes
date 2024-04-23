@@ -8,6 +8,12 @@
       "to": "output-0a357b6f",
       "out": "*",
       "in": ""
+    },
+    {
+      "from": "worker-ba979ccb",
+      "to": "repeater-7e200641",
+      "out": "context",
+      "in": "context"
     }
   ],
   "nodes": [
@@ -16,8 +22,8 @@
       "type": "repeater",
       "metadata": {
         "visual": {
-          "x": 32.999999999999986,
-          "y": -498
+          "x": 234,
+          "y": -509
         },
         "title": "Chat Bot",
         "logLevel": "debug"
@@ -36,6 +42,20 @@
         "visual": {
           "x": 415,
           "y": -465
+        }
+      }
+    },
+    {
+      "id": "worker-ba979ccb",
+      "type": "worker",
+      "configuration": {
+        "context": [],
+        "instruction": "You are a greeter. Please greet the user with kindness and warmth."
+      },
+      "metadata": {
+        "visual": {
+          "x": -33,
+          "y": -475
         }
       }
     }
@@ -64,8 +84,8 @@
           },
           "metadata": {
             "visual": {
-              "x": 568,
-              "y": -595
+              "x": 673,
+              "y": -542
             }
           }
         },
@@ -74,8 +94,8 @@
           "type": "human",
           "metadata": {
             "visual": {
-              "x": 129,
-              "y": -580
+              "x": 78,
+              "y": -703
             }
           }
         },
@@ -84,8 +104,8 @@
           "type": "worker",
           "metadata": {
             "visual": {
-              "x": 335,
-              "y": -577
+              "x": 223,
+              "y": -477
             }
           },
           "configuration": {
@@ -97,8 +117,8 @@
           "type": "input",
           "metadata": {
             "visual": {
-              "x": -73,
-              "y": -578
+              "x": -93,
+              "y": -535
             }
           },
           "configuration": {
@@ -114,6 +134,23 @@
               "type": "object"
             }
           }
+        },
+        {
+          "id": "runJavascript-04637cff",
+          "type": "runJavascript",
+          "metadata": {
+            "visual": {
+              "x": 419,
+              "y": -732
+            },
+            "title": "Exit Checker",
+            "logLevel": "debug"
+          },
+          "configuration": {
+            "name": "run",
+            "raw": "on",
+            "code": "function run({context}) { return { context } }"
+          }
         }
       ],
       "edges": [
@@ -125,13 +162,19 @@
         },
         {
           "from": "worker-3fec00f6",
-          "to": "output",
+          "to": "runJavascript-04637cff",
           "out": "context",
           "in": "context"
         },
         {
           "from": "input-6b16067b",
           "to": "human-e8cf008d",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "runJavascript-04637cff",
+          "to": "output",
           "out": "context",
           "in": "context"
         }

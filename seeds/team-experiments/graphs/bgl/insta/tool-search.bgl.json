@@ -70,7 +70,7 @@
       "id": "urlTemplate-77553e6f",
       "type": "urlTemplate",
       "configuration": {
-        "template": "https://app.scrapingbee.com/api/v1/store/google?api_key={SCRAPING_BEE_KEY}&search={search}&language=en"
+        "template": "https://app.scrapingbee.com/api/v1/store/google?api_key={SCRAPING_BEE_KEY}&search={search}&language=en&nb_results=30"
       },
       "metadata": {
         "visual": {

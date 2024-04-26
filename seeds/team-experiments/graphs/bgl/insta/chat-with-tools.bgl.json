@@ -25,7 +25,7 @@
       "metadata": {
         "visual": {
           "x": 60,
-          "y": 0
+          "y": -1.4210854715202004e-14
         }
       }
     }
@@ -95,8 +95,8 @@
           "type": "human",
           "metadata": {
             "visual": {
-              "x": -77,
-              "y": -108
+              "x": -97,
+              "y": -175
             },
             "title": "Ask User",
             "logLevel": "debug"
@@ -116,7 +116,8 @@
           "configuration": {
             "instruction": "You are a super-helpful chat bot who uses tools to help users. In cases where the tool is not applicable, you improvise and try to answer the question anyway. In situations when the user just wants to have a conversation, just have a conversation.",
             "tools": [
-              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/get-page.json"
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/tool-get-web-page.bgl.json",
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/tool-search.bgl.json"
             ]
           }
         },
@@ -124,7 +125,9 @@
           "id": "secrets-dbf8ee4c",
           "type": "secrets",
           "configuration": {
-            "keys": ["model"]
+            "keys": [
+              "model"
+            ]
           },
           "metadata": {
             "visual": {

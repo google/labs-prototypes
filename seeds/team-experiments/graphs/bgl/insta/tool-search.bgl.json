@@ -1,0 +1,178 @@
+{
+  "title": "Search the Web",
+  "description": "Given a term, searches the Web for it and returns a list of links and descriptions that match.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "search": {
+              "type": "string",
+              "title": "Search",
+              "examples": [],
+              "description": "The term to search the Web for"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 19,
+          "y": 538.0000000000001
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "json": {
+              "type": "object",
+              "title": "JSON",
+              "examples": []
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 595,
+          "y": 505
+        }
+      }
+    },
+    {
+      "id": "fetch-27da0eda",
+      "type": "fetch",
+      "metadata": {
+        "visual": {
+          "x": 568.0000000000001,
+          "y": 151
+        },
+        "title": "Scraping Bee",
+        "description": "Calling Scraping Bee to Get the Contents",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "method": "GET"
+      }
+    },
+    {
+      "id": "urlTemplate-77553e6f",
+      "type": "urlTemplate",
+      "configuration": {
+        "template": "https://app.scrapingbee.com/api/v1/store/google?api_key={SCRAPING_BEE_KEY}&search={search}&language=en"
+      },
+      "metadata": {
+        "visual": {
+          "x": 318,
+          "y": 193
+        },
+        "title": "Scraping Bee API Template",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "secrets-197969de",
+      "type": "secrets",
+      "configuration": {
+        "keys": [
+          "SCRAPING_BEE_KEY"
+        ]
+      },
+      "metadata": {
+        "visual": {
+          "x": 25,
+          "y": 4
+        },
+        "title": "Get API Key",
+        "description": "Asking for API Key",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "jsonata-02f9c069",
+      "type": "jsonata",
+      "configuration": {
+        "expression": "(\n    $results := $eval(evaluate_results[0]);\n{ \"title\": body.title, \"body\": $results.data, \"links\": $results.links  }\n)"
+      },
+      "metadata": {
+        "visual": {
+          "x": 366,
+          "y": 501
+        },
+        "title": "Format Output",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "jsonata-c018bbf7",
+      "type": "jsonata",
+      "configuration": {
+        "expression": "$string({ \"title\": \"title\" })",
+        "json": "{}"
+      },
+      "metadata": {
+        "visual": {
+          "x": 23,
+          "y": 165
+        },
+        "title": "Extract Rules",
+        "description": "Specifying the rules to extract content",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "jsonata-a145253b",
+      "type": "jsonata",
+      "metadata": {
+        "title": "JS Scenario",
+        "description": "Specifying JS to evaluate",
+        "logLevel": "debug",
+        "visual": {
+          "x": 17,
+          "y": 349
+        }
+      },
+      "configuration": {
+        "expression": "$string({\n    \"instructions\":[ {\"evaluate\": $ }]\n})",
+        "json": "JSON.stringify({ data: document.body.innerText, links: Array.from(document.querySelectorAll(\"a\")).map((a) => ({ href: a.href, title: a.innerText.trim() }))})"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "urlTemplate-77553e6f",
+      "to": "fetch-27da0eda",
+      "out": "url",
+      "in": "url"
+    },
+    {
+      "from": "secrets-197969de",
+      "to": "urlTemplate-77553e6f",
+      "out": "SCRAPING_BEE_KEY",
+      "in": "SCRAPING_BEE_KEY"
+    },
+    {
+      "from": "jsonata-02f9c069",
+      "to": "output",
+      "out": "result",
+      "in": "text"
+    },
+    {
+      "from": "fetch-27da0eda",
+      "to": "jsonata-02f9c069",
+      "out": "response",
+      "in": "json"
+    }
+  ]
+}

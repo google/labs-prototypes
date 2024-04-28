@@ -7,6 +7,7 @@ This is a Breadboard starter project.
 Install deps
 
 ```bash
+npm i -g vercel
 npm i
 ```
 

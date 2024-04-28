@@ -4,6 +4,7 @@
   "description": "Experimenting with teams of workers",
   "type": "module",
   "scripts": {
+    "build": "vite build",
     "dev:board": "breadboard debug src/boards --watch -o graphs",
     "dev:server": "wireit",
     "dev": "npm run dev:server --watch"
@@ -24,7 +25,8 @@
   "devDependencies": {
     "tsx": "^4.7.2",
     "typescript": "^5.4.5",
-    "vite": "^5.2.9"
+    "vite": "^5.2.9",
+    "vite-plugin-vercel": "^6.0.1"
   },
   "dependencies": {
     "@google-labs/agent-kit": "^0.5.0",

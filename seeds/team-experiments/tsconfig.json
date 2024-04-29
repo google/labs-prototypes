@@ -26,6 +26,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  }
 }

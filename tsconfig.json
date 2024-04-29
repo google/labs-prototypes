@@ -1,5 +1,5 @@
 {
-  "extends": "@google-labs/tsconfig/base.json",
+  "extends": "./core/tsconfig/base.json",
   "files": [],
   "references": [
     { "path": "seeds/chunker" },

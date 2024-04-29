@@ -6,10 +6,9 @@
 
 import { IncomingMessage, ServerResponse, createServer } from "http";
 import { createServer as createViteServer } from "vite";
-import { serveDir, serveIndex } from "./static.js";
+import { serveIndex } from "./static.js";
 import { serverError } from "./errors.js";
-import { api, browseApi } from "./api.js";
-import { secretsAPI } from "./apis/secrets.js";
+import { getAPIs } from "./api.js";
 
 const PORT = 3000;
 const HOST = "localhost";
@@ -20,6 +19,8 @@ const vite = await createViteServer({
   appType: "custom",
   optimizeDeps: { esbuildOptions: { target: "esnext" } },
 });
+
+const apis = await getAPIs();
 
 const serveApi = async (
   req: IncomingMessage,
@@ -38,19 +39,22 @@ const serveApi = async (
     return;
   }
 
-  if (await api(resolvedURL, res, "/api/browse", browseApi)) return;
-  if (await api(resolvedURL, res, "/api/secrets", secretsAPI)) return;
+  const pathname = resolvedURL.pathname;
+  if (pathname.startsWith("/api/")) {
+    const api = apis.get(pathname.slice(5));
+    if (api) {
+      if (await api(resolvedURL, res)) return true;
+    }
+  }
 
   next();
 };
 
 const server = createServer(async (req, res) => {
-  vite.middlewares(req, res, async () => {
-    serveApi(req, res, async () => {
-      serveDir(req, res, "graphs/bgl", "/bgl", async () => {
-        serveIndex(req, res, async (contents: string) => {
-          return await vite.transformIndexHtml("/index.html", contents);
-        });
+  serveApi(req, res, async () => {
+    vite.middlewares(req, res, async () => {
+      serveIndex(req, res, async (contents: string) => {
+        return await vite.transformIndexHtml("/index.html", contents);
       });
     });
   });

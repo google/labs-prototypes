@@ -13,9 +13,7 @@
             "title": {
               "type": "string",
               "title": "Working Title",
-              "examples": [
-                "Aurora"
-              ]
+              "examples": ["Aurora"]
             },
             "storyarc": {
               "type": "string",
@@ -74,7 +72,7 @@
       "configuration": {
         "$board": {
           "kind": "board",
-          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-critic.json"
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/book/outline-critic.json"
         },
         "bookdescription": "This book will be about breadboards and how awesome they are",
         "chaptertarget": "10",

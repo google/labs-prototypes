@@ -100,8 +100,8 @@
           },
           "configuration": {
             "tools": [
-              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/tool-get-web-page.bgl.json",
-              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/insta/tool-search.bgl.json"
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-get-web-page.bgl.json",
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-search.bgl.json"
             ]
           }
         },

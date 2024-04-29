@@ -13,9 +13,7 @@
             "title": {
               "type": "string",
               "title": "Working Title",
-              "examples": [
-                "Aurora"
-              ]
+              "examples": ["Aurora"]
             },
             "storyarc": {
               "type": "string",
@@ -28,16 +26,12 @@
             "fictiongenre": {
               "type": "string",
               "title": "Fiction Genre",
-              "examples": [
-                "space opera"
-              ]
+              "examples": ["space opera"]
             },
             "pagetarget": {
               "type": "string",
               "title": "Target Number of Pages",
-              "examples": [
-                "400"
-              ]
+              "examples": ["400"]
             }
           },
           "required": []
@@ -100,7 +94,7 @@
       "configuration": {
         "$board": {
           "kind": "board",
-          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-writer.bgl.json"
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/book/outline-writer.bgl.json"
         },
         "bookdescription": "This book will be about breadboards and how awesome they are",
         "chaptertarget": "10",
@@ -122,7 +116,7 @@
       "configuration": {
         "$board": {
           "kind": "board",
-          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-critic.json"
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/book/outline-critic.json"
         }
       }
     },
@@ -167,7 +161,7 @@
       "configuration": {
         "$board": {
           "kind": "board",
-          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/graphs/bgl/book/outline-editor.bgl.json"
+          "path": "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/book/outline-editor.bgl.json"
         }
       }
     },

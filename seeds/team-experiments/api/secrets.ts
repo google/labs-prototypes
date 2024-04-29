@@ -10,8 +10,15 @@ export const headers = {
 };
 export const streaming = true;
 
+import { config } from "dotenv";
+
 export default async function handler() {
-  return new Response(JSON.stringify({ secret: "SECRET" }), {
-    status: 200,
-  });
+  const { parsed, error } = config();
+  let result;
+  if (error) {
+    result = JSON.stringify({ error: "Could not retrieve secrets" });
+  } else {
+    result = JSON.stringify({ parsed });
+  }
+  return new Response(result, { status: 200 });
 }

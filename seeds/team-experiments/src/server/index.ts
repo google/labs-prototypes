@@ -6,7 +6,7 @@
 
 import { IncomingMessage, ServerResponse, createServer } from "http";
 import { createServer as createViteServer } from "vite";
-import { serveDir, serveIndex } from "./static.js";
+import { serveIndex } from "./static.js";
 import { serverError } from "./errors.js";
 import { api, browseApi } from "./api.js";
 import { secretsAPI } from "./apis/secrets.js";
@@ -45,12 +45,10 @@ const serveApi = async (
 };
 
 const server = createServer(async (req, res) => {
-  vite.middlewares(req, res, async () => {
-    serveApi(req, res, async () => {
-      serveDir(req, res, "graphs/bgl", "/bgl", async () => {
-        serveIndex(req, res, async (contents: string) => {
-          return await vite.transformIndexHtml("/index.html", contents);
-        });
+  serveApi(req, res, async () => {
+    vite.middlewares(req, res, async () => {
+      serveIndex(req, res, async (contents: string) => {
+        return await vite.transformIndexHtml("/index.html", contents);
       });
     });
   });

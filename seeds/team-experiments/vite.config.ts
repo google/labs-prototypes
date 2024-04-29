@@ -4,4 +4,5 @@ import vercel from "vite-plugin-vercel";
 export default defineConfig({
   plugins: [vercel()],
   optimizeDeps: { esbuildOptions: { target: "esnext" } },
+  build: { target: "esnext" },
 });

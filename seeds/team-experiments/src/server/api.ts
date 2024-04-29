@@ -15,13 +15,13 @@ type Handler = (url: URL, res: ServerResponse) => Promise<boolean>;
 
 export const fromEdgeFunction = (funcImport: unknown): Handler => {
   type EdgeFunction = {
-    default: (request: Request) => Promise<Response>;
+    GET: (request: Request) => Promise<Response>;
     headers: Record<string, string>;
   };
   const edgeFunction = funcImport as EdgeFunction;
   return async (url: URL, res: ServerResponse): Promise<boolean> => {
     const request = new Request(url);
-    const response = await edgeFunction.default(request);
+    const response = await edgeFunction.GET(request);
     res.writeHead(
       response.status,
       Object.fromEntries(response.headers.entries())

@@ -4,15 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const edge = true;
-export const headers = {
-  "Content-Type": "application/json",
-};
-export const streaming = true;
-
 import { config } from "dotenv";
 
-export default async function handler() {
+export function GET() {
   const { parsed, error } = config();
   let result;
   if (error) {
@@ -20,5 +14,10 @@ export default async function handler() {
   } else {
     result = JSON.stringify({ parsed });
   }
-  return new Response(result, { status: 200 });
+  return new Response(result, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }

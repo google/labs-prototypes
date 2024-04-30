@@ -4,29 +4,49 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { ServerResponse } from "http";
+import { IncomingMessage, ServerResponse } from "http";
 import { serverError } from "./errors";
 import { getPageContent } from "./browse";
 import { root } from "./common";
 import { resolve } from "path";
 import { readdir } from "fs/promises";
+import { VercelRequest, VercelResponse } from "@vercel/node";
 
-type Handler = (url: URL, res: ServerResponse) => Promise<boolean>;
+type Handler = (
+  url: URL,
+  req: IncomingMessage,
+  res: ServerResponse
+) => Promise<boolean>;
 
-export const fromEdgeFunction = (funcImport: unknown): Handler => {
-  type EdgeFunction = {
+export const fromVercelFunction = (funcImport: unknown): Handler => {
+  type VercelFunction = {
     GET: (request: Request) => Promise<Response>;
+    default: (
+      request: VercelRequest,
+      response: VercelResponse
+    ) => VercelResponse;
     headers: Record<string, string>;
   };
-  const edgeFunction = funcImport as EdgeFunction;
-  return async (url: URL, res: ServerResponse): Promise<boolean> => {
+  const fun = funcImport as VercelFunction;
+  return async (
+    url: URL,
+    req: IncomingMessage,
+    res: ServerResponse
+  ): Promise<boolean> => {
     const request = new Request(url);
-    const response = await edgeFunction.GET(request);
-    res.writeHead(
-      response.status,
-      Object.fromEntries(response.headers.entries())
-    );
-    res.end(await response.text());
+    if (fun.GET) {
+      const response = await fun.GET(request);
+      res.writeHead(
+        response.status,
+        Object.fromEntries(response.headers.entries())
+      );
+      res.end(await response.text());
+    } else {
+      await fun.default(
+        req as unknown as VercelRequest,
+        res as unknown as VercelResponse
+      );
+    }
     return true;
   };
 };
@@ -38,18 +58,19 @@ export const getAPIs = async () => {
   for (const name of names) {
     const funcImport = await import(resolve(path, name));
     const apiPath = name.slice(0, -3);
-    apis.set(apiPath, fromEdgeFunction(funcImport));
+    apis.set(apiPath, fromVercelFunction(funcImport));
   }
   return apis;
 };
 
 export const api = async (
   url: URL,
+  req: IncomingMessage,
   res: ServerResponse,
   endpointPath: string,
   handler: Handler
 ) => {
-  if (url.pathname === endpointPath) return handler(url, res);
+  if (url.pathname === endpointPath) return handler(url, req, res);
   return false;
 };
 

@@ -158,6 +158,9 @@ export class TeamJob extends LitElement {
           )
         ),
       ],
+      proxy: [
+        { location: "http", url: "/api/proxy", nodes: ["fetch", "secrets"] },
+      ],
     });
   }
 

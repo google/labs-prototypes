@@ -104,14 +104,6 @@ export class TeamJob extends LitElement {
         type: ItemType.PENDING,
       });
     });
-    this.#run.addEventListener("input", (e) => {
-      const { data } = e;
-      const model = data.inputArguments.schema?.properties?.model;
-      if (model) {
-        e.reply({ inputs: { model: this.#secrets.get("model") } });
-        e.preventDefault();
-      }
-    });
     this.#run.addEventListener("output", (e) => {
       const { outputs, timestamp } = e.data;
       const role = "Team Lead";
@@ -136,15 +128,6 @@ export class TeamJob extends LitElement {
         });
       }
     });
-    this.#run.addEventListener("secret", (e) => {
-      e.reply({
-        inputs: Object.fromEntries(
-          e.data.keys.map((key) => {
-            return [key, this.#secrets.get(key)];
-          })
-        ),
-      });
-    });
     this.#run.start({
       url,
       kits: [
@@ -161,6 +144,7 @@ export class TeamJob extends LitElement {
       proxy: [
         { location: "http", url: "/api/proxy", nodes: ["fetch", "secrets"] },
       ],
+      inputs: { model: this.#secrets.get("model") },
     });
   }
 

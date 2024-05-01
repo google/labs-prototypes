@@ -4,15 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { config } from "dotenv";
-
 export function GET() {
-  const { parsed, error } = config();
+  const model = process.env.model;
   let result;
-  if (error) {
+  if (!model) {
     result = JSON.stringify({ error: "Could not retrieve secrets" });
   } else {
-    result = JSON.stringify({ parsed });
+    result = JSON.stringify({ parsed: { model } });
   }
   return new Response(result, {
     status: 200,

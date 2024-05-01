@@ -5,7 +5,6 @@
  */
 
 import { LitElement, TemplateResult, css, html, nothing } from "lit";
-import * as BreadboardUI from "@google-labs/breadboard-ui";
 import { customElement, property, state } from "lit/decorators.js";
 import "./elements/elements.js";
 
@@ -17,8 +16,6 @@ import {
 } from "../events/events.js";
 import { SECTION, TeamListItem } from "../types/types.js";
 import { Router } from "../router/router.js";
-
-BreadboardUI.register();
 
 @customElement("at-main")
 export class Main extends LitElement {

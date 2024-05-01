@@ -1,0 +1,189 @@
+{
+  "title": "Bills Tool-using Chat Boot with a Prompt",
+  "description": "This chatbot uses search and get web page tools.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "id": "repeater-b5a64681",
+      "type": "repeater",
+      "metadata": {
+        "visual": {
+          "x": 54,
+          "y": -32.999999999999886
+        },
+        "title": "Chat Loop",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "worker": {
+          "kind": "board",
+          "path": "#940f7c71-f50a-4cd5-ad9b-0c9d07702ab5"
+        }
+      }
+    }
+  ],
+  "edges": [],
+  "graphs": {
+    "940f7c71-f50a-4cd5-ad9b-0c9d07702ab5": {
+      "title": "Single Turn",
+      "description": "A blank board. Use it as a starting point for your creations.",
+      "version": "0.0.1",
+      "nodes": [
+        {
+          "type": "input",
+          "id": "input",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "context": {
+                  "type": "string",
+                  "title": "Incoming Conversation Context",
+                  "examples": []
+                }
+              },
+              "required": []
+            }
+          },
+          "metadata": {
+            "visual": {
+              "x": -331,
+              "y": -206
+            }
+          }
+        },
+        {
+          "type": "output",
+          "id": "output",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "context": {
+                  "type": "string",
+                  "title": "Outgoing Context",
+                  "examples": []
+                }
+              },
+              "required": []
+            }
+          },
+          "metadata": {
+            "visual": {
+              "x": 457,
+              "y": -29
+            }
+          }
+        },
+        {
+          "id": "human-48580446",
+          "type": "human",
+          "metadata": {
+            "visual": {
+              "x": -119,
+              "y": -227
+            },
+            "title": "Ask User",
+            "logLevel": "debug"
+          }
+        },
+        {
+          "id": "toolWorker-7793ced3",
+          "type": "toolWorker",
+          "metadata": {
+            "visual": {
+              "x": 184,
+              "y": -216
+            },
+            "title": "Use a Tool",
+            "logLevel": "debug"
+          },
+          "configuration": {
+            "tools": [
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-get-web-page.bgl.json",
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-search.bgl.json"
+            ]
+          }
+        },
+        {
+          "id": "secrets-dbf8ee4c",
+          "type": "secrets",
+          "configuration": {
+            "keys": [
+              "model"
+            ]
+          },
+          "metadata": {
+            "visual": {
+              "x": -24,
+              "y": 132
+            },
+            "title": "Get Model",
+            "logLevel": "debug"
+          }
+        },
+        {
+          "id": "input-ac51f071",
+          "type": "input",
+          "metadata": {
+            "title": "Persona + Task",
+            "logLevel": "debug",
+            "visual": {
+              "x": -198,
+              "y": -9
+            }
+          },
+          "configuration": {
+            "schema": {
+              "properties": {
+                "instruction": {
+                  "type": "string",
+                  "title": "Persona + Task",
+                  "format": "multiline",
+                  "examples": [
+                    "You are a consultant for AI Teams, a service that specializes in\ncompleting common tasks for small and medium businesses. Your goal is to welcome the client, find out their business name and address, and then find out which of your three offerings they are interested in. This will allow you to search the web for pertinent information about the company to be used in later stages of the process.\n\nStart by\nintroducing yourself as AI Teams and ask for the business' name and location. DO NOT Call yourself \"Gemini\". DO not be overly verbose.  \n\nThen ask which of the three areas the client needs help with: instagram posts,\n ads creation, or writing marketing copy.\n\nOnce you know this information, you have search tools you can use to search the web and find relevant information or go to specific pages on the web and get their contents. In situations when the user just wants to have a conversation, just have a conversation."
+                  ]
+                }
+              },
+              "type": "object",
+              "required": []
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "from": "input",
+          "to": "human-48580446",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "human-48580446",
+          "to": "toolWorker-7793ced3",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "toolWorker-7793ced3",
+          "to": "output",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "secrets-dbf8ee4c",
+          "to": "toolWorker-7793ced3",
+          "out": "model",
+          "in": "model"
+        },
+        {
+          "from": "input-ac51f071",
+          "to": "toolWorker-7793ced3",
+          "out": "instruction",
+          "in": "instruction"
+        }
+      ],
+      "url": "file://fsapi~insta/chat-with-tools.bgl.json#940f7c71-f50a-4cd5-ad9b-0c9d07702ab5"
+    }
+  }
+}

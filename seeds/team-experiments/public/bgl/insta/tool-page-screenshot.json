@@ -29,6 +29,30 @@
     },
     {
       "from": "jsonata-15bf2c54",
+      "to": "superWorker-14a88d05",
+      "out": "result",
+      "in": "in"
+    },
+    {
+      "from": "superWorker-14a88d05",
+      "to": "jsonata-d676e36a",
+      "out": "out",
+      "in": "json"
+    },
+    {
+      "from": "input-2ccb0f3b",
+      "to": "jsonata-dfbb4886",
+      "out": "property-2",
+      "in": "json"
+    },
+    {
+      "from": "jsonata-dfbb4886",
+      "to": "superWorker-14a88d05",
+      "out": "result",
+      "in": "task"
+    },
+    {
+      "from": "jsonata-d676e36a",
       "to": "output-0a357b6f",
       "out": "result",
       "in": "property-1"
@@ -40,8 +64,8 @@
       "type": "output",
       "metadata": {
         "visual": {
-          "x": 575,
-          "y": -513
+          "x": 543,
+          "y": -461
         },
         "logLevel": "debug",
         "title": "Output"
@@ -50,12 +74,9 @@
         "schema": {
           "properties": {
             "property-1": {
-              "type": "object",
-              "title": "Screenshot",
+              "type": "string",
+              "title": "Analysis",
               "examples": [],
-              "behavior": [
-                "llm-content"
-              ],
               "default": "null"
             }
           },
@@ -69,8 +90,8 @@
       "type": "secrets",
       "metadata": {
         "visual": {
-          "x": -320,
-          "y": -601
+          "x": -299,
+          "y": -807
         },
         "title": "Get API Key",
         "description": "Ask for API Key",
@@ -92,8 +113,8 @@
         "title": "Format URL",
         "logLevel": "debug",
         "visual": {
-          "x": -35,
-          "y": -532
+          "x": 6,
+          "y": -813
         }
       }
     },
@@ -105,8 +126,8 @@
         "description": "Ask for Scraping Bee API Key",
         "logLevel": "debug",
         "visual": {
-          "x": -352,
-          "y": -407
+          "x": -343,
+          "y": -634
         }
       },
       "configuration": {
@@ -116,7 +137,14 @@
               "type": "string",
               "title": "url",
               "examples": [],
-              "description": "input to search for"
+              "description": "The URL of the page whose screenshot will be taken"
+            },
+            "property-2": {
+              "type": "string",
+              "title": "task",
+              "examples": [],
+              "format": "multiline",
+              "description": "Instructions on what information to get from the screenshot"
             }
           },
           "type": "object",
@@ -129,8 +157,8 @@
       "type": "fetch",
       "metadata": {
         "visual": {
-          "x": 270,
-          "y": -748
+          "x": 294,
+          "y": -821
         },
         "title": "Call Scraping Bee",
         "logLevel": "debug"
@@ -141,14 +169,66 @@
       "type": "jsonata",
       "metadata": {
         "visual": {
-          "x": 540,
-          "y": -760
+          "x": -68,
+          "y": -469
         },
         "title": "Format as LLM Content",
         "logLevel": "debug"
       },
       "configuration": {
         "expression": "{ \"parts\": [{ \"inlineData\": { \"mimeType\": \"image/png\", \"data\": screenshot }}], \"role\": \"user\" } "
+      }
+    },
+    {
+      "id": "superWorker-14a88d05",
+      "type": "superWorker",
+      "metadata": {
+        "visual": {
+          "x": -48,
+          "y": -66
+        },
+        "title": "Analyze Screenshot",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are an expert analyzer of web page screenshots."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "jsonata-dfbb4886",
+      "type": "jsonata",
+      "configuration": {
+        "expression": "{ \"parts\": [{ \"text\": $}], \"role\": \"user\" }"
+      },
+      "metadata": {
+        "visual": {
+          "x": -324,
+          "y": -129
+        },
+        "title": "Format Task",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "jsonata-d676e36a",
+      "type": "jsonata",
+      "metadata": {
+        "visual": {
+          "x": 279,
+          "y": -281
+        },
+        "title": "Format Output",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "expression": "parts[-1].text"
       }
     }
   ],

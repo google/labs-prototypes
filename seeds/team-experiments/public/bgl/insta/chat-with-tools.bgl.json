@@ -9,7 +9,7 @@
       "metadata": {
         "visual": {
           "x": 59.99999999999994,
-          "y": -1.4210854715202004e-14
+          "y": 0
         },
         "title": "Chat Loop",
         "logLevel": "debug"
@@ -102,7 +102,8 @@
             "instruction": "You are a super-helpful chat bot who uses tools to help users. With these tools, you can search the web and find relevant information or go to specific pages on the web and get their contents. In cases where the tool is not applicable, you improvise and try to answer the question anyway. In situations when the user just wants to have a conversation, just have a conversation.",
             "tools": [
               "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-get-web-page.bgl.json",
-              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-search.bgl.json"
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-search.bgl.json",
+              "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-page-screenshot.json"
             ]
           }
         },
@@ -110,7 +111,9 @@
           "id": "secrets-dbf8ee4c",
           "type": "secrets",
           "configuration": {
-            "keys": ["model"]
+            "keys": [
+              "model"
+            ]
           },
           "metadata": {
             "visual": {

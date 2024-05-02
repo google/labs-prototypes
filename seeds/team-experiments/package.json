@@ -30,12 +30,12 @@
     "wireit": "^0.14.4"
   },
   "dependencies": {
-    "@google-labs/agent-kit": "latest",
-    "@google-labs/breadboard": "latest",
-    "@google-labs/core-kit": "latest",
-    "@google-labs/gemini-kit": "latest",
-    "@google-labs/json-kit": "latest",
-    "@google-labs/template-kit": "latest",
+    "@google-labs/agent-kit": "^0.6.0",
+    "@google-labs/breadboard": "^0.19.0",
+    "@google-labs/core-kit": "^0.8.1",
+    "@google-labs/gemini-kit": "^0.3.1",
+    "@google-labs/template-kit": "^0.3.1",
+    "@google-labs/json-kit": "^0.2.2",
     "@types/markdown-it": "^14.0.1",
     "@vercel/node": "^3.0.27",
     "dotenv": "^16.4.5",

@@ -4,10 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InputResponse, OutputResponse } from "@google-labs/breadboard";
+import {
+  ErrorResponse,
+  GraphEndProbeData,
+  GraphStartProbeData,
+  InputResponse,
+  NodeStartProbeMessage,
+  OutputResponse,
+  SkipProbeMessage,
+} from "@google-labs/breadboard";
 import { RunInputEvent, RunOutputEvent, RunSecretEvent } from "./types.js";
 import { SecretResult } from "@google-labs/breadboard/harness";
-import { InputResolveRequest } from "@google-labs/breadboard/remote";
+import { End, InputResolveRequest } from "@google-labs/breadboard/remote";
 
 const opts = {
   composed: true,
@@ -50,5 +58,61 @@ export class SecretEvent extends Event implements RunSecretEvent {
     public reply: (data: InputResolveRequest) => Promise<void>
   ) {
     super(SecretEvent.eventName, { ...opts });
+  }
+}
+
+export class RunnerErrorEvent extends Event {
+  static readonly eventName = "error";
+
+  constructor(public data: ErrorResponse) {
+    super(RunnerErrorEvent.eventName, { ...opts });
+  }
+}
+
+export class EndEvent extends Event {
+  static readonly eventName = "end";
+
+  constructor(public data: End) {
+    super(EndEvent.eventName, { ...opts });
+  }
+}
+
+export class SkipEvent extends Event {
+  static readonly eventName = "skip";
+
+  constructor(public data: SkipProbeMessage["data"]) {
+    super(SkipEvent.eventName, { ...opts });
+  }
+}
+
+export class GraphStartEvent extends Event {
+  static readonly eventName = "graphstart";
+
+  constructor(public data: GraphStartProbeData) {
+    super(GraphStartEvent.eventName, { ...opts });
+  }
+}
+
+export class GraphEndEvent extends Event {
+  static readonly eventName = "graphend";
+
+  constructor(public data: GraphEndProbeData) {
+    super(GraphEndEvent.eventName, { ...opts });
+  }
+}
+
+export class NodeStartEvent extends Event {
+  static readonly eventName = "nodestart";
+
+  constructor(public data: NodeStartProbeMessage["data"]) {
+    super(NodeStartEvent.eventName, { ...opts });
+  }
+}
+
+export class NodeEndEvent extends Event {
+  static readonly eventName = "nodeend";
+
+  constructor(public data: NodeStartProbeMessage["data"]) {
+    super(NodeEndEvent.eventName, { ...opts });
   }
 }

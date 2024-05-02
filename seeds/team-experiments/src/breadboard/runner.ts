@@ -8,10 +8,17 @@ import { InputValues } from "@google-labs/breadboard";
 import { RunConfig, run } from "@google-labs/breadboard/harness";
 import { InputResolveRequest } from "@google-labs/breadboard/remote";
 import {
+  EndEvent,
+  GraphEndEvent,
+  GraphStartEvent,
   InputEvent,
+  NodeEndEvent,
+  NodeStartEvent,
   OutputEvent,
   PendingEvent,
+  RunnerErrorEvent,
   SecretEvent,
+  SkipEvent,
 } from "./events.js";
 import { RunEventTarget } from "./types.js";
 
@@ -59,6 +66,34 @@ export class Runner extends (EventTarget as RunEventTarget) implements Runner {
             this.#pendingInput = reply;
           }
           return true;
+        }
+        case "error": {
+          this.dispatchEvent(new RunnerErrorEvent(data));
+          break;
+        }
+        case "end": {
+          this.dispatchEvent(new EndEvent(data));
+          break;
+        }
+        case "skip": {
+          this.dispatchEvent(new SkipEvent(data));
+          break;
+        }
+        case "graphstart": {
+          this.dispatchEvent(new GraphStartEvent(data));
+          break;
+        }
+        case "graphend": {
+          this.dispatchEvent(new GraphEndEvent(data));
+          break;
+        }
+        case "nodestart": {
+          this.dispatchEvent(new NodeStartEvent(data));
+          break;
+        }
+        case "nodeend": {
+          this.dispatchEvent(new NodeEndEvent(data));
+          break;
         }
         case "output": {
           this.dispatchEvent(new OutputEvent(data));

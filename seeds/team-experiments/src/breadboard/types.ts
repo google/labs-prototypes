@@ -4,15 +4,31 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { InputResponse, OutputResponse } from "@google-labs/breadboard";
+import {
+  ErrorResponse,
+  GraphEndProbeData,
+  GraphStartProbeData,
+  InputResponse,
+  NodeEndProbeMessage,
+  NodeStartProbeMessage,
+  OutputResponse,
+  SkipProbeMessage,
+} from "@google-labs/breadboard";
 import { SecretResult } from "@google-labs/breadboard/harness";
-import { InputResolveRequest } from "@google-labs/breadboard/remote";
+import { End, InputResolveRequest } from "@google-labs/breadboard/remote";
 
 type RunEventMap = {
   input: RunInputEvent;
   output: RunOutputEvent;
   secret: RunSecretEvent;
   pending: RunPendingEvent;
+  error: RunErrorEvent;
+  end: RunEndEvent;
+  skip: RunSkipEvent;
+  graphstart: RunGraphStartEvent;
+  graphend: RunGraphEndEvent;
+  nodestart: RunNodeStartEvent;
+  nodeend: RunNodeEndEvent;
 };
 
 export type RunPendingEvent = Event & {
@@ -31,6 +47,34 @@ export type RunOutputEvent = Event & {
 export type RunSecretEvent = Event & {
   data: SecretResult["data"];
   reply: (data: InputResolveRequest) => Promise<void>;
+};
+
+export type RunErrorEvent = Event & {
+  data: ErrorResponse;
+};
+
+export type RunEndEvent = Event & {
+  data: End;
+};
+
+export type RunSkipEvent = Event & {
+  data: SkipProbeMessage;
+};
+
+export type RunGraphStartEvent = Event & {
+  data: GraphStartProbeData;
+};
+
+export type RunGraphEndEvent = Event & {
+  data: GraphEndProbeData;
+};
+
+export type RunNodeStartEvent = Event & {
+  data: NodeStartProbeMessage["data"];
+};
+
+export type RunNodeEndEvent = Event & {
+  data: NodeEndProbeMessage["data"];
 };
 
 export type TypedEventTarget<EventMap extends object> = {

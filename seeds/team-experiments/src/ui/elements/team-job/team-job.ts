@@ -128,6 +128,21 @@ export class TeamJob extends LitElement {
         });
       }
     });
+    this.#run.addEventListener("input", (e) => {
+      console.log("Runner INPUT", e.data);
+    });
+    this.#run.addEventListener("nodestart", (e) => {
+      console.log("Runner NODESTART", e.data);
+    });
+    this.#run.addEventListener("error", (e) => {
+      console.error("Runner ERROR", e.data);
+    });
+    this.#run.addEventListener("end", (e) => {
+      console.log("Runner END", e.data);
+    });
+    this.#run.addEventListener("skip", (e) => {
+      console.log("Runner SKIP", e.data);
+    });
     this.#run.start({
       url,
       kits: [
@@ -144,6 +159,7 @@ export class TeamJob extends LitElement {
       proxy: [
         { location: "http", url: "/api/proxy", nodes: ["fetch", "secrets"] },
       ],
+      diagnostics: true,
       inputs: { model: this.#secrets.get("model") },
     });
   }

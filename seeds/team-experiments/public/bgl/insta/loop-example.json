@@ -1,0 +1,75 @@
+{
+  "title": "Blank board",
+  "description": "A blank board. Use it as a starting point for your creations.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "id": "human-df33b091",
+      "type": "human",
+      "metadata": {
+        "visual": {
+          "x": -244,
+          "y": -77
+        },
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "worker-d7be5a87",
+      "type": "worker",
+      "metadata": {
+        "visual": {
+          "x": 1,
+          "y": 182
+        }
+      },
+      "configuration": {
+        "instruction": "You are a friendly chat bot who is happy to make up whatever it wants, just to keep the user entertained and pleased."
+      }
+    },
+    {
+      "id": "input-7251140f",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "properties": {
+            "context": {
+              "type": "object",
+              "title": "Context",
+              "examples": [],
+              "default": "[]"
+            }
+          },
+          "type": "object",
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -458,
+          "y": -76
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "human-df33b091",
+      "to": "worker-d7be5a87",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "input-7251140f",
+      "to": "human-df33b091",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "worker-d7be5a87",
+      "to": "human-df33b091",
+      "out": "context",
+      "in": "context"
+    }
+  ]
+}

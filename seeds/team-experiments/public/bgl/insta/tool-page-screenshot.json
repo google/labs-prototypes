@@ -1,6 +1,6 @@
 {
-  "title": "Take a Screenshot of a Page",
-  "description": "This tool takes a screenshot of a page and returns it as an image",
+  "title": "Page Screenshot Analyzer",
+  "description": "Takes a screenshot of a page at at a given URL, then follows the provided instruction to analyze it and returns the analysis.",
   "version": "0.0.1",
   "edges": [
     {
@@ -42,7 +42,7 @@
     {
       "from": "input-2ccb0f3b",
       "to": "jsonata-dfbb4886",
-      "out": "property-2",
+      "out": "instruction",
       "in": "json"
     },
     {
@@ -139,7 +139,7 @@
               "examples": [],
               "description": "The URL of the page whose screenshot will be taken"
             },
-            "property-2": {
+            "instruction": {
               "type": "string",
               "title": "task",
               "examples": [],

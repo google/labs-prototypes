@@ -1,0 +1,258 @@
+{
+  "title": "Take a Screenshot of a Page",
+  "description": "This tool takes a screenshot of a page and returns it as an image",
+  "version": "0.0.1",
+  "edges": [
+    {
+      "from": "secrets-454abd81",
+      "to": "urlTemplate-b8fad290",
+      "out": "SCRAPING_BEE_KEY",
+      "in": "SCRAPING_BEE_KEY"
+    },
+    {
+      "from": "input-2ccb0f3b",
+      "to": "urlTemplate-b8fad290",
+      "out": "url",
+      "in": "url"
+    },
+    {
+      "from": "urlTemplate-b8fad290",
+      "to": "fetch-52e0e27d",
+      "out": "url",
+      "in": "url"
+    },
+    {
+      "from": "fetch-52e0e27d",
+      "to": "jsonata-15bf2c54",
+      "out": "response",
+      "in": "json"
+    },
+    {
+      "from": "jsonata-15bf2c54",
+      "to": "output-0a357b6f",
+      "out": "result",
+      "in": "property-1"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "output-0a357b6f",
+      "type": "output",
+      "metadata": {
+        "visual": {
+          "x": 575,
+          "y": -513
+        },
+        "logLevel": "debug",
+        "title": "Output"
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "property-1": {
+              "type": "object",
+              "title": "Screenshot",
+              "examples": [],
+              "behavior": [
+                "llm-content"
+              ],
+              "default": "null"
+            }
+          },
+          "type": "object",
+          "required": []
+        }
+      }
+    },
+    {
+      "id": "secrets-454abd81",
+      "type": "secrets",
+      "metadata": {
+        "visual": {
+          "x": -320,
+          "y": -601
+        },
+        "title": "Get API Key",
+        "description": "Ask for API Key",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "keys": [
+          "SCRAPING_BEE_KEY"
+        ]
+      }
+    },
+    {
+      "id": "urlTemplate-b8fad290",
+      "type": "urlTemplate",
+      "configuration": {
+        "template": "https://app.scrapingbee.com/api/v1/?api_key={SCRAPING_BEE_KEY}&url={url}&screenshot=True&json_response=True"
+      },
+      "metadata": {
+        "title": "Format URL",
+        "logLevel": "debug",
+        "visual": {
+          "x": -35,
+          "y": -532
+        }
+      }
+    },
+    {
+      "id": "input-2ccb0f3b",
+      "type": "input",
+      "metadata": {
+        "title": "Ask for URL",
+        "description": "Ask for Scraping Bee API Key",
+        "logLevel": "debug",
+        "visual": {
+          "x": -352,
+          "y": -407
+        }
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "url": {
+              "type": "string",
+              "title": "url",
+              "examples": [],
+              "description": "input to search for"
+            }
+          },
+          "type": "object",
+          "required": []
+        }
+      }
+    },
+    {
+      "id": "fetch-52e0e27d",
+      "type": "fetch",
+      "metadata": {
+        "visual": {
+          "x": 270,
+          "y": -748
+        },
+        "title": "Call Scraping Bee",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "jsonata-15bf2c54",
+      "type": "jsonata",
+      "metadata": {
+        "visual": {
+          "x": 540,
+          "y": -760
+        },
+        "title": "Format as LLM Content",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "expression": "{ \"parts\": [{ \"inlineData\": { \"mimeType\": \"image/png\", \"data\": screenshot }}], \"role\": \"user\" } "
+      }
+    }
+  ],
+  "graphs": {
+    "58849527-9663-4146-9531-91c1f0c986ab": {
+      "title": "single turn",
+      "description": "A blank board. Use it as a starting point for your creations.",
+      "version": "0.0.1",
+      "nodes": [
+        {
+          "type": "output",
+          "id": "output",
+          "configuration": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "context": {
+                  "type": "string",
+                  "title": "context",
+                  "examples": []
+                }
+              },
+              "required": []
+            }
+          },
+          "metadata": {
+            "visual": {
+              "x": 568,
+              "y": -595
+            }
+          }
+        },
+        {
+          "id": "human-e8cf008d",
+          "type": "human",
+          "metadata": {
+            "visual": {
+              "x": 171,
+              "y": -649
+            }
+          },
+          "configuration": {
+            "description": "User says",
+            "title": "User"
+          }
+        },
+        {
+          "id": "worker-3fec00f6",
+          "type": "worker",
+          "metadata": {
+            "visual": {
+              "x": 361,
+              "y": -638
+            }
+          },
+          "configuration": {
+            "instruction": "Your main goal is to find out some basic information about your client. Start with the business's name, description, location, industry, website, and instagram. Ask these in three turns, name and location, description which can include industry and other details, website and instagram. Once you have this basic information, find out which of the following areas your client is interested getting started with: social media campaigns on instagram, ads, or writing marketing copy. It can also be a combination of these.\nAfter these tasks are complete, you need to return the values for each of the categories you asked about. Return a json object like the example below, but with the values learned from the conversation, leaving unanswered values as empty strings. In addition, say: \"OK, I have what I need to set up your general profile. I'll be back with you in a moment.\"\n\n{\"name\": \"FC Davis\",\n\"location\": \"Davis, CA\",\n\"description\": \"Semi-pro soccer teams, Men's UPSL and Women's WPSL\",\n\"website\": \"footballdavis.com\",\n\"instagram\": \"@footballclubdavis\",\n\"drive\": \"https://drive.google.com/drive/...\",\n\"focus_area\": \"instagram posts\"}\n"
+          }
+        },
+        {
+          "id": "input-83b41d3c",
+          "type": "input",
+          "configuration": {
+            "schema": {
+              "properties": {
+                "context": {
+                  "type": "string",
+                  "title": "Context",
+                  "examples": []
+                }
+              },
+              "required": [],
+              "type": "object"
+            }
+          },
+          "metadata": {
+            "visual": {
+              "x": -33,
+              "y": -623
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "from": "human-e8cf008d",
+          "to": "worker-3fec00f6",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "worker-3fec00f6",
+          "to": "output",
+          "out": "context",
+          "in": "context"
+        },
+        {
+          "from": "input-83b41d3c",
+          "to": "human-e8cf008d",
+          "out": "context",
+          "in": "context"
+        }
+      ],
+      "url": "idb://default/blank.json#58849527-9663-4146-9531-91c1f0c986ab"
+    }
+  }
+}

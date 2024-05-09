@@ -65,7 +65,7 @@
       "metadata": {
         "visual": {
           "x": 543,
-          "y": -461
+          "y": -461.0000000000001
         },
         "logLevel": "debug",
         "title": "Output"
@@ -91,16 +91,14 @@
       "metadata": {
         "visual": {
           "x": -299,
-          "y": -807
+          "y": -807.0000000000001
         },
         "title": "Get API Key",
         "description": "Ask for API Key",
         "logLevel": "debug"
       },
       "configuration": {
-        "keys": [
-          "SCRAPING_BEE_KEY"
-        ]
+        "keys": ["SCRAPING_BEE_KEY"]
       }
     },
     {
@@ -114,7 +112,7 @@
         "logLevel": "debug",
         "visual": {
           "x": 6,
-          "y": -813
+          "y": -813.0000000000001
         }
       }
     },
@@ -127,7 +125,7 @@
         "logLevel": "debug",
         "visual": {
           "x": -343,
-          "y": -634
+          "y": -634.0000000000001
         }
       },
       "configuration": {
@@ -138,13 +136,6 @@
               "title": "url",
               "examples": [],
               "description": "The URL of the page whose screenshot will be taken"
-            },
-            "instruction": {
-              "type": "string",
-              "title": "task",
-              "examples": [],
-              "format": "multiline",
-              "description": "Instructions on what information to get from the screenshot"
             }
           },
           "type": "object",
@@ -157,8 +148,8 @@
       "type": "fetch",
       "metadata": {
         "visual": {
-          "x": 294,
-          "y": -821
+          "x": 294.00000000000006,
+          "y": -821.0000000000001
         },
         "title": "Call Scraping Bee",
         "logLevel": "debug"
@@ -170,7 +161,7 @@
       "metadata": {
         "visual": {
           "x": -68,
-          "y": -469
+          "y": -469.00000000000006
         },
         "title": "Format as LLM Content",
         "logLevel": "debug"
@@ -184,8 +175,8 @@
       "type": "superWorker",
       "metadata": {
         "visual": {
-          "x": -48,
-          "y": -66
+          "x": -47.99999999999994,
+          "y": -65.99999999999997
         },
         "title": "Analyze Screenshot",
         "logLevel": "debug"
@@ -221,7 +212,7 @@
       "type": "jsonata",
       "metadata": {
         "visual": {
-          "x": 279,
+          "x": 279.00000000000006,
           "y": -281
         },
         "title": "Format Output",

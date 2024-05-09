@@ -1,0 +1,145 @@
+{
+  "title": "Blank board",
+  "description": "A blank board. Use it as a starting point for your creations.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "object",
+              "title": "Context",
+              "examples": [],
+              "behavior": [
+                "llm-content"
+              ],
+              "default": "{\"role\":\"user\",\"parts\":[{\"text\":\"Business name: June Care\\nWebsite: junecare.co\"}]}"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -348,
+          "y": -42
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "object",
+              "title": "text",
+              "examples": [],
+              "behavior": [
+                "llm-content"
+              ]
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 634,
+          "y": -47
+        }
+      }
+    },
+    {
+      "id": "superWorker-0ce54463",
+      "type": "superWorker",
+      "metadata": {
+        "visual": {
+          "x": -84,
+          "y": -50
+        },
+        "title": "Researcher",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are a super-helpful researcher who helps small businesses have a better online presence. With these tools, you can search the web and find relevant information, go to specific pages on the web and get their contents, and even get summaries of the screenshots of the pages. \n"
+            }
+          ]
+        },
+        "task": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Review the conversation and call the necessary tool to gather information about the business."
+            }
+          ]
+        },
+        "tools": [
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-get-web-page.bgl.json",
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-search.bgl.json",
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-page-screenshot.json"
+        ]
+      }
+    },
+    {
+      "id": "superWorker-ef2f062d",
+      "type": "superWorker",
+      "metadata": {
+        "visual": {
+          "x": 281,
+          "y": -45
+        },
+        "title": "Summarizer",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are a super-helpful researcher who helps small businesses have a better online presence. You provide a detailed summary of the information gathered so far, organized in these sections:\n\n- Overview (brief summary of the information found)\n- Product information (what is the product or service that the business provides or sells.\n- Target audience (use bullet points and detailed descriptions for each potential audience segment)\n- Use cases (how would the audience typically use this product or service)\n- Benefits (what are the benefits that this product or service offers to the target audiences)\n- Differentiating capabilities (what stands this product or service apart from others?)\n- Key messages (what is important to communicate about this business, what sets it apart from others)\n"
+            }
+          ]
+        },
+        "task": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Provide a detailed summary."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "superWorker-0ce54463",
+      "out": "text",
+      "in": "in"
+    },
+    {
+      "from": "superWorker-0ce54463",
+      "to": "superWorker-ef2f062d",
+      "out": "out",
+      "in": "in"
+    },
+    {
+      "from": "superWorker-ef2f062d",
+      "to": "output",
+      "out": "out",
+      "in": "text"
+    }
+  ]
+}

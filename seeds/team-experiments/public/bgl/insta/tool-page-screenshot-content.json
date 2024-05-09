@@ -1,6 +1,6 @@
 {
-  "title": "Page Screenshot Analyzer",
-  "description": "Takes a screenshot of a page at at a given URL, then follows the provided instruction to analyze it and returns the analysis.",
+  "title": "Page Screenshot Taker",
+  "description": "Takes a screenshot of a page at at a given URL and returns it.",
   "version": "0.0.1",
   "edges": [
     {
@@ -29,30 +29,6 @@
     },
     {
       "from": "jsonata-15bf2c54",
-      "to": "superWorker-14a88d05",
-      "out": "result",
-      "in": "in"
-    },
-    {
-      "from": "superWorker-14a88d05",
-      "to": "jsonata-d676e36a",
-      "out": "out",
-      "in": "json"
-    },
-    {
-      "from": "input-2ccb0f3b",
-      "to": "jsonata-dfbb4886",
-      "out": "instruction",
-      "in": "json"
-    },
-    {
-      "from": "jsonata-dfbb4886",
-      "to": "superWorker-14a88d05",
-      "out": "result",
-      "in": "task"
-    },
-    {
-      "from": "jsonata-d676e36a",
       "to": "output-0a357b6f",
       "out": "result",
       "in": "property-1"
@@ -64,8 +40,8 @@
       "type": "output",
       "metadata": {
         "visual": {
-          "x": 543,
-          "y": -461
+          "x": 303,
+          "y": -437
         },
         "logLevel": "debug",
         "title": "Output"
@@ -75,14 +51,15 @@
           "properties": {
             "property-1": {
               "type": "string",
-              "title": "Analysis",
+              "title": "Content",
               "examples": [],
               "default": "null"
             }
           },
           "type": "object",
           "required": []
-        }
+        },
+        "property-1": "null"
       }
     },
     {
@@ -114,7 +91,7 @@
         "logLevel": "debug",
         "visual": {
           "x": 6,
-          "y": -813
+          "y": -812.9999999999999
         }
       }
     },
@@ -127,7 +104,7 @@
         "logLevel": "debug",
         "visual": {
           "x": -343,
-          "y": -634
+          "y": -633.9999999999999
         }
       },
       "configuration": {
@@ -138,13 +115,6 @@
               "title": "url",
               "examples": [],
               "description": "The URL of the page whose screenshot will be taken"
-            },
-            "instruction": {
-              "type": "string",
-              "title": "task",
-              "examples": [],
-              "format": "multiline",
-              "description": "Instructions on what information to get from the screenshot"
             }
           },
           "type": "object",
@@ -170,65 +140,13 @@
       "metadata": {
         "visual": {
           "x": -68,
-          "y": -469
+          "y": -468.99999999999994
         },
         "title": "Format as LLM Content",
         "logLevel": "debug"
       },
       "configuration": {
-        "expression": "{ \"parts\": [{ \"inlineData\": { \"mimeType\": \"image/png\", \"data\": screenshot }}], \"role\": \"user\" } "
-      }
-    },
-    {
-      "id": "superWorker-14a88d05",
-      "type": "superWorker",
-      "metadata": {
-        "visual": {
-          "x": -48,
-          "y": -66
-        },
-        "title": "Analyze Screenshot",
-        "logLevel": "debug"
-      },
-      "configuration": {
-        "persona": {
-          "role": "user",
-          "parts": [
-            {
-              "text": "You are an expert analyzer of web page screenshots."
-            }
-          ]
-        }
-      }
-    },
-    {
-      "id": "jsonata-dfbb4886",
-      "type": "jsonata",
-      "configuration": {
-        "expression": "{ \"parts\": [{ \"text\": $}], \"role\": \"user\" }"
-      },
-      "metadata": {
-        "visual": {
-          "x": -324,
-          "y": -129
-        },
-        "title": "Format Task",
-        "logLevel": "debug"
-      }
-    },
-    {
-      "id": "jsonata-d676e36a",
-      "type": "jsonata",
-      "metadata": {
-        "visual": {
-          "x": 279,
-          "y": -281
-        },
-        "title": "Format Output",
-        "logLevel": "debug"
-      },
-      "configuration": {
-        "expression": "parts[-1].text"
+        "expression": "{ \"content\": { \"parts\": [{ \"inlineData\": { \"mimeType\": \"image/png\", \"data\": screenshot }}], \"role\": \"user\" } }"
       }
     }
   ],

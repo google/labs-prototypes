@@ -1,0 +1,178 @@
+{
+  "title": "Blank board",
+  "description": "A blank board. Use it as a starting point for your creations.",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "id": "superWorker-997913c1",
+      "type": "superWorker",
+      "metadata": {
+        "visual": {
+          "x": -66,
+          "y": -84
+        },
+        "title": "Interviewer",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are a friendly chat for who helps small businesses build better online presence. Your job is to collect the name, the location, and the website of the customer's business. You typically start conversation with a warm greeting, and then get to work.\n\nWhen you have the business name, its location, and the website, reply with a brief summary of the information you've collected in a neat bulleted list, then conclude the conversation by saying \"OK, hold on one moment while I look that up. I'll be with you in just a couple of minutes. Stand by. ##DONE##\""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "human-b009493b",
+      "type": "human",
+      "metadata": {
+        "visual": {
+          "x": 194,
+          "y": -110
+        },
+        "title": "User",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "looper-f3060a3f",
+      "type": "looper",
+      "metadata": {
+        "visual": {
+          "x": 20,
+          "y": -315
+        },
+        "title": "Chat Loop",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "task": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Chat until \"##DONE##\"."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "output-c3f84eca",
+      "type": "output",
+      "metadata": {
+        "visual": {
+          "x": 561,
+          "y": -322
+        },
+        "title": "Results",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "schema": {
+          "properties": {
+            "property-1": {
+              "type": "object",
+              "title": "Context Out",
+              "examples": [],
+              "behavior": [
+                "llm-content"
+              ]
+            }
+          },
+          "type": "object",
+          "required": []
+        }
+      }
+    },
+    {
+      "id": "input-880b671c",
+      "type": "input",
+      "configuration": {
+        "schema": {
+          "properties": {
+            "property-1": {
+              "type": "object",
+              "title": "Context",
+              "examples": [],
+              "behavior": [
+                "llm-content"
+              ]
+            }
+          },
+          "type": "object",
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -219,
+          "y": -288
+        },
+        "title": "Start",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "toolWorker-7d26ed05",
+      "type": "toolWorker",
+      "metadata": {
+        "visual": {
+          "x": 289,
+          "y": -417
+        },
+        "title": "Researcher",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "instruction": "You are a super-helpful researcher who helps small businesses have a better online presence. With these tools, you can search the web and find relevant information, go to specific pages on the web and get their contents, and even get summaries of the screenshots of the pages. \n\nReview the conversation and call the necessary tool to gather information about the business.",
+        "tools": [
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-get-web-page.bgl.json",
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-search.bgl.json",
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-page-screenshot.json"
+        ],
+        "instruction2": "Using the tool output, provide a detailed summary of the information you've gathered, organized in these sections:\n\n- Overview (brief summary of the information found)\n- Product information (what is the product or service that the business provides or sells.\n- Target audience (use bullet points and detailed descriptions for each potential audience segment)\n- Use cases (how would the audience typically use this product or service)\n- Benefits (what are the benefits that this product or service offers to the target audiences)\n- Differentiating capabilities (what stands this product or service apart from others?)\n- Key messages (what is important to communicate about this business, what sets it apart from others)\n"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "superWorker-997913c1",
+      "to": "human-b009493b",
+      "out": "out",
+      "in": "context"
+    },
+    {
+      "from": "looper-f3060a3f",
+      "to": "superWorker-997913c1",
+      "out": "loop",
+      "in": "in"
+    },
+    {
+      "from": "human-b009493b",
+      "to": "looper-f3060a3f",
+      "out": "context",
+      "in": "context"
+    },
+    {
+      "from": "input-880b671c",
+      "to": "looper-f3060a3f",
+      "out": "property-1",
+      "in": "context"
+    },
+    {
+      "from": "toolWorker-7d26ed05",
+      "to": "output-c3f84eca",
+      "out": "context",
+      "in": "property-1"
+    },
+    {
+      "from": "looper-f3060a3f",
+      "to": "toolWorker-7d26ed05",
+      "out": "done",
+      "in": "context"
+    }
+  ]
+}

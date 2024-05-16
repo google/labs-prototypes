@@ -4,21 +4,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export const edge = true;
-export const headers = {
-  "Content-Type": "application/json",
-};
-export const streaming = true;
-
-import { config } from "dotenv";
-
-export default async function handler() {
-  const { parsed, error } = config();
+export function GET() {
+  const model = process.env.model;
   let result;
-  if (error) {
+  if (!model) {
     result = JSON.stringify({ error: "Could not retrieve secrets" });
   } else {
-    result = JSON.stringify({ parsed });
+    result = JSON.stringify({ parsed: { model } });
   }
-  return new Response(result, { status: 200 });
+  return new Response(result, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }

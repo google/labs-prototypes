@@ -43,7 +43,11 @@ const serveApi = async (
   if (pathname.startsWith("/api/")) {
     const api = apis.get(pathname.slice(5));
     if (api) {
-      if (await api(resolvedURL, res)) return true;
+      try {
+        if (await api(resolvedURL, req, res)) return true;
+      } catch (e) {
+        console.error("API ERROR", pathname, e);
+      }
     }
   }
 

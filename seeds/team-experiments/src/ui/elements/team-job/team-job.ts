@@ -104,14 +104,6 @@ export class TeamJob extends LitElement {
         type: ItemType.PENDING,
       });
     });
-    this.#run.addEventListener("input", (e) => {
-      const { data } = e;
-      const model = data.inputArguments.schema?.properties?.model;
-      if (model) {
-        e.reply({ inputs: { model: this.#secrets.get("model") } });
-        e.preventDefault();
-      }
-    });
     this.#run.addEventListener("output", (e) => {
       const { outputs, timestamp } = e.data;
       const role = "Team Lead";
@@ -136,14 +128,20 @@ export class TeamJob extends LitElement {
         });
       }
     });
-    this.#run.addEventListener("secret", (e) => {
-      e.reply({
-        inputs: Object.fromEntries(
-          e.data.keys.map((key) => {
-            return [key, this.#secrets.get(key)];
-          })
-        ),
-      });
+    this.#run.addEventListener("input", (e) => {
+      console.log("Runner INPUT", e.data);
+    });
+    this.#run.addEventListener("nodestart", (e) => {
+      console.log("Runner NODESTART", e.data);
+    });
+    this.#run.addEventListener("error", (e) => {
+      console.error("Runner ERROR", e.data);
+    });
+    this.#run.addEventListener("end", (e) => {
+      console.log("Runner END", e.data);
+    });
+    this.#run.addEventListener("skip", (e) => {
+      console.log("Runner SKIP", e.data);
     });
     this.#run.start({
       url,
@@ -158,6 +156,11 @@ export class TeamJob extends LitElement {
           )
         ),
       ],
+      proxy: [
+        { location: "http", url: "/api/proxy", nodes: ["fetch", "secrets"] },
+      ],
+      diagnostics: true,
+      inputs: { model: this.#secrets.get("model") },
     });
   }
 

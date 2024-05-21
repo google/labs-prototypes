@@ -1,0 +1,379 @@
+{
+  "title": "generate-post-from-business-name-location",
+  "description": "Chat about a business: get the name, location, and details and description of the website",
+  "version": "0.0.1",
+  "nodes": [
+    {
+      "type": "input",
+      "id": "input",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "object",
+              "title": "text",
+              "examples": [],
+              "behavior": [
+                "llm-content"
+              ],
+              "description": "Add a description of a business as well as the visuals on the its main website",
+              "default": "{\"role\":\"user\",\"parts\":[{\"text\":\"Start dialog\"}]}"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": -230,
+          "y": -82
+        }
+      }
+    },
+    {
+      "type": "output",
+      "id": "output",
+      "configuration": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "title": "text",
+              "examples": []
+            },
+            "property-2": {
+              "type": "object",
+              "title": "image",
+              "examples": [],
+              "behavior": [
+                "llm-content"
+              ],
+              "format": "image-file",
+              "default": "null"
+            }
+          },
+          "required": []
+        }
+      },
+      "metadata": {
+        "visual": {
+          "x": 1113,
+          "y": 588
+        }
+      }
+    },
+    {
+      "id": "specialist-1b71b8b7",
+      "type": "specialist",
+      "metadata": {
+        "visual": {
+          "x": -13,
+          "y": -85
+        },
+        "title": "onboarder",
+        "description": "get the business name and location",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are a consultant for AI Teams, a service that specializes in\ncompleting common tasks for small and medium businesses.\nStart by introducing yourself as AI Teams. DO NOT Call yourself\n\"Gemini\". Never break character. \nThen, ask for two things:\n(1) the business name \n(2) the business location (city and state) which you should ask in one sentence\nWhen the user has answered all three (1-2), your output should be the following:\n\"Thanks! Hold on one moment while I take a closer look at your business ##DONE##\""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "looper-03c40c9b",
+      "type": "looper",
+      "metadata": {
+        "visual": {
+          "x": -13,
+          "y": 49
+        },
+        "title": "onboarder",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "task": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Chat until ##DONE##"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "human-a7ffc3c9",
+      "type": "human",
+      "metadata": {
+        "visual": {
+          "x": -12,
+          "y": 204
+        },
+        "title": "onboarder",
+        "logLevel": "debug"
+      }
+    },
+    {
+      "id": "specialist-26f51da7",
+      "type": "specialist",
+      "metadata": {
+        "title": "Summarize screenshot details ",
+        "description": "Summarize details of screenshot ",
+        "logLevel": "debug",
+        "visual": {
+          "x": 9,
+          "y": 851
+        }
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Describe the visuals you captured from the screenshot including stylistic themes in the photos or images as well as the content you identified. You will remember these when you generate more material later."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "specialist-a4ba7efc",
+      "type": "specialist",
+      "metadata": {
+        "title": "take a screenshot of business website",
+        "description": "take a screenshot of business website",
+        "logLevel": "debug",
+        "visual": {
+          "x": 6,
+          "y": 727
+        }
+      },
+      "configuration": {
+        "tools": [
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-page-screenshot.json"
+        ],
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are a helpful screenshot taker who uses the business website url found in the context to take a screenshot of the business's main website. Use the url that looks like the business's main website and take a screenshot."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "specialist-cfdfc773",
+      "type": "specialist",
+      "metadata": {
+        "title": "search web for business facts",
+        "description": "search web for business links etc.",
+        "logLevel": "debug",
+        "visual": {
+          "x": -415,
+          "y": 651
+        }
+      },
+      "configuration": {
+        "tools": [
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-get-web-page.bgl.json",
+          "https://raw.githubusercontent.com/google/labs-prototypes/main/seeds/team-experiments/public/bgl/insta/tool-search.bgl.json"
+        ],
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are a helpful researcher who uses the search tools with the name and location of a business. With these tools, you can search the web and find relevant information or go to specific pages on the web and get their contents.\n\nUsing business name and location being discussed call the search tools to gather information about that business. Make sure to respond with the web site url so the next worker can use it to take a screenshot."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "specialist-b1c9a5d3",
+      "type": "specialist",
+      "metadata": {
+        "title": "Image description creator",
+        "logLevel": "debug",
+        "visual": {
+          "x": 416,
+          "y": 838
+        }
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Study the caption and the business summary. Then write a description of an image that should accompany the caption in this instagram post. DO not ask for more details. Just create the description based on what you have read."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "specialist-6ad7d8ff",
+      "type": "specialist",
+      "metadata": {
+        "title": "Image creator",
+        "logLevel": "debug",
+        "visual": {
+          "x": 750,
+          "y": 838
+        }
+      },
+      "configuration": {
+        "tools": [
+          "file://fsapi~breadboards/tool-imagegen-dalle.json"
+        ],
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Your job is to use the imagegen tool to create an image based on the image description you were given. DO not ask questions, just create one."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "specialist-1edddf49",
+      "type": "specialist",
+      "metadata": {
+        "title": "Caption creator",
+        "logLevel": "debug",
+        "visual": {
+          "x": 423,
+          "y": 708
+        }
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "You are an expert social media post creator. Use the summary of the business, its industry to write one, and only one, instagram post caption for a post for the business. It should include the text, the hashtags and any emojis. Do not ask any questions about the caption. Just write it based on the context you have. Your output should look like this, with the description filled in. \nCaption: <description>"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "specialist-784a443e",
+      "type": "specialist",
+      "metadata": {
+        "visual": {
+          "x": 6,
+          "y": 529
+        },
+        "title": "summarize search results",
+        "description": "condenses search results into one paragraph summary",
+        "logLevel": "debug"
+      },
+      "configuration": {
+        "persona": {
+          "role": "user",
+          "parts": [
+            {
+              "text": "Using the json results, write a short one-paragraph summary of this business and its unique characteristics. Don't be gratuitously positive. Instead, offer a matter-of-fact description based on the data."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "specialist-1b71b8b7",
+      "out": "text",
+      "in": "in"
+    },
+    {
+      "from": "specialist-1b71b8b7",
+      "to": "looper-03c40c9b",
+      "out": "out",
+      "in": "context"
+    },
+    {
+      "from": "looper-03c40c9b",
+      "to": "human-a7ffc3c9",
+      "out": "loop",
+      "in": "context"
+    },
+    {
+      "from": "human-a7ffc3c9",
+      "to": "specialist-1b71b8b7",
+      "out": "context",
+      "in": "in"
+    },
+    {
+      "from": "specialist-a4ba7efc",
+      "to": "specialist-26f51da7",
+      "in": "in",
+      "out": "out"
+    },
+    {
+      "from": "looper-03c40c9b",
+      "to": "specialist-cfdfc773",
+      "out": "done",
+      "in": "in"
+    },
+    {
+      "from": "specialist-1edddf49",
+      "to": "output",
+      "in": "text",
+      "out": "out"
+    },
+    {
+      "from": "specialist-6ad7d8ff",
+      "to": "output",
+      "in": "property-2",
+      "out": "out"
+    },
+    {
+      "from": "specialist-cfdfc773",
+      "to": "specialist-784a443e",
+      "out": "out",
+      "in": "in"
+    },
+    {
+      "from": "specialist-cfdfc773",
+      "to": "specialist-a4ba7efc",
+      "out": "out",
+      "in": "in"
+    },
+    {
+      "from": "specialist-784a443e",
+      "to": "specialist-1edddf49",
+      "out": "out",
+      "in": "in"
+    },
+    {
+      "from": "specialist-26f51da7",
+      "to": "specialist-b1c9a5d3",
+      "out": "out",
+      "in": "in"
+    },
+    {
+      "from": "specialist-b1c9a5d3",
+      "to": "specialist-6ad7d8ff",
+      "out": "out",
+      "in": "in"
+    },
+    {
+      "from": "specialist-1edddf49",
+      "to": "specialist-b1c9a5d3",
+      "out": "out",
+      "in": "in"
+    }
+  ]
+}

@@ -17,6 +17,9 @@ import bs4
 # Text within these html tags will be excluded from passages by default.
 _DEFAULT_HTML_TAGS_TO_EXCLUDE = frozenset({"noscript", "script", "style"})
 
+# Text within these html classes will be excluded from passages by default.
+_DEFAULT_HTML_CLASSES_TO_EXCLUDE = frozenset({})
+
 # Html tags that indicate a section break. Sibling nodes will not be
 # greedily-aggregated into a chunk across one of these tags.
 _SECTION_BREAK_HTML_TAGS = frozenset({
@@ -56,6 +59,8 @@ class HtmlChunker:
     html_tags_to_exclude: Text within any of the tags in this set will not be
       included in the output passages. Defaults to {"noscript", "script",
       "style"}.
+    html_classes_to_exclude: Text within any of the classes in this set will not be
+      included in the output passages.
   """
 
   def __init__(
@@ -63,12 +68,14 @@ class HtmlChunker:
       max_words_per_aggregate_passage: int,
       greedily_aggregate_sibling_nodes: bool,
       html_tags_to_exclude: frozenset[str] = _DEFAULT_HTML_TAGS_TO_EXCLUDE,
+      html_classes_to_exclude: frozenset[str] = _DEFAULT_HTML_CLASSES_TO_EXCLUDE,
   ) -> None:
     self.max_words_per_aggregate_passage = max_words_per_aggregate_passage
     self.greedily_aggregate_sibling_nodes = greedily_aggregate_sibling_nodes
     self.html_tags_to_exclude = {
         tag.strip().lower() for tag in html_tags_to_exclude
     }
+    self.html_classes_to_exclude = {class_.strip().lower() for class_ in html_classes_to_exclude}
 
   class PassageList:
     """A list of text passages."""
@@ -134,7 +141,13 @@ class HtmlChunker:
     current_node = self.AggregateNode()
     if node.name:
       current_node.html_tag = node.name
-    if node.name in self.html_tags_to_exclude or isinstance(node, bs4.Comment):
+    if (node.name in self.html_tags_to_exclude 
+      or isinstance(node, bs4.Comment)
+      or (
+          not isinstance(node, bs4.NavigableString)
+          and any(cls in self.html_classes_to_exclude for cls in node.get("class", []))
+        )
+      ):
       # Exclude text within these tags.
       return current_node
 

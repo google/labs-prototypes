@@ -60,8 +60,7 @@ class HtmlChunker:
       included in the output passages. Defaults to {"noscript", "script",
       "style"}.
     html_classes_to_exclude: Text within any of the classes in this set will not be
-      included in the output passages. Defaults to {"noscript", "script",
-      "style"}.
+      included in the output passages.
   """
 
   def __init__(

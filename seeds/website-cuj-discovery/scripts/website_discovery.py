@@ -8,19 +8,24 @@ from google.genai.types import Content, Part
 import os
 from dotenv import load_dotenv
 from website_navigation import execute_function_calls, get_function_responses
+import mlflow
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
+# Set up tracing
+mlflow.gemini.autolog()
+mlflow.set_tracking_uri("http://localhost:5000")
 
 # Constants for screen dimensions
 SCREEN_WIDTH = 1440
 SCREEN_HEIGHT = 900
 
-USER_PROMPT = """Explore https://labs.google/ and create a report for interesting website CUJs to look into for a SWE interested in science and arts.
+USER_PROMPT = """Explore http://bankofamerica.com/ and create a report for interesting website CUJs to look into for a new BoA customer who is interested in checkings account, credit cards, and investment accounts.
 Try to answer the following questions:
-1. What are the typical UI interaction trajectories to fetch these contents?
-2. Is there any repetitive pattern in the UI interaction trajectory? If so, you can just write down the pattern and skip the repetitive parts.
-3. How many of these UI trajectories might a new user need to go through to get to the contents?
+1. What tasks might such users want to accomplish in this website?
+2. What are the typical UI interaction trajectories for such customer?
+3. Is there any repetitive pattern in the UI interaction trajectory? If so, you can just write down the pattern and skip the repetitive parts.
+4. How many of these UI trajectories might a new user need to go through to complete their tasks?
 """
 
 # USER_PROMPT = "Go to ai.google.dev/gemini-api/docs and search for pricing. Generate a report of the pricing."
@@ -32,7 +37,6 @@ playwright = sync_playwright().start()
 browser = playwright.chromium.launch(headless=False)
 context = browser.new_context(viewport={"width": SCREEN_WIDTH, "height": SCREEN_HEIGHT})
 page = context.new_page()
-# page.goto("https://www.google.com") # Use await
 
 
 def navigate_page(page):
@@ -98,7 +102,7 @@ def navigate_page(page):
       )
 
 
-page.goto("https://labs.google/") 
+page.goto("http://bankofamerica.com/")
 
 def main():
     try:

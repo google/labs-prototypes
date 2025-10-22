@@ -1,2 +1,9 @@
+# python
 /venv
 __pycache__
+
+# sqlite
+*.db
+
+# mlflow
+mlartifacts

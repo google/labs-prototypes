@@ -51,9 +51,6 @@ def execute_function_calls(candidate, page, screen_width, screen_height):
                 actual_y = denormalize_y(args["y"], screen_height)
                 text = args["text"]
                 press_enter = args.get("press_enter", False)
-
-                page.mouse.hover(actual_x, actual_y)
-                time.sleep(0.5)
                 page.mouse.click(actual_x, actual_y)
                 # Simple clear (Command+A, Backspace for Mac)
                 page.keyboard.press("Meta+A")
